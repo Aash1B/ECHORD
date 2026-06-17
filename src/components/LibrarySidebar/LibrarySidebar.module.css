@@ -52,8 +52,8 @@
 
 .tooltip {
   position: absolute;
-  bottom: calc(100% + 10px);
-  left: 50%;
+  top: calc(100% + 10px);
+  left: 0;
   z-index: 2;
   padding: 8px 12px;
   border-radius: 4px;
@@ -63,7 +63,7 @@
   font-weight: 700;
   opacity: 0;
   pointer-events: none;
-  transform: translateX(-50%);
+  transform: translateY(-4px);
   transition: opacity 160ms ease;
   visibility: hidden;
   white-space: nowrap;
@@ -71,6 +71,7 @@
 
 .libraryTitle:hover .tooltip {
   opacity: 1;
+  transform: translateY(0);
   visibility: visible;
 }
 
