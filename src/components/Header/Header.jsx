@@ -80,6 +80,11 @@ export function Header() {
                 <div className={styles.checkIcon}>
                   <Check size={60} strokeWidth={2.5} />
                 </div>
+                <h4 className={styles.updateTitle}>You're all caught up</h4>
+                <p className={styles.updateText}>
+                  Watch this space for news on your followers,
+                  playlists, events and more.
+                </p>
               </div>
             </div>
           )}

@@ -1,0 +1,241 @@
+.mainContent {
+  padding: 20px;
+  background: #121212;
+  color: white;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.categoryButtons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.categoryButtons button {
+  background: #2a2a2a;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 160ms ease;
+  font-weight: 600;
+}
+
+.categoryButtons button:hover {
+  background: #3a3a3a;
+}
+
+.quickPicks {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+.pickCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #242424;
+  border-radius: 6px;
+  overflow: hidden;
+  padding: 8px;
+  cursor: pointer;
+  transition: background 160ms ease;
+}
+
+.pickCard:hover {
+  background: #2a2a2a;
+}
+
+.pickCard img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.pickCard span {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 30px 0 15px;
+}
+
+.sectionHeader h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.sectionHeader span {
+  color: #b3b3b3;
+  cursor: pointer;
+  font-size: 13px;
+  transition: color 160ms ease;
+}
+
+.sectionHeader span:hover {
+  color: white;
+}
+
+.cardsRow {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  margin-bottom: 40px;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+
+.cardsRow::-webkit-scrollbar {
+  display: none;
+}
+
+.musicCard {
+  min-width: 160px;
+  background: #282828;
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  transition: background 160ms ease, transform 160ms ease;
+  flex-shrink: 0;
+}
+
+.musicCard:hover {
+  background: #3a3a3a;
+  transform: translateY(-4px);
+}
+
+.musicCard img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.musicCard h3 {
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  line-height: 1.3;
+}
+
+.musicCard p {
+  font-size: 11px;
+  color: #b3b3b3;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.cardsContainer {
+  position: relative;
+  margin-bottom: 40px;
+}
+
+.spotifyArrow {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  border: none;
+  border-radius: 50%;
+  background: #2a2a2a;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 160ms ease;
+  z-index: 100;
+}
+
+.spotifyArrow:hover {
+  background: #3a3a3a;
+}
+
+.spotifyArrowLeft {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  border: none;
+  border-radius: 50%;
+  background: #2a2a2a;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 160ms ease;
+  z-index: 100;
+}
+
+.spotifyArrowLeft:hover {
+  background: #3a3a3a;
+}
+
+.mixesArrow {
+  right: 10px;
+}
+
+.mixesArrowLeft {
+  left: 10px;
+}
+
+.featuredArrow {
+  right: 10px;
+}
+
+.featuredArrowLeft {
+  left: 10px;
+}
+
+@media (max-width: 900px) {
+  .quickPicks {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .musicCard {
+    min-width: 150px;
+  }
+
+  .musicCard img {
+    height: 120px;
+  }
+}
+
+@media (max-width: 600px) {
+  .mainContent {
+    padding: 12px;
+  }
+
+  .quickPicks {
+    grid-template-columns: 1fr;
+  }
+
+  .pickCard {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .cardsRow {
+    gap: 15px;
+  }
+
+  .musicCard {
+    min-width: 140px;
+  }
+}
