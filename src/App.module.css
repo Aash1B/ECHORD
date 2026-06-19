@@ -16,14 +16,20 @@
   background: #000;
 }
 
-.mainPlaceholder {
+/*.mainPlaceholder {
   min-width: 0;
-  min-height: 0;   /* Shubh */
-  overflow: hidden; /* shubh */
+  min-height: 0;   
+  overflow: hidden;  
   border-radius: 8px;
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.055), transparent 34%),
     #121212;
+}shubh */
+.mainPlaceholder {
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .mainPlaceholder {
