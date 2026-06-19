@@ -12,7 +12,7 @@ import {
 import { useState } from 'react';
 import styles from './Header.module.css';
 
-export function Header() {
+export function Header({ onHomeClick }) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   return (
@@ -27,7 +27,12 @@ export function Header() {
       </div>
 
       <div className={styles.center}>
-        <button className={styles.homeButton} type="button" aria-label="Home">
+        <button
+  className={styles.homeButton}
+  type="button"
+  aria-label="Home"
+  onClick={onHomeClick}
+>
           <Home size={26} fill="currentColor" strokeWidth={2.1} />
         </button>
 

@@ -5,12 +5,15 @@ import { RightSidebar } from './components/RightSidebar/RightSidebar.jsx';
 import { MainPage } from './components/MainPage';
 import styles from './App.module.css';
 import { useState } from "react";
+import { PlaylistView } from "./components/PlaylistView/PlaylistView";
 
 function App() {
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   return (
     <div className={styles.appFrame}>
-      <Header />
+     <Header
+  onHomeClick={() => setSelectedPlaylist(null)}
+/>
       <div className={styles.appShell}>
         <LibrarySidebar
   onPlaylistSelect={setSelectedPlaylist}
@@ -20,7 +23,11 @@ function App() {
   className={styles.mainPlaceholder}
   aria-label="Main content"
 >
-  <MainPage />
+  {selectedPlaylist ? (
+    <PlaylistView playlist={selectedPlaylist} />
+  ) : (
+    <MainPage />
+  )}
 </main>
         <RightSidebar />
       </div>
