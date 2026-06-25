@@ -13,18 +13,24 @@ const s3 = new S3Client({
 
 async function getSignedStreamUrl(key) {
 
+    console.log("========== B2 DEBUG ==========");
+    console.log("Bucket :", process.env.B2_BUCKET);
+    console.log("Endpoint :", process.env.B2_ENDPOINT);
+    console.log("Region :", process.env.B2_REGION);
+    console.log("Key :", key);
+
     const command = new GetObjectCommand({
         Bucket: process.env.B2_BUCKET,
         Key: key,
     });
 
-    const url = await getSignedUrl(
-        s3,
-        command,
-        {
-            expiresIn: 3600, // 1 hour
-        }
-    );
+    const url = await getSignedUrl(s3, command, {
+        expiresIn: 3600,
+    });
+
+    console.log("Generated URL:");
+    console.log(url);
+    console.log("==============================");
 
     return url;
 }

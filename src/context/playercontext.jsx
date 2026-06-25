@@ -66,6 +66,7 @@ export function PlayerProvider({ children }) {
 
             const streamUrl = await getSongStream(song.id);
 
+console.log("STREAM URL:", streamUrl);
             audioRef.current.src = streamUrl;
 
             await audioRef.current.play();

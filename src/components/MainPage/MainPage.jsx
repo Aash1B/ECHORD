@@ -6,13 +6,13 @@ import { getSongs } from "../../services/api";
 import { usePlayer } from "../../context/PlayerContext";
 
 
-// const QUICK_PICKS = [
-//   { id: 1, img: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBw0NDQ0NDQ0NDQ0NDQ0NDQ0HDQ8NDQ0NFREWFiARExYYHSggGCYxGxUVITchJSkrMDouFyAzODcsOSgtLisBCgoKDQ0NFQ8PFSsdFR0rLTcrLysrLSsrLSsrNzAtLCstNysrLisxKzcrLS0tKystLS0tLTAtKystKy0rN//AABEIAOEA4QMBIgACEQEDEQH/xAAbAAEBAAIDAQAAAAAAAAAAAAACAAEDBQYHBP/EADQQAQEAAgADBAgEBgMBAAAAAAEAAgMEESEFMVPRBhJBUVJhkpMTcYGRBxQiMrHBQ1ShQv/EABsBAAMBAQEBAQAAAAAAAAAAAAECAwAEBgUH/8QAJhEBAQACAQMDBAMBAAAAAAAAAAECAxEEUpExMlESEyFBYWKhBf/aAAwDAQACEQMRAD8A85NePw4/sSNWPw4/STCQX6jdWvtnh0cQTTj8OP0kjTh8OP0kwmEl1a+2eG/AGjD4MfpJGjD4MPpLYEgp3Xr7Z4DgDRh8GH0kjh9fh4fSWwJhJdevtngGs4fX4eH04yOG1+Hh9GNtCQSXXh2zwDWcNr8PD6MZHC6vD1/Rj5W0JhTuvDtngGo4XV4ev6MfKRwurwtf0Y+VuCQSXDDtnhmo4TV4Wv6MfKZwurwtf0Y+VuCQSXDDtnhmo4TV4Wv6MfKZwGjwNP2sPK2hMKdww7YDScHp8LV9vHymcHp8LV9vHytwTCS4YfEBoOC0+Dq+3j5TOC0+Dq+3h5W8JBJcMPiA0HA6fB1fbw8pnA6PB0/aw8reEwp3DD4B85wOjwdP2sPKZwGjwNP2sPK3hMJLjj8A+c4DR4Gn7WHlM7P4fwNP2sPK+gJhJccfgHzHZ/D+Bp+1h5Tx7O4f/AK+j7WHlfQFsxOtO44/AcvL/AMHD4MfpLM6vk8QTCYUEwv0O11IJhQSCnaCCYUEwv0O11IJhQSCnaCCYUEgt2ggmFBMKdoIJhQTCS0GAmFkJBTtBBMKCYSWsgkFBMKdoIJhQTCnaCCYUEgktBBMKCYU7QQTCgmEloIJhQTCnaCCYUEwktBBMKCYU7QQTCgmEloIJhQTCnaCCYUEwktBBMKCYU7QQTCgmFO1kE8TrQTxOsloPKKqzfOM+0JhQTC95a6UEwoJBTtBBMKCYU7QQTCgmEloIJBQTCnaCCYT4fRnsyMNeGWeeXdjqxcsn9C7HwnoP2lsPWdevVz9nE7Qy/bHnyufb1GvX78pAdcCQXY+J9CO0dRzNeG33/yuwX9suXP9LgtunPXk4Z45YZHfjsHHI/Rkw369nsylAAmE9GrLPIwwxyzye7HWKv6XP8ACehvaGw9Z14ah7v5nYD+xzT9ZNm7DD3ZcM4AJhc/xHoZ2hrOZhr2cvZw+wX9suVwu3RnrycNmGWGZ347BEp47tefty5KATCgmEbQQTCwEwp2sgmFBMJLQqCYWAmFO0qC2YlgJ4nUp2s8kqzVwnckEwoJBe5tdCCYUEwp2ggmFBIJLQQTCgmFO0EF9vZXZ+zit+vRqOeex5c3uxDq5Py5Xyheifwu4A9TiOKT+pzNGD7sQMnl+5+1x9Z1H2dVynr+gdn7A7B0cDrMNWI7EPxN2Yevsf8AR8rlQqzeTyyyztyyvNoMcri+2+weH43D1duPLM/s26wNmP6+0+VytWxyuN5xvFZxXYfYOjgcOWs9bN/v27A/Ey/X2HyuVqrZZXK85Xmsrje2ex9PGYOO3E9Y5+psxP68H5Pt/K5KrY243merPIO0OA2cNuz07D+', label: 'Liked Songs' },
-//   { id: 2, img: 'https://picsum.photos/60?2', label: 'Arijit Singh' },
-//   { id: 3, img: 'https://picsum.photos/60?3', label: 'Desi Boyz' },
-//   { id: 4, img: 'https://picsum.photos/60?4', label: 'Cigarettes After Sex' },
-//   { id: 5, img: 'https://picsum.photos/60?5', label: 'The Weeknd' },
-// ];
+const QUICK_PICKS = [
+  { id: 1, img: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBw0NDQ0NDQ0NDQ0NDQ0NDQ0HDQ8NDQ0NFREWFiARExYYHSggGCYxGxUVITchJSkrMDouFyAzODcsOSgtLisBCgoKDQ0NFQ8PFSsdFR0rLTcrLysrLSsrLSsrNzAtLCstNysrLisxKzcrLS0tKystLS0tLTAtKystKy0rN//AABEIAOEA4QMBIgACEQEDEQH/xAAbAAEBAAIDAQAAAAAAAAAAAAACAAEDBQYHBP/EADQQAQEAAgADBAgEBgMBAAAAAAEAAgMEESEFMVPRBhJBUVJhkpMTcYGRBxQiMrHBQ1ShQv/EABsBAAMBAQEBAQAAAAAAAAAAAAECAwAEBgUH/8QAJhEBAQACAQMDBAMBAAAAAAAAAAECAxEEUpExMlESEyFBYWKhBf/aAAwDAQACEQMRAD8A85NePw4/sSNWPw4/STCQX6jdWvtnh0cQTTj8OP0kjTh8OP0kwmEl1a+2eG/AGjD4MfpJGjD4MPpLYEgp3Xr7Z4DgDRh8GH0kjh9fh4fSWwJhJdevtngGs4fX4eH04yOG1+Hh9GNtCQSXXh2zwDWcNr8PD6MZHC6vD1/Rj5W0JhTuvDtngGo4XV4ev6MfKRwurwtf0Y+VuCQSXDDtnhmo4TV4Wv6MfKZwurwtf0Y+VuCQSXDDtnhmo4TV4Wv6MfKZwGjwNP2sPK2hMKdww7YDScHp8LV9vHymcHp8LV9vHytwTCS4YfEBoOC0+Dq+3j5TOC0+Dq+3h5W8JBJcMPiA0HA6fB1fbw8pnA6PB0/aw8reEwp3DD4B85wOjwdP2sPKZwGjwNP2sPK3hMJLjj8A+c4DR4Gn7WHlM7P4fwNP2sPK+gJhJccfgHzHZ/D+Bp+1h5Tx7O4f/AK+j7WHlfQFsxOtO44/AcvL/AMHD4MfpLM6vk8QTCYUEwv0O11IJhQSCnaCCYUEwv0O11IJhQSCnaCCYUEgt2ggmFBMKdoIJhQTCS0GAmFkJBTtBBMKCYSWsgkFBMKdoIJhQTCnaCCYUEgktBBMKCYU7QQTCgmEloIJhQTCnaCCYUEwktBBMKCYU7QQTCgmEloIJhQTCnaCCYUEwktBBMKCYU7QQTCgmFO1kE8TrQTxOsloPKKqzfOM+0JhQTC95a6UEwoJBTtBBMKCYU7QQTCgmEloIJBQTCnaCCYT4fRnsyMNeGWeeXdjqxcsn9C7HwnoP2lsPWdevVz9nE7Qy/bHnyufb1GvX78pAdcCQXY+J9CO0dRzNeG33/yuwX9suXP9LgtunPXk4Z45YZHfjsHHI/Rkw369nsylAAmE9GrLPIwwxyzye7HWKv6XP8ACehvaGw9Z14ah7v5nYD+xzT9ZNm7DD3ZcM4AJhc/xHoZ2hrOZhr2cvZw+wX9suVwu3RnrycNmGWGZ347BEp47tefty5KATCgmEbQQTCwEwp2sgmFBMJLQqCYWAmFO0qC2YlgJ4nUp2s8kqzVwnckEwoJBe5tdCCYUEwp2ggmFBIJLQQTCgmFO0EF9vZXZ+zit+vRqOeex5c3uxDq5Py5Xyheifwu4A9TiOKT+pzNGD7sQMnl+5+1x9Z1H2dVynr+gdn7A7B0cDrMNWI7EPxN2Yevsf8AR8rlQqzeTyyyztyyvNoMcri+2+weH43D1duPLM/s26wNmP6+0+VytWxyuN5xvFZxXYfYOjgcOWs9bN/v27A/Ey/X2HyuVqrZZXK85Xmsrje2ex9PGYOO3E9Y5+psxP68H5Pt/K5KrY243merPIO0OA2cNuz07D+', label: 'Liked Songs' },
+  { id: 2, img: 'https://picsum.photos/60?2', label: 'Arijit Singh' },
+  { id: 3, img: 'https://picsum.photos/60?3', label: 'Desi Boyz' },
+  { id: 4, img: 'https://picsum.photos/60?4', label: 'Cigarettes After Sex' },
+  { id: 5, img: 'https://picsum.photos/60?5', label: 'The Weeknd' },
+];
 
 // const POPULAR_CARDS = [
 //   { id: 1, img: 'https://i.pinimg.com/736x/79/03/25/790325665fefa194156f1bd296b2dc08.jpg', title: 'Ramayana', artist: 'Fever Stories' },
@@ -85,10 +85,16 @@ useEffect(() => {
     }
   };
 
-  const MusicCard = ({ song }) => (
+//   
+const MusicCard = ({ song }) => (
   <div
     className={styles.musicCard}
-    onClick={() => playSong(song, songs)}
+    onClick={() => {
+      console.log("Card Clicked");
+      console.log(song);
+
+      playSong(song, songs);
+    }}
   >
     <img
       src={song.cover_url || placeholder}
