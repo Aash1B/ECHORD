@@ -236,3 +236,8 @@ SELECT COUNT(*) AS artists FROM artists;
 SELECT COUNT(*) AS albums FROM albums;
 SELECT COUNT(*) AS genres FROM genres;
 SELECT COUNT(*) AS songs FROM songs;
+
+ SELECT id, title, b2_key
+FROM songs;
+UPDATE songs
+SET b2_key = CONCAT(id, '.mp3');
