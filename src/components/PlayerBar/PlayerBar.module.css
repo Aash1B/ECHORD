@@ -194,3 +194,16 @@
     width: 100%;
   }
 }
+.pauseIcon {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
+}
+
+.pauseIcon span {
+    width: 5px;
+    height: 18px;
+    background: #000;
+    border-radius: 2px;
+}

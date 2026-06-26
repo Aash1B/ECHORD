@@ -104,19 +104,19 @@ export function PlayerBar() {
             onClick={togglePlay}
           >
             {isPlaying ? (
-              <Pause
-                size={22}
-                color="black"
-                strokeWidth={3}
-              />
-            ) : (
-              <Play
-                size={22}
-                color="black"
-                fill="black"
-                strokeWidth={2.5}
-              />
-            )}
+    <div className={styles.pauseIcon}>
+        <span></span>
+        <span></span>
+    </div>
+) : (
+    <Play
+        size={18}
+        fill="black"
+        color="black"
+        strokeWidth={2.5}
+        className={styles.playIcon}
+    />
+)}
           </button>
 
           <button
