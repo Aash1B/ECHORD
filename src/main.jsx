@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
 
 import App from "./App";
 
@@ -8,15 +9,11 @@ import "./styles/global.css";
 import { PlayerProvider } from "./context/PlayerContext";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-
-<React.StrictMode>
-
-<PlayerProvider>
-
-<App />
-
-</PlayerProvider>
-
-</React.StrictMode>
-
+  <React.StrictMode>
+    <BrowserRouter basename="/spotify-ghostt">
+      <PlayerProvider>
+        <App />
+      </PlayerProvider>
+    </BrowserRouter>
+  </React.StrictMode>
 );

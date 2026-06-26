@@ -1,3 +1,7 @@
+import { useState, useEffect } from 'react';
+import { ArrowLeft, User, Shield, Key, Bell, Monitor } from 'lucide-react';
+import './AccountPage.css';
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 function AccountPage({ user, onProfileUpdate, onBackToMain }) {

@@ -10,18 +10,30 @@ import {
   Check,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './Header.module.css';
 
 export function Header({ onHomeClick, user, onLogout, onAccountClick }) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <header className={styles.navbar} aria-label="Main navigation">
       <div className={styles.left}>
-        <button className={styles.iconButton} type="button" aria-label="Go back">
+        <button 
+          className={styles.iconButton} 
+          type="button" 
+          aria-label="Go back"
+          onClick={() => navigate(-1)}
+        >
           <ChevronLeft size={22} strokeWidth={2.4} />
         </button>
-        <button className={styles.iconButton} type="button" aria-label="Go forward">
+        <button 
+          className={styles.iconButton} 
+          type="button" 
+          aria-label="Go forward"
+          onClick={() => navigate(1)}
+        >
           <ChevronRight size={22} strokeWidth={2.4} />
         </button>
       </div>

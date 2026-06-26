@@ -1,5 +1,6 @@
 import styles from './App.module.css';
 import { useState } from "react";
+import { Routes, Route, Navigate, useNavigate, Outlet } from 'react-router-dom';
 import { Header } from './components/Header/Header.jsx';
 import { LibrarySidebar } from './components/LibrarySidebar/LibrarySidebar.jsx';
 import { PlayerBar } from './components/PlayerBar/PlayerBar.jsx';
@@ -20,14 +21,15 @@ function App() {
       return null;
     }
   });
-  const [showAuthScreen, setShowAuthScreen] = useState('login'); // 'login' or 'signup'
-  const [currentView, setCurrentView] = useState('main'); // 'main' or 'account'
+
+  const navigate = useNavigate();
 
   const handleLoginSuccess = (token, loggedInUser) => {
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(loggedInUser));
     setUser(loggedInUser);
     setIsAuthenticated(true);
+    navigate('/');
   };
 
   const handleLogout = async () => {
@@ -46,81 +48,115 @@ function App() {
     localStorage.removeItem('user');
     setIsAuthenticated(false);
     setUser(null);
-    setCurrentView('main');
+    navigate('/login');
   };
 
-  const path = window.location.pathname;
-  const base = import.meta.env.BASE_URL || '/';
-  const cleanBase = base.endsWith('/') ? base.slice(0, -1) : base;
-
-  // If not authenticated and we are on an auth URL path, or if we are not authenticated at all:
-  if (!isAuthenticated) {
-    if (path.includes("/auth/signup") || showAuthScreen === 'signup') {
-      return (
-        <SignUp
-          onShowLogin={() => {
-            setShowAuthScreen('login');
-            window.history.pushState({}, '', `${cleanBase}/auth`);
-          }}
-          onSignUpSuccess={() => {
-            setShowAuthScreen('login');
-            window.history.pushState({}, '', `${cleanBase}/auth`);
-          }}
-          onLoginSuccess={handleLoginSuccess}
-        />
-      );
+  // Protected Layout component that renders the full Spotify layout
+  const AppLayout = () => {
+    if (!isAuthenticated) {
+      return <Navigate to="/login" replace />;
     }
+
     return (
-      <Login
-        onShowSignUp={() => {
-          setShowAuthScreen('signup');
-          window.history.pushState({}, '', `${cleanBase}/auth/signup`);
-        }}
-        onLoginSuccess={handleLoginSuccess}
-      />
-    );
-  }
-
-  // Home Page
-  return (
-    <div className={styles.appFrame}>
-      <Header
-        onHomeClick={() => { setSelectedPlaylist(null); setCurrentView('main'); }}
-        user={user}
-        onLogout={handleLogout}
-        onAccountClick={() => setCurrentView('account')}
-      />
-
-      <div className={styles.appShell}>
-        <LibrarySidebar
-          onPlaylistSelect={(playlist) => {
-            setSelectedPlaylist(playlist);
-            setCurrentView('main');
+      <div className={styles.appFrame}>
+        <Header
+          onHomeClick={() => {
+            setSelectedPlaylist(null);
+            navigate('/');
           }}
-          selectedPlaylist={selectedPlaylist}
+          user={user}
+          onLogout={handleLogout}
+          onAccountClick={() => navigate('/profile')}
         />
-        <main
-          className={styles.mainPlaceholder}
-          aria-label="Main content"
-        >
-          {currentView === 'account' ? (
+
+        <div className={styles.appShell}>
+          <LibrarySidebar
+            onPlaylistSelect={(playlist) => {
+              setSelectedPlaylist(playlist);
+              navigate('/');
+            }}
+            selectedPlaylist={selectedPlaylist}
+          />
+          <main
+            className={styles.mainPlaceholder}
+            aria-label="Main content"
+          >
+            <Outlet />
+          </main>
+
+          <RightSidebar />
+        </div>
+
+        <PlayerBar />
+      </div>
+    );
+  };
+
+  return (
+    <Routes>
+      {/* Public/Guest Routes */}
+      <Route
+        path="/login"
+        element={
+          isAuthenticated ? (
+            <Navigate to="/" replace />
+          ) : (
+            <Login
+              onShowSignUp={() => navigate('/signup')}
+              onLoginSuccess={handleLoginSuccess}
+            />
+          )
+        }
+      />
+      <Route
+        path="/signup"
+        element={
+          isAuthenticated ? (
+            <Navigate to="/" replace />
+          ) : (
+            <SignUp
+              onShowLogin={() => navigate('/login')}
+              onSignUpSuccess={() => navigate('/login')}
+              onLoginSuccess={handleLoginSuccess}
+            />
+          )
+        }
+      />
+
+      {/* Legacy auth route compatibility */}
+      <Route path="/auth" element={<Navigate to="/login" replace />} />
+      <Route path="/auth/signup" element={<Navigate to="/signup" replace />} />
+
+      {/* Protected Routes inside the App Layout */}
+      <Route element={<AppLayout />}>
+        <Route
+          path="/"
+          element={
+            selectedPlaylist ? (
+              <PlaylistView playlist={selectedPlaylist} />
+            ) : (
+              <MainPage />
+            )
+          }
+        />
+        <Route
+          path="/profile"
+          element={
             <AccountPage
               user={user}
               onProfileUpdate={(updated) => setUser(updated)}
-              onBackToMain={() => setCurrentView('main')}
+              onBackToMain={() => {
+                setSelectedPlaylist(null);
+                navigate('/');
+              }}
             />
-          ) : selectedPlaylist ? (
-            <PlaylistView playlist={selectedPlaylist} />
-          ) : (
-            <MainPage />
-          )}
-        </main>
+          }
+        />
+      </Route>
 
-        <RightSidebar />
-      </div>
-
-      <PlayerBar />
-    </div>
+      {/* Fallback route */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
