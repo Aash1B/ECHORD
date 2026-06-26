@@ -15,6 +15,7 @@ import {
 
 import styles from "./PlayerBar.module.css";
 import { usePlayer } from "../../context/PlayerContext";
+import placeholder from "../../assets/music-placeholder.jpg";
 
 export function PlayerBar() {
   const {
@@ -60,7 +61,7 @@ export function PlayerBar() {
           className={styles.albumCover}
           src={
             currentSong.cover_url ||
-            "https://placehold.co/64x64?text=♪"
+            placeholder
           }
           alt={currentSong.title}
         />
