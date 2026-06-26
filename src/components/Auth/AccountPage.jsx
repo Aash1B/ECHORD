@@ -1,6 +1,4 @@
-import { useState, useEffect } from 'react';
-import './AccountPage.css';
-import { User, Shield, Bell, Key, Monitor, ArrowLeft } from 'lucide-react';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 function AccountPage({ user, onProfileUpdate, onBackToMain }) {
   const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'edit', 'password', 'notifications', 'sessions'
@@ -37,7 +35,7 @@ function AccountPage({ user, onProfileUpdate, onBackToMain }) {
   const fetchSessions = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:3001/api/user/sessions', {
+      const res = await fetch(`${API_URL}/user/sessions`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -59,7 +57,7 @@ function AccountPage({ user, onProfileUpdate, onBackToMain }) {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:3001/api/user/profile', {
+      const res = await fetch(`${API_URL}/user/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -94,7 +92,7 @@ function AccountPage({ user, onProfileUpdate, onBackToMain }) {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:3001/api/user/change-password', {
+      const res = await fetch(`${API_URL}/user/change-password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -127,7 +125,7 @@ function AccountPage({ user, onProfileUpdate, onBackToMain }) {
   const handleRevokeSession = async (sessionId) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:3001/api/user/sessions/${sessionId}`, {
+      const res = await fetch(`${API_URL}/user/sessions/${sessionId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

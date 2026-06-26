@@ -3,13 +3,41 @@ import './auth.css';
 import { FaSpotify } from 'react-icons/fa';
 import { SocialButtons } from './SocialButtons';
 
-function SignUp({ onShowLogin, onSignUpSuccess }) {
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+function SignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const handleGoogleSignUp = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/auth/social-login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: 'dummygoogle@example.com',
+          name: 'Dummy Google User',
+          google_id: 'g-123456',
+          profile_picture: 'https://i.pinimg.com/736x/6c/41/cb/6c41cb3ae4d97eeb68ee2279fe0e0c6f.jpg'
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Google Sign Up failed.');
+      }
+      onLoginSuccess?.(data.token, data.user);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -20,7 +48,7 @@ function SignUp({ onShowLogin, onSignUpSuccess }) {
     setError('');
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:3001/api/auth/register', {
+      const res = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -108,6 +136,7 @@ function SignUp({ onShowLogin, onSignUpSuccess }) {
             onPhoneLoginClick={() => {
               alert('Please sign up by filling out the form. Phone OTP is currently supported for login verification.');
             }}
+            onGoogleClick={handleGoogleSignUp}
           />
 
           <p className="auth-footer-text">

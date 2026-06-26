@@ -50,6 +50,8 @@ function App() {
   };
 
   const path = window.location.pathname;
+  const base = import.meta.env.BASE_URL || '/';
+  const cleanBase = base.endsWith('/') ? base.slice(0, -1) : base;
 
   // If not authenticated and we are on an auth URL path, or if we are not authenticated at all:
   if (!isAuthenticated) {
@@ -58,12 +60,13 @@ function App() {
         <SignUp
           onShowLogin={() => {
             setShowAuthScreen('login');
-            window.history.pushState({}, '', '/auth');
+            window.history.pushState({}, '', `${cleanBase}/auth`);
           }}
           onSignUpSuccess={() => {
             setShowAuthScreen('login');
-            window.history.pushState({}, '', '/auth');
+            window.history.pushState({}, '', `${cleanBase}/auth`);
           }}
+          onLoginSuccess={handleLoginSuccess}
         />
       );
     }
@@ -71,7 +74,7 @@ function App() {
       <Login
         onShowSignUp={() => {
           setShowAuthScreen('signup');
-          window.history.pushState({}, '', '/auth/signup');
+          window.history.pushState({}, '', `${cleanBase}/auth/signup`);
         }}
         onLoginSuccess={handleLoginSuccess}
       />

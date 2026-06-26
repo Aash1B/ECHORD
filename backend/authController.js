@@ -1,9 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const { createDatabase } = require('./db');
+const database = require('./db');
 const { JWT_SECRET } = require('./authMiddleware');
-
-const database = createDatabase();
 
 // Helper to read JSON request body
 function readBody(request) {
@@ -59,7 +57,8 @@ async function handleRegister(request, response) {
     }
 
     // Check if email already registered
-    const existing = database.prepare('SELECT id FROM users WHERE email = ?').get(email);
+    const [existingUsers] = await database.query('SELECT id FROM users WHERE email = ?', [email]);
+    const existing = existingUsers[0];
     if (existing) {
       return sendJson(response, 409, { error: 'Email already registered.' });
     }
@@ -68,11 +67,12 @@ async function handleRegister(request, response) {
     const passwordHash = bcrypt.hashSync(password, 10);
 
     // Save user - default is_verified to 1 for now since email verification is deferred
-    const result = database.prepare(
-      'INSERT INTO users (name, email, phone_number, password, is_verified) VALUES (?, ?, ?, ?, 1)'
-    ).run(name, email, phone_number || null, passwordHash);
+    const [result] = await database.query(
+      'INSERT INTO users (name, email, phone_number, password, is_verified) VALUES (?, ?, ?, ?, 1)',
+      [name, email, phone_number || null, passwordHash]
+    );
 
-    const userId = result.lastInsertRowid;
+    const userId = result.insertId;
 
     sendJson(response, 201, {
       message: 'User registered successfully.',
@@ -99,12 +99,14 @@ async function handleLogin(request, response) {
     }
 
     // Lookup user
-    const user = database.prepare('SELECT * FROM users WHERE email = ?').get(email);
+    const [users] = await database.query('SELECT * FROM users WHERE email = ?', [email]);
+    const user = users[0];
     if (!user) {
       // Record failed activity
-      database.prepare(
-        'INSERT INTO login_activity (user_id, ip_address, device_info, status) VALUES (NULL, ?, ?, ?)'
-      ).run(ip, device, 'failed');
+      await database.query(
+        'INSERT INTO login_activity (user_id, ip_address, device_info, status) VALUES (NULL, ?, ?, ?)',
+        [ip, device, 'failed']
+      );
       return sendJson(response, 401, { error: 'Invalid email or password.' });
     }
 
@@ -113,28 +115,31 @@ async function handleLogin(request, response) {
     // Verify password
     const match = bcrypt.compareSync(password, user.password);
     if (!match) {
-      database.prepare(
-        'INSERT INTO login_activity (user_id, ip_address, device_info, status) VALUES (?, ?, ?, ?)'
-      ).run(userIdForLog, ip, device, 'failed');
+      await database.query(
+        'INSERT INTO login_activity (user_id, ip_address, device_info, status) VALUES (?, ?, ?, ?)',
+        [userIdForLog, ip, device, 'failed']
+      );
       return sendJson(response, 401, { error: 'Invalid email or password.' });
     }
 
     // Success - Create JWT & Session
     const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     // Store session in DB
-    database.prepare(
-      'INSERT INTO sessions (user_id, token, device_info, ip_address, expires_at) VALUES (?, ?, ?, ?, ?)'
-    ).run(user.id, token, device, ip, expiresAt);
+    await database.query(
+      'INSERT INTO sessions (user_id, token, device_info, ip_address, expires_at) VALUES (?, ?, ?, ?, ?)',
+      [user.id, token, device, ip, expiresAt]
+    );
 
     // Record login activity
-    database.prepare(
-      'INSERT INTO login_activity (user_id, ip_address, device_info, status) VALUES (?, ?, ?, ?)'
-    ).run(user.id, ip, device, 'success');
+    await database.query(
+      'INSERT INTO login_activity (user_id, ip_address, device_info, status) VALUES (?, ?, ?, ?)',
+      [user.id, ip, device, 'success']
+    );
 
     // Update last login timestamp
-    database.prepare('UPDATE users SET last_login = ? WHERE id = ?').run(new Date().toISOString(), user.id);
+    await database.query('UPDATE users SET last_login = ? WHERE id = ?', [new Date(), user.id]);
 
     sendJson(response, 200, {
       message: 'Login successful.',
@@ -150,9 +155,10 @@ async function handleLogin(request, response) {
     });
   } catch (error) {
     if (userIdForLog) {
-      database.prepare(
-        'INSERT INTO login_activity (user_id, ip_address, device_info, status) VALUES (?, ?, ?, ?)'
-      ).run(userIdForLog, ip, device, 'failed');
+      await database.query(
+        'INSERT INTO login_activity (user_id, ip_address, device_info, status) VALUES (?, ?, ?, ?)',
+        [userIdForLog, ip, device, 'failed']
+      );
     }
     sendJson(response, 500, { error: error.message });
   }
@@ -168,7 +174,7 @@ async function handleLogout(request, response) {
     }
 
     // Set active session in DB to inactive
-    database.prepare('UPDATE sessions SET is_active = 0 WHERE token = ?').run(request.sessionToken);
+    await database.query('UPDATE sessions SET is_active = 0 WHERE token = ?', [request.sessionToken]);
 
     sendJson(response, 200, { message: 'Logged out successfully.' });
   } catch (error) {
@@ -193,9 +199,11 @@ async function handleSendOtp(request, response) {
     // Locate the user
     let user;
     if (email) {
-      user = database.prepare('SELECT id FROM users WHERE email = ?').get(email);
+      const [users] = await database.query('SELECT id FROM users WHERE email = ?', [email]);
+      user = users[0];
     } else {
-      user = database.prepare('SELECT id FROM users WHERE phone_number = ?').get(phone_number);
+      const [users] = await database.query('SELECT id FROM users WHERE phone_number = ?', [phone_number]);
+      user = users[0];
     }
 
     if (!user) {
@@ -204,16 +212,16 @@ async function handleSendOtp(request, response) {
 
     // Generate dummy OTP (constant or standard sequence for local validation)
     const dummyOtp = '123456';
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 minutes expiry
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes expiry
 
     // Mark previous OTPs of this purpose for this user as used
-    database.prepare('UPDATE otp_verifications SET is_used = 1 WHERE user_id = ? AND purpose = ?')
-      .run(user.id, otpPurpose);
+    await database.query('UPDATE otp_verifications SET is_used = 1 WHERE user_id = ? AND purpose = ?', [user.id, otpPurpose]);
 
     // Save in DB
-    database.prepare(
-      'INSERT INTO otp_verifications (user_id, otp_code, purpose, expires_at) VALUES (?, ?, ?, ?)'
-    ).run(user.id, dummyOtp, otpPurpose, expiresAt);
+    await database.query(
+      'INSERT INTO otp_verifications (user_id, otp_code, purpose, expires_at) VALUES (?, ?, ?, ?)',
+      [user.id, dummyOtp, otpPurpose, expiresAt]
+    );
 
     // Return the dummy OTP directly in the response so the UI can display it
     sendJson(response, 200, {
@@ -242,45 +250,52 @@ async function handleVerifyOtp(request, response) {
     // Find the user
     let user;
     if (email) {
-      user = database.prepare('SELECT id FROM users WHERE email = ?').get(email);
+      const [users] = await database.query('SELECT id FROM users WHERE email = ?', [email]);
+      user = users[0];
     } else {
-      user = database.prepare('SELECT id FROM users WHERE phone_number = ?').get(phone_number);
+      const [users] = await database.query('SELECT id FROM users WHERE phone_number = ?', [phone_number]);
+      user = users[0];
     }
 
     if (!user) {
       return sendJson(response, 404, { error: 'User not found.' });
     }
 
-    const now = new Date().toISOString();
+    const now = new Date();
     // Retrieve latest unused, non-expired OTP for this user
-    const otpRecord = database.prepare(
-      'SELECT * FROM otp_verifications WHERE user_id = ? AND otp_code = ? AND purpose = ? AND is_used = 0 AND expires_at > ?'
-    ).get(user.id, otp_code, otpPurpose, now);
+    const [otps] = await database.query(
+      'SELECT * FROM otp_verifications WHERE user_id = ? AND otp_code = ? AND purpose = ? AND is_used = 0 AND expires_at > ?',
+      [user.id, otp_code, otpPurpose, now]
+    );
+    const otpRecord = otps[0];
 
     if (!otpRecord) {
       return sendJson(response, 400, { error: 'Invalid or expired OTP.' });
     }
 
     // Mark OTP as used
-    database.prepare('UPDATE otp_verifications SET is_used = 1 WHERE id = ?').run(otpRecord.id);
+    await database.query('UPDATE otp_verifications SET is_used = 1 WHERE id = ?', [otpRecord.id]);
 
     // If verification is for login, generate JWT and create session
     if (otpPurpose === 'login') {
-      const fullUser = database.prepare('SELECT * FROM users WHERE id = ?').get(user.id);
+      const [users] = await database.query('SELECT * FROM users WHERE id = ?', [user.id]);
+      const fullUser = users[0];
       const { ip, device } = getClientMeta(request);
       
       const token = jwt.sign({ id: fullUser.id, email: fullUser.email, role: fullUser.role }, JWT_SECRET, { expiresIn: '24h' });
-      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-      database.prepare(
-        'INSERT INTO sessions (user_id, token, device_info, ip_address, expires_at) VALUES (?, ?, ?, ?, ?)'
-      ).run(fullUser.id, token, device, ip, expiresAt);
+      await database.query(
+        'INSERT INTO sessions (user_id, token, device_info, ip_address, expires_at) VALUES (?, ?, ?, ?, ?)',
+        [fullUser.id, token, device, ip, expiresAt]
+      );
 
-      database.prepare(
-        'INSERT INTO login_activity (user_id, ip_address, device_info, status) VALUES (?, ?, ?, ?)'
-      ).run(fullUser.id, ip, device, 'success');
+      await database.query(
+        'INSERT INTO login_activity (user_id, ip_address, device_info, status) VALUES (?, ?, ?, ?)',
+        [fullUser.id, ip, device, 'success']
+      );
 
-      database.prepare('UPDATE users SET last_login = ? WHERE id = ?').run(new Date().toISOString(), fullUser.id);
+      await database.query('UPDATE users SET last_login = ? WHERE id = ?', [new Date(), fullUser.id]);
 
       return sendJson(response, 200, {
         message: 'OTP verified. Login successful.',
@@ -313,12 +328,13 @@ async function handleRefreshToken(request, response) {
 
     const now = new Date();
     const token = jwt.sign({ id: request.user.id, email: request.user.email, role: request.user.role }, JWT_SECRET, { expiresIn: '24h' });
-    const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
+    const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
     // Update session table with the new token and new expiry
-    database.prepare(
-      'UPDATE sessions SET token = ?, expires_at = ? WHERE id = ?'
-    ).run(token, expiresAt, request.sessionId);
+    await database.query(
+      'UPDATE sessions SET token = ?, expires_at = ? WHERE id = ?',
+      [token, expiresAt, request.sessionId]
+    );
 
     sendJson(response, 200, {
       message: 'Token refreshed.',
@@ -356,14 +372,16 @@ async function handleUpdateProfile(request, response) {
     }
 
     // Check if new email conflicts with another user
-    const conflict = database.prepare('SELECT id FROM users WHERE email = ? AND id != ?').get(email, request.user.id);
+    const [conflicts] = await database.query('SELECT id FROM users WHERE email = ? AND id != ?', [email, request.user.id]);
+    const conflict = conflicts[0];
     if (conflict) {
       return sendJson(response, 409, { error: 'Email is already taken by another user.' });
     }
 
-    database.prepare(
-      'UPDATE users SET name = ?, email = ?, phone_number = ?, profile_picture = ?, updated_at = ? WHERE id = ?'
-    ).run(name, email, phone_number || null, profile_picture || null, new Date().toISOString(), request.user.id);
+    await database.query(
+      'UPDATE users SET name = ?, email = ?, phone_number = ?, profile_picture = ?, updated_at = ? WHERE id = ?',
+      [name, email, phone_number || null, profile_picture || null, new Date(), request.user.id]
+    );
 
     sendJson(response, 200, {
       message: 'Profile updated successfully.',
@@ -391,7 +409,8 @@ async function handleChangePassword(request, response) {
     }
 
     // Fetch user password hash
-    const user = database.prepare('SELECT password FROM users WHERE id = ?').get(request.user.id);
+    const [users] = await database.query('SELECT password FROM users WHERE id = ?', [request.user.id]);
+    const user = users[0];
 
     const match = bcrypt.compareSync(current_password, user.password);
     if (!match) {
@@ -399,8 +418,7 @@ async function handleChangePassword(request, response) {
     }
 
     const newHash = bcrypt.hashSync(new_password, 10);
-    database.prepare('UPDATE users SET password = ?, updated_at = ? WHERE id = ?')
-      .run(newHash, new Date().toISOString(), request.user.id);
+    await database.query('UPDATE users SET password = ?, updated_at = ? WHERE id = ?', [newHash, new Date(), request.user.id]);
 
     sendJson(response, 200, { message: 'Password updated successfully.' });
   } catch (error) {
@@ -418,9 +436,10 @@ async function handleGetDashboard(request, response) {
     }
 
     // Retrieve recent login activity
-    const activity = database.prepare(
-      'SELECT id, ip_address, device_info, status, created_at FROM login_activity WHERE user_id = ? ORDER BY id DESC LIMIT 10'
-    ).all(request.user.id);
+    const [activity] = await database.query(
+      'SELECT id, ip_address, device_info, status, created_at FROM login_activity WHERE user_id = ? ORDER BY id DESC LIMIT 10',
+      [request.user.id]
+    );
 
     sendJson(response, 200, {
       user: request.user,
@@ -440,9 +459,10 @@ async function handleGetSessions(request, response) {
       return sendJson(response, 401, { error: 'Unauthorized.' });
     }
 
-    const sessions = database.prepare(
-      'SELECT id, device_info, ip_address, is_active, expires_at, created_at FROM sessions WHERE user_id = ? AND is_active = 1 ORDER BY id DESC'
-    ).all(request.user.id);
+    const [sessions] = await database.query(
+      'SELECT id, device_info, ip_address, is_active, expires_at, created_at FROM sessions WHERE user_id = ? AND is_active = 1 ORDER BY id DESC',
+      [request.user.id]
+    );
 
     sendJson(response, 200, { sessions });
   } catch (error) {
@@ -465,11 +485,12 @@ async function handleRevokeSession(request, response, sessionId) {
     }
 
     // Invalidate the session (make sure it belongs to the user)
-    const result = database.prepare(
-      'UPDATE sessions SET is_active = 0 WHERE id = ? AND user_id = ?'
-    ).run(sId, request.user.id);
+    const [result] = await database.query(
+      'UPDATE sessions SET is_active = 0 WHERE id = ? AND user_id = ?',
+      [sId, request.user.id]
+    );
 
-    if (result.changes === 0) {
+    if (result.affectedRows === 0) {
       return sendJson(response, 404, { error: 'Session not found or already inactive.' });
     }
 
@@ -488,9 +509,9 @@ async function handleAdminListUsers(request, response) {
       return sendJson(response, 403, { error: 'Forbidden. Admin privileges required.' });
     }
 
-    const users = database.prepare(
+    const [users] = await database.query(
       'SELECT id, name, email, phone_number, role, is_verified, last_login, created_at FROM users ORDER BY id DESC'
-    ).all();
+    );
 
     sendJson(response, 200, { users });
   } catch (error) {
@@ -512,8 +533,8 @@ async function handleAdminDeleteUser(request, response, userId) {
       return sendJson(response, 400, { error: 'Invalid user ID.' });
     }
 
-    const result = database.prepare('DELETE FROM users WHERE id = ?').run(targetUserId);
-    if (result.changes === 0) {
+    const [result] = await database.query('DELETE FROM users WHERE id = ?', [targetUserId]);
+    if (result.affectedRows === 0) {
       return sendJson(response, 404, { error: 'User not found.' });
     }
 
@@ -544,10 +565,9 @@ async function handleAdminChangeRole(request, response, userId) {
       return sendJson(response, 400, { error: "Role must be either 'user' or 'admin'." });
     }
 
-    const result = database.prepare('UPDATE users SET role = ?, updated_at = ? WHERE id = ?')
-      .run(role, new Date().toISOString(), targetUserId);
+    const [result] = await database.query('UPDATE users SET role = ?, updated_at = ? WHERE id = ?', [role, new Date(), targetUserId]);
 
-    if (result.changes === 0) {
+    if (result.affectedRows === 0) {
       return sendJson(response, 404, { error: 'User not found.' });
     }
 
@@ -567,16 +587,19 @@ async function handleResetPassword(request, response) {
     }
 
     // Find user
-    const user = database.prepare('SELECT id FROM users WHERE email = ?').get(email);
+    const [users] = await database.query('SELECT id FROM users WHERE email = ?', [email]);
+    const user = users[0];
     if (!user) {
       return sendJson(response, 404, { error: 'User not found.' });
     }
 
-    const now = new Date().toISOString();
+    const now = new Date();
     // Retrieve latest unused, non-expired OTP for this user for purpose 'reset'
-    const otpRecord = database.prepare(
-      "SELECT * FROM otp_verifications WHERE user_id = ? AND otp_code = ? AND purpose = 'reset' AND is_used = 0 AND expires_at > ?"
-    ).get(user.id, otp_code, now);
+    const [otps] = await database.query(
+      "SELECT * FROM otp_verifications WHERE user_id = ? AND otp_code = ? AND purpose = 'reset' AND is_used = 0 AND expires_at > ?",
+      [user.id, otp_code, now]
+    );
+    const otpRecord = otps[0];
 
     if (!otpRecord) {
       return sendJson(response, 400, { error: 'Invalid or expired reset OTP.' });
@@ -584,12 +607,93 @@ async function handleResetPassword(request, response) {
 
     // Hash and update password, then mark OTP as used
     const newHash = bcrypt.hashSync(new_password, 10);
-    database.prepare('UPDATE otp_verifications SET is_used = 1 WHERE id = ?').run(otpRecord.id);
-    database.prepare('UPDATE users SET password = ?, updated_at = ? WHERE id = ?')
-      .run(newHash, new Date().toISOString(), user.id);
+    await database.query('UPDATE otp_verifications SET is_used = 1 WHERE id = ?', [otpRecord.id]);
+    await database.query('UPDATE users SET password = ?, updated_at = ? WHERE id = ?', [newHash, new Date(), user.id]);
 
     sendJson(response, 200, { message: 'Password reset successfully. You can now log in with your new password.' });
   } catch (error) {
+    sendJson(response, 500, { error: error.message });
+  }
+}
+
+/**
+ * POST /api/auth/social-login
+ */
+async function handleSocialLogin(request, response) {
+  let userIdForLog = null;
+  const { ip, device } = getClientMeta(request);
+
+  try {
+    const body = await readBody(request);
+    const { email, name, google_id, profile_picture } = body;
+
+    if (!email || !google_id) {
+      return sendJson(response, 400, { error: 'Email and google_id are required.' });
+    }
+
+    // Check if user already exists
+    let [users] = await database.query('SELECT * FROM users WHERE google_id = ? OR email = ?', [google_id, email]);
+    let user = users[0];
+
+    if (!user) {
+      // Create user
+      const [result] = await database.query(
+        'INSERT INTO users (name, email, is_google_user, google_id, profile_picture, is_verified) VALUES (?, ?, 1, ?, ?, 1)',
+        [name || 'Google User', email, google_id, profile_picture || null]
+      );
+      const userId = result.insertId;
+      const [newUsers] = await database.query('SELECT * FROM users WHERE id = ?', [userId]);
+      user = newUsers[0];
+    } else {
+      // User exists, but make sure the google_id is linked if it wasn't
+      if (!user.google_id) {
+        await database.query('UPDATE users SET is_google_user = 1, google_id = ?, profile_picture = COALESCE(profile_picture, ?) WHERE id = ?', [google_id, profile_picture || null, user.id]);
+        user.is_google_user = 1;
+        user.google_id = google_id;
+        if (profile_picture && !user.profile_picture) user.profile_picture = profile_picture;
+      }
+    }
+
+    userIdForLog = user.id;
+
+    // Success - Create JWT & Session
+    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    // Store session in DB
+    await database.query(
+      'INSERT INTO sessions (user_id, token, device_info, ip_address, expires_at) VALUES (?, ?, ?, ?, ?)',
+      [user.id, token, device, ip, expiresAt]
+    );
+
+    // Record login activity
+    await database.query(
+      'INSERT INTO login_activity (user_id, ip_address, device_info, status) VALUES (?, ?, ?, ?)',
+      [user.id, ip, device, 'success']
+    );
+
+    // Update last login timestamp
+    await database.query('UPDATE users SET last_login = ? WHERE id = ?', [new Date(), user.id]);
+
+    sendJson(response, 200, {
+      message: 'Login successful.',
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone_number: user.phone_number,
+        role: user.role,
+        profile_picture: user.profile_picture
+      }
+    });
+  } catch (error) {
+    if (userIdForLog) {
+      await database.query(
+        'INSERT INTO login_activity (user_id, ip_address, device_info, status) VALUES (?, ?, ?, ?)',
+        [userIdForLog, ip, device, 'failed']
+      );
+    }
     sendJson(response, 500, { error: error.message });
   }
 }
@@ -611,5 +715,6 @@ module.exports = {
   handleRevokeSession,
   handleAdminListUsers,
   handleAdminDeleteUser,
-  handleAdminChangeRole
+  handleAdminChangeRole,
+  handleSocialLogin
 };

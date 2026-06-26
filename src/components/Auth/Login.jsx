@@ -3,6 +3,8 @@ import './auth.css';
 import { FaSpotify } from 'react-icons/fa';
 import { SocialButtons } from './SocialButtons';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 function Login({ onShowSignUp, onLoginSuccess }) {
   const [loginMethod, setLoginMethod] = useState('email'); // 'email', 'phone', 'otp', 'forgot_email', 'forgot_reset'
   const [email, setEmail] = useState('');
@@ -14,6 +16,32 @@ function Login({ onShowSignUp, onLoginSuccess }) {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const handleGoogleLogin = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/auth/social-login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: 'dummygoogle@example.com',
+          name: 'Dummy Google User',
+          google_id: 'g-123456',
+          profile_picture: 'https://i.pinimg.com/736x/6c/41/cb/6c41cb3ae4d97eeb68ee2279fe0e0c6f.jpg'
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Google Login failed.');
+      }
+      onLoginSuccess?.(data.token, data.user);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleEmailLogin = async (e) => {
     e.preventDefault();
     if (!email || !password) {
@@ -23,7 +51,7 @@ function Login({ onShowSignUp, onLoginSuccess }) {
     setError('');
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:3001/api/auth/login', {
+      const res = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -49,7 +77,7 @@ function Login({ onShowSignUp, onLoginSuccess }) {
     setError('');
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:3001/api/auth/send-otp', {
+      const res = await fetch(`${API_URL}/auth/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone_number: phone, purpose: 'login' }),
@@ -77,7 +105,7 @@ function Login({ onShowSignUp, onLoginSuccess }) {
     setError('');
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:3001/api/auth/verify-otp', {
+      const res = await fetch(`${API_URL}/auth/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone_number: phone, otp_code: otp, purpose: 'login' }),
@@ -103,7 +131,7 @@ function Login({ onShowSignUp, onLoginSuccess }) {
     setError('');
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:3001/api/auth/send-otp', {
+      const res = await fetch(`${API_URL}/auth/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, purpose: 'reset' }),
@@ -133,7 +161,7 @@ function Login({ onShowSignUp, onLoginSuccess }) {
     setError('');
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:3001/api/auth/reset-password', {
+      const res = await fetch(`${API_URL}/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp_code: otp, new_password: password }),
@@ -416,6 +444,7 @@ function Login({ onShowSignUp, onLoginSuccess }) {
                   setError('');
                   setMessage('');
                 }}
+                onGoogleClick={handleGoogleLogin}
               />
             </>
           )}

@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
-const { createDatabase } = require('./db');
+const pool = require('./db');
 
-const database = createDatabase();
 const JWT_SECRET = process.env.JWT_SECRET || 'meowsick-secret-key-123';
 
 /**
@@ -24,10 +23,12 @@ async function authenticateRequest(request) {
     const decoded = jwt.verify(token, JWT_SECRET);
 
     // Verify session in the database is active and has not expired
-    const now = new Date().toISOString();
-    const session = database
-      .prepare('SELECT * FROM sessions WHERE token = ? AND is_active = 1 AND expires_at > ?')
-      .get(token, now);
+    const now = new Date();
+    const [sessions] = await pool.query(
+      'SELECT * FROM sessions WHERE token = ? AND is_active = 1 AND expires_at > ?',
+      [token, now]
+    );
+    const session = sessions[0];
 
     if (!session) {
       const error = new Error('Unauthorized: Session has expired or is inactive.');
@@ -36,9 +37,11 @@ async function authenticateRequest(request) {
     }
 
     // Retrieve user profile details (excluding password)
-    const user = database
-      .prepare('SELECT id, name, email, phone_number, role, profile_picture FROM users WHERE id = ?')
-      .get(session.user_id);
+    const [users] = await pool.query(
+      'SELECT id, name, email, phone_number, role, profile_picture FROM users WHERE id = ?',
+      [session.user_id]
+    );
+    const user = users[0];
 
     if (!user) {
       const error = new Error('Unauthorized: User not found.');
