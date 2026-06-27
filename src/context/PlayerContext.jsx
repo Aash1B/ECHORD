@@ -26,14 +26,19 @@ export function PlayerProvider({ children }) {
 
     const [volume, setVolumeState] = useState(0.20);
 
+    // Keep mutable refs of state to avoid stale closure issues in event listeners
+    const queueRef = useRef([]);
+    const currentSongRef = useRef(null);
+
     useEffect(() => {
 
         const audio = audioRef.current;
-        audio.volume = volume; // Start song at 30% volume
+        audio.volume = volume; // Start song at saved volume
 
         audio.ontimeupdate = () => {
 
             setCurrentTime(audio.currentTime);
+            localStorage.setItem('playback_time', audio.currentTime.toString());
 
         };
 
@@ -49,6 +54,53 @@ export function PlayerProvider({ children }) {
 
         };
 
+        // Restore song, queue, and playback time from localStorage
+        const restorePlayback = async () => {
+            try {
+                const savedSongStr = localStorage.getItem('last_song');
+                const savedQueueStr = localStorage.getItem('last_queue');
+                const savedTimeStr = localStorage.getItem('playback_time');
+
+                if (savedSongStr) {
+                    const savedSong = JSON.parse(savedSongStr);
+                    setCurrentSong(savedSong);
+                    currentSongRef.current = savedSong;
+
+                    if (savedQueueStr) {
+                        const savedQueue = JSON.parse(savedQueueStr);
+                        setQueue(savedQueue);
+                        queueRef.current = savedQueue;
+                    }
+
+                    // Get stream URL and load it
+                    const streamUrl = await getSongStream(savedSong.id);
+                    audio.src = streamUrl;
+                    audio.volume = volume;
+
+                    if (savedTimeStr) {
+                        const savedTime = parseFloat(savedTimeStr);
+                        if (!isNaN(savedTime)) {
+                            audio.currentTime = savedTime;
+                            setCurrentTime(savedTime);
+                        }
+                    }
+
+                    // Attempt autoplay on restore
+                    try {
+                        await audio.play();
+                        setIsPlaying(true);
+                    } catch (playError) {
+                        console.warn("Autoplay blocked by browser. Song loaded in paused state.", playError);
+                        setIsPlaying(false);
+                    }
+                }
+            } catch (err) {
+                console.error("Error restoring playback:", err);
+            }
+        };
+
+        restorePlayback();
+
     }, []);
 
     const playSong = async (song, playlist = []) => {
@@ -56,10 +108,9 @@ export function PlayerProvider({ children }) {
         try {
 
             if (playlist.length > 0) {
-
-             if (playlist.length > 0) {
-          setQueue(playlist);
-}
+                setQueue(playlist);
+                queueRef.current = playlist;
+                localStorage.setItem('last_queue', JSON.stringify(playlist));
             }
 
             const streamUrl = await getSongStream(song.id);
@@ -70,11 +121,15 @@ export function PlayerProvider({ children }) {
 
             await audioRef.current.play();
 
-            // Locally increment play count for immediate feedback
-            setCurrentSong({
+            const updatedSong = {
                 ...song,
                 play_count: (song.play_count || 0) + 1
-            });
+            };
+
+            // Locally increment play count for immediate feedback
+            setCurrentSong(updatedSong);
+            currentSongRef.current = updatedSong;
+            localStorage.setItem('last_song', JSON.stringify(updatedSong));
 
             setIsPlaying(true);
 
@@ -105,38 +160,47 @@ export function PlayerProvider({ children }) {
         }
 
     };
-   const nextSong = () => {
 
-    console.log("========== NEXT ==========");
-    console.log("Queue:", queue);
-    console.log("Current Song:", currentSong);
+    const nextSong = () => {
 
-    const index = queue.findIndex(
-        song => song.id === currentSong.id
-    );
+        const q = queueRef.current;
+        const curr = currentSongRef.current;
 
-    console.log("Index:", index);
+        console.log("========== NEXT ==========");
+        console.log("Queue:", q);
+        console.log("Current Song:", curr);
 
-    if (index === -1) return;
+        if (!curr) return;
 
-    if (index === queue.length - 1) return;
+        const index = q.findIndex(
+            song => song.id === curr.id
+        );
 
-    playSong(queue[index + 1], queue);
-};
+        console.log("Index:", index);
+
+        if (index === -1) return;
+
+        if (index === q.length - 1) return;
+
+        playSong(q[index + 1], q);
+    };
 
     const previousSong = () => {
 
-    if (!currentSong || queue.length === 0) return;
+        const q = queueRef.current;
+        const curr = currentSongRef.current;
 
-    const index = queue.findIndex(
-        song => song.id === currentSong.id
-    );
+        if (!curr || q.length === 0) return;
 
-    if (index <= 0) return;
+        const index = q.findIndex(
+            song => song.id === curr.id
+        );
 
-    playSong(queue[index - 1], queue);
+        if (index <= 0) return;
 
-};
+        playSong(q[index - 1], q);
+
+    };
 
     const seek = (value) => {
 
@@ -159,23 +223,31 @@ export function PlayerProvider({ children }) {
             const res = await toggleLikeSong(currentSong.id);
             setCurrentSong(prev => {
                 if (!prev) return null;
-                return {
+                const updated = {
                     ...prev,
                     is_liked: res.liked ? 1 : 0,
                     like_count: res.liked ? (prev.like_count || 0) + 1 : Math.max(0, (prev.like_count || 0) - 1)
                 };
+                currentSongRef.current = updated;
+                localStorage.setItem('last_song', JSON.stringify(updated));
+                return updated;
             });
             // Update in queue
-            setQueue(prevQueue => prevQueue.map(s => {
-                if (s.id === currentSong.id) {
-                    return {
-                        ...s,
-                        is_liked: res.liked ? 1 : 0,
-                        like_count: res.liked ? (s.like_count || 0) + 1 : Math.max(0, (s.like_count || 0) - 1)
-                    };
-                }
-                return s;
-            }));
+            setQueue(prevQueue => {
+                const updatedQueue = prevQueue.map(s => {
+                    if (s.id === currentSongRef.current?.id) {
+                        return {
+                            ...s,
+                            is_liked: res.liked ? 1 : 0,
+                            like_count: res.liked ? (s.like_count || 0) + 1 : Math.max(0, (s.like_count || 0) - 1)
+                        };
+                    }
+                    return s;
+                });
+                queueRef.current = updatedQueue;
+                localStorage.setItem('last_queue', JSON.stringify(updatedQueue));
+                return updatedQueue;
+            });
         } catch (err) {
             console.error("Failed to toggle like:", err);
             alert(err.message || "Please log in to like songs!");

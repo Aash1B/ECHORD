@@ -185,6 +185,27 @@ async function streamSong(req, res) {
             [id]
         );
 
+        // Try to decode optional token to record history
+        let userId = null;
+        const authHeader = req.headers['authorization'];
+        if (authHeader && authHeader.toLowerCase().startsWith('bearer ')) {
+            const token = authHeader.split(' ')[1];
+            try {
+                const decoded = jwt.verify(token, JWT_SECRET);
+                userId = decoded.id;
+            } catch (e) {
+                // Ignore token errors and treat as guest
+            }
+        }
+
+        if (userId) {
+            // Insert into history table
+            await pool.query(
+                "INSERT INTO history (user_id, song_id) VALUES (?, ?)",
+                [userId, id]
+            );
+        }
+
         const [songs] = await pool.query(
             `
             SELECT
@@ -270,9 +291,65 @@ async function toggleLikeSong(req, res) {
     }
 }
 
+async function getListeningHistory(req, res) {
+    try {
+        const userId = req.user.id;
+        const [history] = await pool.query(`
+            SELECT
+                h.id AS history_id,
+                h.played_at,
+                s.id,
+                s.title,
+                a.name AS artist,
+                a.bio AS artist_bio,
+                a.cover_url AS artist_image,
+                al.title AS album,
+                g.name AS genre,
+                s.duration,
+                s.b2_key,
+                s.cover_url,
+                s.play_count,
+                s.like_count AS like_count,
+                s.created_at,
+                EXISTS(SELECT 1 FROM likes WHERE song_id = s.id AND user_id = ?) AS is_liked
+            FROM (
+                SELECT max(id) AS max_id
+                FROM history
+                WHERE user_id = ?
+                GROUP BY song_id
+            ) latest_history
+            JOIN history h
+                ON h.id = latest_history.max_id
+            JOIN songs s
+                ON h.song_id = s.id
+            LEFT JOIN artists a
+                ON s.artist_id = a.id
+            LEFT JOIN albums al
+                ON s.album_id = al.id
+            LEFT JOIN genres g
+                ON s.genre_id = g.id
+            ORDER BY h.played_at DESC
+            LIMIT 50
+        `, [userId, userId]);
+
+        res.status(200).json({
+            success: true,
+            count: history.length,
+            songs: history,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+        });
+    }
+}
+
 module.exports = {
     getAllSongs,
     searchSongs,
     streamSong,
     toggleLikeSong,
+    getListeningHistory,
 };

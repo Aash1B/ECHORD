@@ -1,6 +1,7 @@
 import styles from './App.module.css';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate, Outlet } from 'react-router-dom';
+import { searchSongs } from "./services/api";
 import { Header } from './components/Header/Header.jsx';
 import { LibrarySidebar } from './components/LibrarySidebar/LibrarySidebar.jsx';
 import { PlayerBar } from './components/PlayerBar/PlayerBar.jsx';
@@ -10,6 +11,7 @@ import { PlaylistView } from "./components/PlaylistView/PlaylistView";
 import Login from './components/Auth/Login.jsx';
 import SignUp from './components/Auth/SignUp.jsx';
 import AccountPage from './components/Auth/AccountPage.jsx';
+import { HistoryView } from './components/HistoryView/HistoryView.jsx';
 
 function ProtectedLayout({
   isAuthenticated,
@@ -133,6 +135,9 @@ function App() {
     }
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('last_song');
+    localStorage.removeItem('last_queue');
+    localStorage.removeItem('playback_time');
     setIsAuthenticated(false);
     setUser(null);
     navigate('/login');
@@ -253,6 +258,17 @@ function App() {
             <AccountPage
               user={user}
               onProfileUpdate={(updated) => setUser(updated)}
+              onBackToMain={() => {
+                setSelectedPlaylist(null);
+                navigate('/');
+              }}
+            />
+          }
+        />
+        <Route
+          path="/history"
+          element={
+            <HistoryView
               onBackToMain={() => {
                 setSelectedPlaylist(null);
                 navigate('/');
