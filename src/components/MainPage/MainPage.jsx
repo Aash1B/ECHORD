@@ -9,7 +9,7 @@ import { usePlayer } from "../../context/playercontext";
 const QUICK_PICKS = [
   { id: 1, img: 'https://i1.sndcdn.com/artworks-y6qitUuZoS6y8LQo-5s2pPA-t500x500.jpg', label: 'Liked Songs' },
   { id: 2, img: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=60&h=60&fit=crop', label: 'Arijit Singh' },
-  { id: 3, img: 'https://images.unsplash.com/photo-1511379938547-c1f69b13d835?w=60&h=60&fit=crop', label: 'Desi Boyz' },
+  { id: 3, img: 'https://upload.wikimedia.org/wikipedia/en/f/f5/11nov_desiboyz-poster01.jpg', label: 'Desi Boyz' },
   { id: 4, img: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=60&h=60&fit=crop', label: 'Cigarettes After Sex' },
   { id: 5, img: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=60&h=60&fit=crop', label: 'The Weeknd' },
 ];
