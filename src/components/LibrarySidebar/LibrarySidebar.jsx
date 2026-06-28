@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ListFilter, Plus, Search, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useRef } from "react";
 
 import styles from "./LibrarySidebar.module.css";
 import placeholder from "../../assets/music-placeholder.jpg";
@@ -18,6 +19,10 @@ export function LibrarySidebar({
     const navigate = useNavigate();
 
     const [showCreateModel, setShowCreateModel] = useState(false);
+    const [showSearch, setShowSearch] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const searchRef = useRef(null);
+    const [activeFilter, setActiveFilter] = useState(filters[0]);
 
     const {
         playlists,
@@ -63,6 +68,14 @@ export function LibrarySidebar({
                     <button
                         key={filter}
                         type="button"
+                        className={activeFilter === filter ? styles.filterActive : ""}
+                        onClick={() => {
+                            setActiveFilter(filter);
+                            setSearchQuery("");
+                            if (filter === "Artists") {
+                                navigate('/browse');
+                            }
+                        }}
                     >
 
                         {filter}
@@ -78,6 +91,12 @@ export function LibrarySidebar({
                 <button
                     className={styles.controlButton}
                     type="button"
+                    onClick={() => {
+                        setShowSearch(prev => !prev);
+                        setTimeout(() => {
+                            if (searchRef.current) searchRef.current.focus();
+                        }, 0);
+                    }}
                 >
 
                     <Search
@@ -86,6 +105,24 @@ export function LibrarySidebar({
                     />
 
                 </button>
+
+                {showSearch && (
+                    <div className={styles.searchContainer}>
+                        <input
+                            ref={searchRef}
+                            className={styles.searchInput}
+                            placeholder="Search playlists..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Escape") {
+                                    setShowSearch(false);
+                                    setSearchQuery("");
+                                }
+                            }}
+                        />
+                    </div>
+                )}
 
                 <button
                     className={styles.recentsButton}
@@ -106,91 +143,103 @@ export function LibrarySidebar({
 
             <div className={styles.libraryList}>
 
-                {/* Liked Songs */}
+                {activeFilter === "Playlists" ? (
 
-                <button
-                    className={`${styles.libraryItem} ${
-                        selectedPlaylist?.id === "liked-songs"
-                            ? styles.activePlaylist
-                            : ""
-                    }`}
-                    type="button"
-                    onClick={() => onPlaylistSelect({ id: "liked-songs", name: "Liked Songs" })}
-                >
+                    <>
+                        {/* Liked Songs */}
 
-                    <div
-                        style={{
-                            width: 48,
-                            height: 48,
-                            borderRadius: 6,
-                            background:
-                                "linear-gradient(135deg,#450af5,#8e8ee5,#c4efd9)",
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            color: "white",
-                        }}
-                    >
+                        <button
+                            className={`${styles.libraryItem} ${
+                                selectedPlaylist?.id === "liked-songs"
+                                    ? styles.activePlaylist
+                                    : ""
+                            }`}
+                            type="button"
+                            onClick={() => onPlaylistSelect({ id: "liked-songs", name: "Liked Songs" })}
+                        >
 
-                        <Heart
-                            size={20}
-                            fill="white"
-                        />
+                            <div
+                                style={{
+                                    width: 48,
+                                    height: 48,
+                                    borderRadius: 6,
+                                    background:
+                                        "linear-gradient(135deg,#450af5,#8e8ee5,#c4efd9)",
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    color: "white",
+                                }}
+                            >
 
+                                <Heart
+                                    size={20}
+                                    fill="white"
+                                />
+
+                            </div>
+
+                            <span className={styles.itemInfo}>
+
+                                <span className={styles.itemTitle}>
+                                    Liked Songs
+                                </span>
+
+                                <span className={styles.itemSubtitle}>
+                                    Playlist
+                                </span>
+
+                            </span>
+
+                        </button>
+
+                        {/* User Playlists */}
+
+                        {playlists
+                            .filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()))
+                            .map((playlist) => (
+
+                            <button
+                                key={playlist.id}
+                                className={`${styles.libraryItem} ${
+                                    selectedPlaylist?.id === playlist.id
+                                        ? styles.activePlaylist
+                                        : ""
+                                }`}
+                                type="button"
+                                onClick={() => onPlaylistSelect(playlist)}
+                            >
+
+                                <img
+                                    src={
+                                        playlist.cover_url ||
+                                        placeholder
+                                    }
+                                    alt=""
+                                />
+
+                                <span className={styles.itemInfo}>
+
+                                    <span className={styles.itemTitle}>
+                                        {playlist.name}
+                                    </span>
+
+                                    <span className={styles.itemSubtitle}>
+                                        Playlist • {playlist.song_count} songs
+                                    </span>
+
+                                </span>
+
+                            </button>
+
+                        ))}
+                    </>
+
+                ) : (
+                    <div className={styles.unimplementedMessage}>
+                        Search for {activeFilter} is not implemented yet.
                     </div>
-
-                    <span className={styles.itemInfo}>
-
-                        <span className={styles.itemTitle}>
-                            Liked Songs
-                        </span>
-
-                        <span className={styles.itemSubtitle}>
-                            Playlist
-                        </span>
-
-                    </span>
-
-                </button>
-
-                {/* User Playlists */}
-
-                {playlists.map((playlist) => (
-
-                    <button
-                        key={playlist.id}
-                        className={`${styles.libraryItem} ${
-                            selectedPlaylist?.id === playlist.id
-                                ? styles.activePlaylist
-                                : ""
-                        }`}
-                        type="button"
-                        onClick={() => onPlaylistSelect(playlist)}
-                    >
-
-                        <img
-                            src={
-                                playlist.cover_url ||
-                                placeholder
-                            }
-                            alt=""
-                        />
-
-                        <span className={styles.itemInfo}>
-
-                            <span className={styles.itemTitle}>
-                                {playlist.name}
-                            </span>
-
-                            <span className={styles.itemSubtitle}>
-                                Playlist • {playlist.song_count} songs
-                            </span>
-
-                        </span>
-
-                    </button>
-
-                ))}
+                )}
 
             </div>
             <CreatePlaylistModel
