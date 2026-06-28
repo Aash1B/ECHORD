@@ -20,10 +20,13 @@ console.log("DB_NAME:", process.env.DB_NAME);
 // Import Routes
 const songRoutes = require("./routes/songRoutes");
 const recommendationRoutes = require("./routes/recommendationRoutes");
+const playlistRoutes = require("./routes/playlistRoutes");
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Health Check
 app.get("/api/health", (req, res) => {
@@ -68,14 +71,38 @@ app.put("/api/admin/users/:userId/role", expressAuth, (req, res) => auth.handleA
 // Register Routes
 app.use("/api/songs", songRoutes);
 app.use("/api/recommend", recommendationRoutes);
+app.use("/api/playlists", playlistRoutes);
 
+// ==================== BROWSE GENRES & CREATORS ====================
+app.get("/api/genres", async (req, res) => {
+    try {
+        const pool = require("./db");
+        const [genres] = await pool.query("SELECT * FROM genres ORDER BY name ASC");
+        res.json({ success: true, genres });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Failed to fetch genres" });
+    }
+});
+
+app.get("/api/artists", async (req, res) => {
+    try {
+        const pool = require("./db");
+        const [artists] = await pool.query("SELECT * FROM artists ORDER BY name ASC");
+        res.json({ success: true, artists });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Failed to fetch creators" });
+    }
+});
 // Database Viewer (HTML)
 app.get("/db-viewer", async (req, res) => {
     const pool = require("./db");
     try {
         const tables = [
             'users', 'sessions', 'login_activity', 'otp_verifications',
-            'artists', 'albums', 'genres', 'songs', 'playlists', 'creators'
+            'artists', 'albums', 'genres', 'songs', 'playlists', 'playlist_songs',
+            'likes', 'history', 'creators'
         ];
         
         let html = `

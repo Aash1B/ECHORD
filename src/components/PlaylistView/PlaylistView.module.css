@@ -1,7 +1,9 @@
 .container {
   height: 100%;
+  width: 100%;
   overflow-y: auto;
   color: white;
+  background: #121212;
 }
 
 .empty {
@@ -10,18 +12,19 @@
   align-items: center;
   justify-content: center;
   color: #b3b3b3;
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .header {
   display: flex;
-  align-items: end;
+  align-items: flex-end;
   gap: 24px;
   padding: 32px;
-  min-height: 300px;
-
+  min-height: 280px;
   background: linear-gradient(
     180deg,
-    rgba(29, 185, 84, 0.25),
+    rgba(80, 80, 80, 0.4),
     rgba(18, 18, 18, 1)
   );
 }
@@ -31,6 +34,21 @@
   height: 220px;
   object-fit: cover;
   border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  flex-shrink: 0;
+}
+
+.likedSongsCover {
+  width: 220px;
+  height: 220px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #450af5, #8e8ee5, #c4efd9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  flex-shrink: 0;
 }
 
 .info {
@@ -40,30 +58,46 @@
 
 .info h1 {
   margin: 0;
-  font-size: clamp(1.8rem, 3.5vw, 3rem);
+  font-size: clamp(2rem, 4vw, 4rem);
   font-weight: 800;
-  line-height: 1;
-
+  line-height: 1.1;
+  letter-spacing: -0.02em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  padding-bottom: 8px;
 }
+
 .type {
-  margin-bottom: 12px;
-  font-size: 0.9rem;
+  margin: 0 0 8px 0;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
 }
 
 .subtitle {
-  margin-top: 12px;
+  margin: 8px 0 0 0;
   color: #b3b3b3;
+  font-size: 14px;
 }
-.container {
-  height: 100%;
-  width: 100%;
-  overflow-y: scroll;
+
+.metaInfo {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 600;
   color: white;
 }
+
+.metaInfo span {
+  color: #b3b3b3;
+  font-weight: 400;
+}
+
 .actions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
   padding: 24px 32px;
 }
 
@@ -74,24 +108,43 @@
   border-radius: 50%;
   background: #1db954;
   color: black;
-  font-size: 24px;
-  font-weight: bold;
-  cursor: pointer;
-}
-.header {
   display: flex;
-  align-items: end;
-  gap: 24px;
-  padding: 32px;
-  min-height: 300px;
-  overflow: hidden;
-
-  background: linear-gradient(
-    180deg,
-    rgba(29, 185, 84, 0.25),
-    rgba(18, 18, 18, 1)
-  );
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
+
+.playButton:hover {
+  transform: scale(1.05);
+  background-color: #1ed760;
+}
+
+.playButton:active {
+  transform: scale(0.95);
+}
+
+.shuffleButton {
+  background: none;
+  border: none;
+  color: #b3b3b3;
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shuffleButton:hover {
+  color: white;
+  transform: scale(1.06);
+}
+
+.shuffleActive {
+  color: #1db954 !important;
+}
+
 .songList {
   padding: 0 32px 32px;
 }
@@ -99,23 +152,340 @@
 .songHeader,
 .songRow {
   display: grid;
-  grid-template-columns: 50px 2fr 1.5fr 100px;
+  grid-template-columns: 50px 2.5fr 2fr 60px 100px 60px;
   align-items: center;
-  padding: 12px 0;
+  padding: 12px 16px;
 }
 
 .songHeader {
   color: #b3b3b3;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   margin-bottom: 8px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
 }
 
 .songRow {
-  border-radius: 4px;
-  padding: 12px 8px;
+  border-radius: 6px;
   transition: background 0.2s;
+  cursor: pointer;
 }
 
 .songRow:hover {
-  background: rgba(255,255,255,0.08);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.songRow:hover .songIndex {
+  color: white;
+}
+
+.songIndex {
+  color: #b3b3b3;
+  font-variant-numeric: tabular-nums;
+}
+
+.songTitleCol {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.songTitleCol img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.songTitle {
+  font-weight: 500;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.songArtist {
+  color: #b3b3b3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.likeButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #b3b3b3;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.likeButton:hover {
+  color: white;
+  transform: scale(1.08);
+}
+
+.likeButton.liked {
+  color: #1db954;
+}
+
+.songDuration {
+  color: #b3b3b3;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Add songs section styles */
+.addSongsSection {
+  margin-top: 40px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 32px;
+}
+
+.addSongsSection h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.addSongsSection p {
+  color: #b3b3b3;
+  margin: 0 0 20px;
+  font-size: 14px;
+}
+
+.addSearchBox {
+  display: flex;
+  align-items: center;
+  background: #242424;
+  border-radius: 4px;
+  padding: 8px 16px;
+  gap: 12px;
+  max-width: 400px;
+  margin-bottom: 24px;
+  border: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.addSearchBox:focus-within {
+  border-color: #535353;
+}
+
+.addSearchBox input {
+  background: none;
+  border: none;
+  color: white;
+  width: 100%;
+  font-size: 14px;
+}
+
+.addSearchBox input:focus {
+  outline: none;
+}
+
+.addResultsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.addSongRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: background 0.2s;
+}
+
+.addSongRow:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.addSongDetails {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.addSongCover {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.addSongInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.addSongTitle {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.addSongArtist {
+  font-size: 12px;
+  color: #b3b3b3;
+  margin: 2px 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.addButton {
+  background: none;
+  border: 1px solid #878787;
+  color: white;
+  padding: 6px 18px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.addButton:hover {
+  border-color: white;
+  background-color: rgba(255, 255, 255, 0.08);
+  transform: scale(1.04);
+}
+
+.addButton:active {
+  transform: scale(0.96);
+}
+
+.editableCoverContainer {
+  position: relative;
+  cursor: pointer;
+  width: 220px;
+  height: 220px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  flex-shrink: 0;
+}
+
+.editableCoverContainer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.3s;
+}
+
+.coverOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  gap: 8px;
+}
+
+.editableCoverContainer:hover .coverOverlay {
+  opacity: 1;
+}
+
+.editableCoverContainer:hover img {
+  opacity: 0.7;
+}
+
+.editableTitle {
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.editableTitle:hover {
+  color: #1db954;
+}
+
+.addSongsActionButton {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: white;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: border-color 0.2s, background-color 0.2s, transform 0.2s;
+}
+
+.addSongsActionButton:hover {
+  border-color: white;
+  background-color: rgba(255, 255, 255, 0.08);
+  transform: scale(1.04);
+}
+
+.addSongsActionButton:active {
+  transform: scale(0.96);
+}
+
+.editButton {
+  background: none;
+  border: none;
+  color: #b3b3b3;
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.editButton:hover {
+  color: white;
+  transform: scale(1.08);
+}
+
+.removeSongButton {
+  background: none;
+  border: none;
+  color: #b3b3b3;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: color 0.2s, transform 0.2s;
+  opacity: 0;
+}
+
+.songRow:hover .removeSongButton {
+  opacity: 1;
+}
+
+.removeSongButton:hover {
+  color: #e91429;
+  transform: scale(1.15);
+}
+
+.songRemoveCol {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }

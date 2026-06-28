@@ -1,77 +1,108 @@
 import { useState, useRef, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Play, Heart, ListPlus } from 'lucide-react';
 import styles from './MainPage.module.css';
 import placeholder from "../../assets/music-placeholder.jpg";
-import { getSongs } from "../../services/api";
-import { usePlayer } from "../../context/playercontext";
+import { getSongs, getListeningHistory, toggleLikeSong } from "../../services/api";
+import { usePlayer } from "../../context/PlayerContext";
+import { usePlaylists } from "../../context/playlistcontext";
+import { useNavigate } from "react-router-dom";
 
-
-const QUICK_PICKS = [
-  { id: 1, img: 'https://i1.sndcdn.com/artworks-y6qitUuZoS6y8LQo-5s2pPA-t500x500.jpg', label: 'Liked Songs' },
-  { id: 2, img: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=60&h=60&fit=crop', label: 'Arijit Singh' },
-  { id: 3, img: 'https://upload.wikimedia.org/wikipedia/en/f/f5/11nov_desiboyz-poster01.jpg', label: 'Desi Boyz' },
-  { id: 4, img: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=60&h=60&fit=crop', label: 'Cigarettes After Sex' },
-  { id: 5, img: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=60&h=60&fit=crop', label: 'The Weeknd' },
-];
-
-// const POPULAR_CARDS = [
-//   { id: 1, img: 'https://i.pinimg.com/736x/79/03/25/790325665fefa194156f1bd296b2dc08.jpg', title: 'Ramayana', artist: 'Fever Stories' },
-//   { id: 2, img: 'https://i.pinimg.com/736x/56/e7/49/56e7490ed7c4f3d48d799720ab58bae2.jpg', title: 'Mahabharat', artist: 'Pooja Patil' },
-//   { id: 3, img: 'https://picsum.photos/220?8', title: 'Munshi Premchand', artist: 'Aawaz.com' },
-// ];
-
-// const RECENT_CARDS = [
-//   { id: 1, img: 'https://i.pinimg.com/736x/fa/62/3c/fa623c2875bd9ac93a1fe6c1482b21a7.jpg', title: 'Weeknd,Lily Rose', artist: 'One of the girls' },
-//   { id: 2, img: 'https://i.pinimg.com/736x/4f/02/ec/4f02ec86a0cb37e6f64c319e9c874252.jpg', title: 'Taylor Swift', artist: 'Bejewelled' },
-//   { id: 3, img: 'https://i.pinimg.com/736x/30/d0/1d/30d01d1bee3ba3657873a6d12a5878ce.jpg', title: 'Michael Jackson', artist: 'Earth Song' },
-//   { id: 4, img: 'https://i.pinimg.com/736x/44/d1/2d/44d12d66b8c91296e4786dab30bf30bf.jpg', title: 'Alphaville', artist: 'Big in Japan' },
-//   { id: 5, img: 'https://i.pinimg.com/736x/fa/62/3c/fa623c2875bd9ac93a1fe6c1482b21a7.jpg', title: 'Weeknd,Lily Rose', artist: 'One of the girls' },
-//   { id: 6, img: 'https://i.pinimg.com/736x/4f/02/ec/4f02ec86a0cb37e6f64c319e9c874252.jpg', title: 'Taylor Swift', artist: 'Bejewelled' },
-//   { id: 7, img: 'https://i.pinimg.com/736x/30/d0/1d/30d01d1bee3ba3657873a6d12a5878ce.jpg', title: 'Michael Jackson', artist: 'Earth Song' },
-// ];
-
-// const MIXES_CARDS = [
-//   { id: 1, img: 'https://i.pinimg.com/736x/fa/62/3c/fa623c2875bd9ac93a1fe6c1482b21a7.jpg', title: 'Weeknd,Lily Rose', artist: 'One of the girls' },
-//   { id: 2, img: 'https://i.pinimg.com/736x/4f/02/ec/4f02ec86a0cb37e6f64c319e9c874252.jpg', title: 'Taylor Swift', artist: 'Bejewelled' },
-//   { id: 3, img: 'https://i.pinimg.com/736x/30/d0/1d/30d01d1bee3ba3657873a6d12a5878ce.jpg', title: 'Michael Jackson', artist: 'Earth Song' },
-//   { id: 4, img: 'https://i.pinimg.com/736x/44/d1/2d/44d12d66b8c91296e4786dab30bf30bf.jpg', title: 'Alphaville', artist: 'Big in Japan' },
-//   { id: 5, img: 'https://i.pinimg.com/736x/fa/62/3c/fa623c2875bd9ac93a1fe6c1482b21a7.jpg', title: 'Weeknd,Lily Rose', artist: 'One of the girls' },
-//   { id: 6, img: 'https://i.pinimg.com/736x/4f/02/ec/4f02ec86a0cb37e6f64c319e9c874252.jpg', title: 'Taylor Swift', artist: 'Bejewelled' },
-//   { id: 7, img: 'https://i.pinimg.com/736x/30/d0/1d/30d01d1bee3ba3657873a6d12a5878ce.jpg', title: 'Michael Jackson', artist: 'Earth Song' },
-// ];
-
-// const FEATURED_CARDS = [
-//   { id: 1, img: 'https://i.pinimg.com/736x/fa/62/3c/fa623c2875bd9ac93a1fe6c1482b21a7.jpg', title: 'Featured 1', artist: 'Artist Name' },
-//   { id: 2, img: 'https://i.pinimg.com/736x/4f/02/ec/4f02ec86a0cb37e6f64c319e9c874252.jpg', title: 'Featured 2', artist: 'Artist Name' },
-//   { id: 3, img: 'https://i.pinimg.com/736x/30/d0/1d/30d01d1bee3ba3657873a6d12a5878ce.jpg', title: 'Featured 3', artist: 'Artist Name' },
-//   { id: 4, img: 'https://i.pinimg.com/736x/44/d1/2d/44d12d66b8c91296e4786dab30bf30bf.jpg', title: 'Featured 4', artist: 'Artist Name' },
-//   { id: 5, img: 'https://i.pinimg.com/736x/fa/62/3c/fa623c2875bd9ac93a1fe6c1482b21a7.jpg', title: 'Featured 5', artist: 'Artist Name' },
-//   { id: 6, img: 'https://i.pinimg.com/736x/4f/02/ec/4f02ec86a0cb37e6f64c319e9c874252.jpg', title: 'Featured 6', artist: 'Artist Name' },
-// ];
-
-export function MainPage() {
+export function MainPage({
+  searchQuery = "",
+  searchResults = [],
+}) {
   const [showRecentLeftArrow, setShowRecentLeftArrow] = useState(false);
   const [showMixesLeftArrow, setShowMixesLeftArrow] = useState(false);
   const [showFeaturedLeftArrow, setShowFeaturedLeftArrow] = useState(false);
   const recentRef = useRef(null);
   const mixesRef = useRef(null);
   const featuredRef = useRef(null);
+  const navigate = useNavigate();
   const [songs, setSongs] = useState([]);
+  const [historySongs, setHistorySongs] = useState([]);
+  const [localSearchResults, setLocalSearchResults] = useState([]);
 
-  const { playSong } = usePlayer();
+  const { playlists, selectPlaylist } = usePlaylists();
+  const { playSong, initializeQueue, currentSong, isPlaying, addToUserQueue } = usePlayer();
+
+  const displayedSongs = songs;
+
+  // Keep search results in local state so we can toggle likes immediately
+  useEffect(() => {
+    setLocalSearchResults(searchResults);
+  }, [searchResults]);
 
   useEffect(() => {
     async function loadSongs() {
       try {
         const data = await getSongs();
         setSongs(data);
+        initializeQueue(data);
       } catch (err) {
         console.error(err);
       }
     }
 
+    async function loadHistory() {
+      try {
+        const token = localStorage.getItem('token');
+        if (token) {
+          const history = await getListeningHistory();
+          setHistorySongs(history);
+        }
+      } catch (err) {
+        console.error("Error loading listening history:", err);
+      }
+    }
+
     loadSongs();
+    loadHistory();
   }, []);
+
+  const handleLikeToggle = async (e, songId) => {
+    e.stopPropagation();
+    try {
+      const res = await toggleLikeSong(songId);
+      // Update local search results
+      setLocalSearchResults(prev => prev.map(s => {
+        if (s.id === songId) {
+          return {
+            ...s,
+            is_liked: res.liked ? 1 : 0,
+            like_count: res.liked ? (s.like_count || 0) + 1 : Math.max(0, (s.like_count || 0) - 1)
+          };
+        }
+        return s;
+      }));
+
+      // Update main songs list
+      setSongs(prev => prev.map(s => {
+        if (s.id === songId) {
+          return {
+            ...s,
+            is_liked: res.liked ? 1 : 0,
+            like_count: res.liked ? (s.like_count || 0) + 1 : Math.max(0, (s.like_count || 0) - 1)
+          };
+        }
+        return s;
+      }));
+
+      // Update history list
+      setHistorySongs(prev => prev.map(s => {
+        if (s.id === songId) {
+          return {
+            ...s,
+            is_liked: res.liked ? 1 : 0,
+            like_count: res.liked ? (s.like_count || 0) + 1 : Math.max(0, (s.like_count || 0) - 1)
+          };
+        }
+        return s;
+      }));
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Failed to toggle like.");
+    }
+  };
 
   const scrollRight = (ref) => {
     if (ref.current) {
@@ -85,28 +116,120 @@ export function MainPage() {
     }
   };
 
-  //   
-  const MusicCard = ({ song }) => (
+  const formatDuration = (seconds) => {
+    if (!seconds) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const MusicCard = ({ song, playlist }) => (
     <div
       className={styles.musicCard}
       onClick={() => {
-        console.log("Card Clicked");
-        console.log(song);
-
-        playSong(song, songs);
+        playSong(song, playlist || displayedSongs);
       }}
     >
       <img
         src={song.cover_url || placeholder}
         alt={song.title}
       />
-
       <h3>{song.title}</h3>
-
       <p>{song.artist}</p>
     </div>
   );
 
+  // Render Full Page Search Results
+  if (searchQuery.trim() !== "") {
+    const topResult = localSearchResults[0];
+    const otherSongs = localSearchResults.slice(0, 5);
+
+    return (
+      <div className={styles.mainContent}>
+        <h2>Search Results for "{searchQuery}"</h2>
+
+        {localSearchResults.length === 0 ? (
+          <div className={styles.noResults}>
+            <h3>No results found</h3>
+            <p>Please make sure your words are spelled correctly or try fewer or different keywords.</p>
+          </div>
+        ) : (
+          <div className={styles.searchLayout}>
+            {topResult && (
+              <div className={styles.topResultContainer}>
+                <h3>Top Result</h3>
+                <div
+                  className={styles.topResultCard}
+                  onClick={() => playSong(topResult, localSearchResults)}
+                >
+                  <img
+                    src={topResult.cover_url || placeholder}
+                    alt={topResult.title}
+                    className={styles.topResultImage}
+                  />
+                  <h2 className={styles.topResultName}>{topResult.title}</h2>
+                  <div className={styles.topResultMeta}>
+                    <span className={styles.topResultBadge}>Song</span>
+                    <span className={styles.topResultArtist}>{topResult.artist}</span>
+                  </div>
+                  <div className={styles.playOverlay}>
+                    <Play fill="black" color="black" size={24} />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className={styles.songsResultContainer}>
+              <h3>Songs</h3>
+              <div className={styles.searchSongList}>
+                {otherSongs.map((song) => (
+                  <div
+                    key={song.id}
+                    className={styles.searchSongRow}
+                    onClick={() => playSong(song, localSearchResults)}
+                  >
+                    <img
+                      src={song.cover_url || placeholder}
+                      alt=""
+                      className={styles.searchSongCover}
+                    />
+                    <div className={styles.searchSongInfo}>
+                      <p className={styles.searchSongTitle}>{song.title}</p>
+                      <p className={styles.searchSongArtist}>{song.artist}</p>
+                    </div>
+                    <div className={styles.searchSongControls}>
+                      <button
+                        className={`${styles.searchLikeButton} ${song.is_liked ? styles.liked : ''}`}
+                        onClick={(e) => handleLikeToggle(e, song.id)}
+                      >
+                        <Heart
+                          size={18}
+                          fill={song.is_liked ? "#1db954" : "none"}
+                          color={song.is_liked ? "#1db954" : "#b3b3b3"}
+                        />
+                      </button>
+                      <button
+                        className={styles.searchLikeButton}
+                        title="Add to queue"
+                        onClick={(e) => { e.stopPropagation(); addToUserQueue(song); }}
+                      >
+                        <ListPlus size={18} color="#b3b3b3" />
+                      </button>
+                      <span className={styles.searchSongDuration}>
+                        {formatDuration(song.duration)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Normal Home Page View
   return (
     <div className={styles.mainContent}>
       <div className={styles.categoryButtons}>
@@ -116,20 +239,45 @@ export function MainPage() {
       </div>
 
       <div className={styles.quickPicks}>
-        {QUICK_PICKS.map(pick => (
-          <div key={pick.id} className={styles.pickCard}>
-            <img src={pick.img} alt={pick.label} />
-            <span>{pick.label}</span>
+        <div
+          className={styles.pickCard}
+          onClick={() => selectPlaylist({ id: "liked-songs", name: "Liked Songs" })}
+        >
+          <div
+            style={{
+              width: 60,
+              height: 60,
+              borderRadius: 4,
+              background: "linear-gradient(135deg,#450af5,#8e8ee5,#c4efd9)",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              color: "white",
+            }}
+          >
+            <Heart size={24} fill="white" />
+          </div>
+          <span>Liked Songs</span>
+        </div>
+
+        {playlists.slice(0, 5).map(playlist => (
+          <div
+            key={playlist.id}
+            className={styles.pickCard}
+            onClick={() => selectPlaylist(playlist)}
+          >
+            <img src={playlist.cover_url || placeholder} alt={playlist.name} />
+            <span>{playlist.name}</span>
           </div>
         ))}
       </div>
 
       <div className={styles.sectionHeader}>
-        <h2>Popular with listeners of Mahabharat</h2>
-        <span>Show all</span>
+        <h2>Trending</h2>
+        <span style={{ cursor: "pointer" }} onClick={() => selectPlaylist({ id: "trending", name: "Trending" })}>Show all</span>
       </div>
       <div className={styles.cardsRow}>
-        {songs.slice(0, 3).map(song => (
+        {displayedSongs.slice(0, 3).map(song => (
           <MusicCard
             key={song.id}
             song={song}
@@ -139,7 +287,7 @@ export function MainPage() {
 
       <div className={styles.sectionHeader}>
         <h2>Recents</h2>
-        <span>Show all</span>
+        <span style={{ cursor: "pointer" }} onClick={() => navigate('/history')}>Show all</span>
       </div>
       <div className={styles.cardsContainer}>
         {showRecentLeftArrow && (
@@ -151,10 +299,11 @@ export function MainPage() {
           <ChevronRight size={20} />
         </button>
         <div className={styles.cardsRow} ref={recentRef}>
-          {songs.slice(0, 7).map(song => (
+          {(historySongs.length > 0 ? historySongs.slice(0, 7) : displayedSongs.slice(0, 7)).map(song => (
             <MusicCard
-              key={song.id}
+              key={song.history_id || song.id}
               song={song}
+              playlist={historySongs.length > 0 ? historySongs : displayedSongs}
             />
           ))}
         </div>
@@ -162,7 +311,7 @@ export function MainPage() {
 
       <div className={styles.sectionHeader}>
         <h2>Your top mixes</h2>
-        <span>Show all</span>
+        <span style={{ cursor: "pointer" }} onClick={() => selectPlaylist({ id: "mixes", name: "Your top mixes" })}>Show all</span>
       </div>
       <div className={styles.cardsContainer}>
         {showMixesLeftArrow && (
@@ -174,7 +323,7 @@ export function MainPage() {
           <ChevronRight size={20} />
         </button>
         <div className={styles.cardsRow} ref={mixesRef}>
-          {songs.slice(2, 9).map(song => (
+          {displayedSongs.slice(2, 9).map(song => (
             <MusicCard
               key={song.id}
               song={song}
@@ -185,7 +334,7 @@ export function MainPage() {
 
       <div className={styles.sectionHeader}>
         <h2>Featured now</h2>
-        <span>Show all</span>
+        <span style={{ cursor: "pointer" }} onClick={() => selectPlaylist({ id: "featured", name: "Featured now" })}>Show all</span>
       </div>
       <div className={styles.cardsContainer}>
         {showFeaturedLeftArrow && (

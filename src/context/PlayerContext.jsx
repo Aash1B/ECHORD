@@ -7,18 +7,19 @@ import {
 } from "react";
 
 import { getSongStream, toggleLikeSong } from "../services/api";
+import { usePlaylists } from "./playlistcontext";
 
 const playercontext = createContext();
 
 export function PlayerProvider({ children }) {
 
+    const { refreshSelectedPlaylist } = usePlaylists();
+
     const audioRef = useRef(new Audio());
 
     const [queue, setQueue] = useState([]);
-
+    const [allSongs, setAllSongs] = useState([]);
     const [currentSong, setCurrentSong] = useState(null);
-
-    const [currentIndex, setCurrentIndex] = useState(-1);
 
     const [isPlaying, setIsPlaying] = useState(false);
 
@@ -28,14 +29,65 @@ export function PlayerProvider({ children }) {
 
     const [volume, setVolumeState] = useState(0.20);
 
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    const [isShuffle, setIsShuffle] = useState(() => localStorage.getItem('is_shuffle') === 'true');
+    const [isRepeat, setIsRepeat] = useState(() => localStorage.getItem('is_repeat') === 'true');
+
+    const [userQueue, setUserQueueState] = useState([]);
+    const [lastContextSong, setLastContextSongState] = useState(null);
+
+    const toggleExpand = () => {
+        setIsExpanded(prev => !prev);
+    };
+
+    // Keep mutable refs of state to avoid stale closure issues in event listeners
+    const queueRef = useRef([]);
+    const currentSongRef = useRef(null);
+    const isShuffleRef = useRef(localStorage.getItem('is_shuffle') === 'true');
+    const isRepeatRef = useRef(localStorage.getItem('is_repeat') === 'true');
+    const userQueueRef = useRef([]);
+    const lastContextSongRef = useRef(null);
+
+    const setUserQueue = (updatedQueue) => {
+        setUserQueueState(updatedQueue);
+        userQueueRef.current = updatedQueue;
+        localStorage.setItem("user_queue", JSON.stringify(updatedQueue));
+    };
+
+    const setLastContextSong = (song) => {
+        setLastContextSongState(song);
+        lastContextSongRef.current = song;
+        localStorage.setItem("last_context_song", JSON.stringify(song));
+    };
+
+    const toggleShuffle = () => {
+        setIsShuffle(prev => {
+            const next = !prev;
+            isShuffleRef.current = next;
+            localStorage.setItem('is_shuffle', next.toString());
+            return next;
+        });
+    };
+
+    const toggleRepeat = () => {
+        setIsRepeat(prev => {
+            const next = !prev;
+            isRepeatRef.current = next;
+            localStorage.setItem('is_repeat', next.toString());
+            return next;
+        });
+    };
+
     useEffect(() => {
 
         const audio = audioRef.current;
-        audio.volume = volume; // Start song at 30% volume
+        audio.volume = volume; // Start song at saved volume
 
         audio.ontimeupdate = () => {
 
             setCurrentTime(audio.currentTime);
+            localStorage.setItem('playback_time', audio.currentTime.toString());
 
         };
 
@@ -47,24 +99,91 @@ export function PlayerProvider({ children }) {
 
         audio.onended = () => {
 
-            nextSong();
+            if (isRepeatRef.current) {
+                audio.currentTime = 0;
+                audio.play().catch(err => console.error("Repeat play failed:", err));
+            } else {
+                nextSong();
+            }
 
         };
 
-    }, []);
+        // Restore song, queue, and playback time from localStorage
+        const restorePlayback = async () => {
+            try {
+                const savedSongStr = localStorage.getItem('last_song');
+                const savedQueueStr = localStorage.getItem('last_queue');
+                const savedTimeStr = localStorage.getItem('playback_time');
+                const savedUserQueueStr = localStorage.getItem('user_queue');
+                const savedLastContextSongStr = localStorage.getItem('last_context_song');
 
+                if (savedUserQueueStr) {
+                    const savedUserQueue = JSON.parse(savedUserQueueStr);
+                    setUserQueueState(savedUserQueue);
+                    userQueueRef.current = savedUserQueue;
+                }
+
+                if (savedLastContextSongStr) {
+                    const savedLastContextSong = JSON.parse(savedLastContextSongStr);
+                    setLastContextSongState(savedLastContextSong);
+                    lastContextSongRef.current = savedLastContextSong;
+                }
+
+                if (savedSongStr) {
+                    const savedSong = JSON.parse(savedSongStr);
+                    setCurrentSong(savedSong);
+                    currentSongRef.current = savedSong;
+
+                    if (savedQueueStr) {
+                        const savedQueue = JSON.parse(savedQueueStr);
+                        setQueue(savedQueue);
+                        queueRef.current = savedQueue;
+                    }
+
+                    // Get stream URL and load it
+                    const streamUrl = await getSongStream(savedSong.id);
+                    audio.src = streamUrl;
+                    audio.volume = volume;
+
+                    if (savedTimeStr) {
+                        const savedTime = parseFloat(savedTimeStr);
+                        if (!isNaN(savedTime)) {
+                            audio.currentTime = savedTime;
+                            setCurrentTime(savedTime);
+                        }
+                    }
+
+                    // Attempt autoplay on restore
+                    try {
+                        await audio.play();
+                        setIsPlaying(true);
+                    } catch (playError) {
+                        console.warn("Autoplay blocked by browser. Song loaded in paused state.", playError);
+                        setIsPlaying(false);
+                    }
+                }
+            } catch (err) {
+                console.error("Error restoring playback:", err);
+            }
+        };
+
+        restorePlayback();
+
+    }, []);
     const playSong = async (song, playlist = []) => {
 
         try {
 
             if (playlist.length > 0) {
-
                 setQueue(playlist);
-
-                setCurrentIndex(
-                    playlist.findIndex((s) => s.id === song.id)
-                );
-
+                queueRef.current = playlist;
+                localStorage.setItem('last_queue', JSON.stringify(playlist));
+                setLastContextSong(song);
+            } else {
+                const isInContext = queueRef.current.some(s => s.id === song.id);
+                if (isInContext) {
+                    setLastContextSong(song);
+                }
             }
 
             const streamUrl = await getSongStream(song.id);
@@ -75,11 +194,15 @@ export function PlayerProvider({ children }) {
 
             await audioRef.current.play();
 
-            // Locally increment play count for immediate feedback
-            setCurrentSong({
+            const updatedSong = {
                 ...song,
                 play_count: (song.play_count || 0) + 1
-            });
+            };
+
+            // Locally increment play count for immediate feedback
+            setCurrentSong(updatedSong);
+            currentSongRef.current = updatedSong;
+            localStorage.setItem('last_song', JSON.stringify(updatedSong));
 
             setIsPlaying(true);
 
@@ -112,19 +235,87 @@ export function PlayerProvider({ children }) {
     };
 
     const nextSong = () => {
+        const uq = userQueueRef.current;
+        const q = queueRef.current;
+        const curr = currentSongRef.current;
 
-        if (currentIndex + 1 >= queue.length) return;
+        console.log("========== NEXT ==========");
+        console.log("User Queue:", uq);
+        console.log("Playback Context Queue:", q);
+        console.log("Current Song:", curr);
 
-        playSong(queue[currentIndex + 1], queue);
+        if (uq.length > 0) {
+            const nextFromUserQueue = uq[0];
+            const updatedUserQueue = uq.slice(1);
+            setUserQueue(updatedUserQueue);
+            playSong(nextFromUserQueue);
+            return;
+        }
 
+        if (!curr || q.length === 0) return;
+
+        const refSong = q.some(s => s.id === curr.id) ? curr : lastContextSongRef.current;
+
+        if (!refSong) {
+            playSong(q[0], q);
+            return;
+        }
+
+        if (isShuffleRef.current) {
+            let randomIndex = Math.floor(Math.random() * q.length);
+            if (q.length > 1) {
+                while (q[randomIndex]?.id === refSong.id) {
+                    randomIndex = Math.floor(Math.random() * q.length);
+                }
+            }
+            playSong(q[randomIndex], q);
+        } else {
+            const index = q.findIndex(
+                song => song.id === refSong.id
+            );
+
+            if (index === -1) {
+                playSong(q[0], q);
+                return;
+            }
+
+            if (index === q.length - 1) {
+                if (isRepeatRef.current) {
+                    playSong(q[0], q);
+                } else {
+                    setIsPlaying(false);
+                    audioRef.current.pause();
+                }
+                return;
+            }
+
+            playSong(q[index + 1], q);
+        }
     };
 
     const previousSong = () => {
+        const q = queueRef.current;
+        const curr = currentSongRef.current;
 
-        if (currentIndex <= 0) return;
+        if (!curr || q.length === 0) return;
 
-        playSong(queue[currentIndex - 1], queue);
+        const isCurrentInContext = q.some(s => s.id === curr.id);
+        if (!isCurrentInContext) {
+            if (lastContextSongRef.current) {
+                playSong(lastContextSongRef.current, q);
+            } else {
+                playSong(q[0], q);
+            }
+            return;
+        }
 
+        const index = q.findIndex(
+            song => song.id === curr.id
+        );
+
+        if (index <= 0) return;
+
+        playSong(q[index - 1], q);
     };
 
     const seek = (value) => {
@@ -148,27 +339,77 @@ export function PlayerProvider({ children }) {
             const res = await toggleLikeSong(currentSong.id);
             setCurrentSong(prev => {
                 if (!prev) return null;
-                return {
+                const updated = {
                     ...prev,
                     is_liked: res.liked ? 1 : 0,
                     like_count: res.liked ? (prev.like_count || 0) + 1 : Math.max(0, (prev.like_count || 0) - 1)
                 };
+                currentSongRef.current = updated;
+                localStorage.setItem('last_song', JSON.stringify(updated));
+                return updated;
             });
             // Update in queue
-            setQueue(prevQueue => prevQueue.map(s => {
-                if (s.id === currentSong.id) {
-                    return {
-                        ...s,
-                        is_liked: res.liked ? 1 : 0,
-                        like_count: res.liked ? (s.like_count || 0) + 1 : Math.max(0, (s.like_count || 0) - 1)
-                    };
-                }
-                return s;
-            }));
+            setQueue(prevQueue => {
+                const updatedQueue = prevQueue.map(s => {
+                    if (s.id === currentSongRef.current?.id) {
+                        return {
+                            ...s,
+                            is_liked: res.liked ? 1 : 0,
+                            like_count: res.liked ? (s.like_count || 0) + 1 : Math.max(0, (s.like_count || 0) - 1)
+                        };
+                    }
+                    return s;
+                });
+                queueRef.current = updatedQueue;
+                localStorage.setItem('last_queue', JSON.stringify(updatedQueue));
+                return updatedQueue;
+            });
+            refreshSelectedPlaylist();
         } catch (err) {
             console.error("Failed to toggle like:", err);
             alert(err.message || "Please log in to like songs!");
         }
+    };
+
+    const initializeQueue = (songs) => {
+        setQueue(songs);
+        queueRef.current = songs;
+        localStorage.setItem('last_queue', JSON.stringify(songs));
+    };
+
+    const addToQueue = (song) => {
+        if (!song) return;
+        setQueue((prev) => {
+            const exists = prev.some(s => s.id === song.id);
+            if (exists) return prev;
+            const updated = [...prev, song];
+            queueRef.current = updated;
+            localStorage.setItem('last_queue', JSON.stringify(updated));
+            return updated;
+        });
+        // Silent: no alert when adding to queue
+    };
+
+    const addToUserQueue = (song) => {
+        if (!song) return;
+        const updated = [...userQueueRef.current, song];
+        setUserQueue(updated);
+    };
+
+    const removeFromUserQueue = (indexToRemove) => {
+        const updated = userQueueRef.current.filter((_, idx) => idx !== indexToRemove);
+        setUserQueue(updated);
+    };
+
+    const reorderUserQueue = (startIndex, endIndex) => {
+        const updated = [...userQueueRef.current];
+        const [movedItem] = updated.splice(startIndex, 1);
+        updated.splice(endIndex, 0, movedItem);
+        setUserQueue(updated);
+    };
+
+    const clearUserQueue = () => {
+        setUserQueue([]);
     };
 
     return (
@@ -188,6 +429,20 @@ export function PlayerProvider({ children }) {
                 volume,
                 setVolume,
                 toggleLike,
+                isExpanded,
+                toggleExpand,
+                isShuffle,
+                toggleShuffle,
+                isRepeat,
+                toggleRepeat,
+                initializeQueue,
+                addToQueue,
+                userQueue,
+                addToUserQueue,
+                removeFromUserQueue,
+                reorderUserQueue,
+                clearUserQueue,
+                setUserQueue,
             }}
         >
 

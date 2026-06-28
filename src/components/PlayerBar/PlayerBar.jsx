@@ -1,7 +1,8 @@
 import {
-    Heart,
+  Heart,
   ListMusic,
   Maximize2,
+  Minimize2,
   Mic2,
   MonitorSpeaker,
   Pause,
@@ -11,26 +12,96 @@ import {
   SkipBack,
   SkipForward,
   Volume2,
+  VolumeX,
+  Plus,
 } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import styles from "./PlayerBar.module.css";
-import { usePlayer } from "../../context/playercontext";
+import { usePlayer } from "../../context/PlayerContext";
+import { usePlaylists } from "../../context/playlistcontext";
+import { CreatePlaylistModel } from "../CreatePlaylistModel/CreatePlaylistModel";
+import { addSongToPlaylist } from "../../services/api";
 import placeholder from "../../assets/music-placeholder.jpg";
 
 export function PlayerBar() {
-  const {
-    currentSong,
-    isPlaying,
-    togglePlay,
-    nextSong,
-    previousSong,
-    currentTime,
-    duration,
-    seek,
-    volume,
-    setVolume,
-    toggleLike,
-  } = usePlayer();
+    const {
+        currentSong,
+        isPlaying,
+        togglePlay,
+        nextSong,
+        previousSong,
+        currentTime,
+        duration,
+        seek,
+        volume,
+        setVolume,
+        toggleLike,
+        isExpanded,
+        toggleExpand,
+        isShuffle,
+        toggleShuffle,
+        isRepeat,
+        toggleRepeat,
+        addToUserQueue,
+    } = usePlayer();
+
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isQueueActive = location.pathname === "/queue";
+
+  const { playlists, loadPlaylists, refreshSelectedPlaylist } = usePlaylists();
+  const [showAddToPlaylistDropdown, setShowAddToPlaylistDropdown] = useState(false);
+  const [showCreateModel, setShowCreateModel] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const prevVolumeRef = useRef(volume);
+
+  const toggleMute = useCallback(() => {
+    if (isMuted) {
+      // Unmute: restore previous volume
+      const restored = prevVolumeRef.current > 0 ? prevVolumeRef.current : 0.2;
+      setVolume(restored);
+      setIsMuted(false);
+    } else {
+      // Mute: save current volume and set to 0
+      prevVolumeRef.current = volume;
+      setVolume(0);
+      setIsMuted(true);
+    }
+  }, [isMuted, volume, setVolume]);
+
+  const addToPlaylistDropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (
+        addToPlaylistDropdownRef.current &&
+        !addToPlaylistDropdownRef.current.contains(e.target)
+      ) {
+        setShowAddToPlaylistDropdown(false);
+      }
+    };
+    if (showAddToPlaylistDropdown) {
+      document.addEventListener("mousedown", handleOutsideClick);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [showAddToPlaylistDropdown]);
+
+  const handleAddSongToPl = async (playlistId) => {
+    if (!currentSong) return;
+    try {
+      await addSongToPlaylist(playlistId, currentSong.id);
+      alert("Song added to playlist successfully!");
+      setShowAddToPlaylistDropdown(false);
+      await loadPlaylists(); // update count in library sidebar
+      await refreshSelectedPlaylist(); // update counts in playlist details
+    } catch (err) {
+      alert(err.message || "Failed to add song.");
+    }
+  };
 
   // Nothing selected yet
   if (!currentSong) {
@@ -82,7 +153,7 @@ export function PlayerBar() {
             <MonitorSpeaker size={18} />
           </button>
           <button className={`${styles.controlButton} ${styles.disabled}`} disabled>
-            <Volume2 size={18} />
+            {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
           </button>
           <input
             className={styles.volumeSlider}
@@ -90,8 +161,13 @@ export function PlayerBar() {
             min={0}
             max={1}
             step={0.01}
-            value={volume}
-            onChange={(e) => setVolume(Number(e.target.value))}
+            value={isMuted ? 0 : volume}
+            onChange={(e) => {
+              const val = Number(e.target.value);
+              if (isMuted && val > 0) setIsMuted(false);
+              prevVolumeRef.current = val;
+              setVolume(val);
+            }}
           />
           <button className={`${styles.controlButton} ${styles.disabled}`} disabled>
             <Maximize2 size={17} />
@@ -146,7 +222,11 @@ export function PlayerBar() {
       {/* CENTER */}
       <div className={styles.playerCenter}>
         <div className={styles.controls}>
-          <button className={styles.controlButton}>
+          <button 
+            className={`${styles.controlButton} ${isShuffle ? styles.activeControl : ""}`}
+            onClick={toggleShuffle}
+            aria-label="Toggle Shuffle"
+          >
             <Shuffle size={18} />
           </button>
 
@@ -190,7 +270,11 @@ export function PlayerBar() {
             />
           </button>
 
-          <button className={styles.controlButton}>
+          <button 
+            className={`${styles.controlButton} ${isRepeat ? styles.activeControl : ""}`}
+            onClick={toggleRepeat}
+            aria-label="Toggle Repeat"
+          >
             <Repeat2 size={18} />
           </button>
         </div>
@@ -214,11 +298,52 @@ export function PlayerBar() {
 
       {/* RIGHT */}
       <div className={styles.extras}>
-        <button className={styles.controlButton}>
-          <Mic2 size={18} />
-        </button>
+        <div className={styles.dropdownWrapper} ref={addToPlaylistDropdownRef}>
+          <button 
+            className={styles.controlButton}
+            onClick={() => setShowAddToPlaylistDropdown(!showAddToPlaylistDropdown)}
+            title="Add to playlist"
+          >
+            <Plus size={18} />
+          </button>
+          
+          {showAddToPlaylistDropdown && (
+            <div className={styles.playlistDropdown}>
+              <button 
+                className={styles.dropdownItem}
+                onClick={() => {
+                  setShowCreateModel(true);
+                  setShowAddToPlaylistDropdown(false);
+                }}
+              >
+                <Plus size={14} /> Create Playlist
+              </button>
+              
+              {playlists.length > 0 && (
+                <>
+                  <div className={styles.dropdownDivider} />
+                  <div className={styles.dropdownHeader}>Add to Playlist</div>
+                  {playlists.map(pl => (
+                    <button
+                      key={pl.id}
+                      className={styles.dropdownItem}
+                      onClick={() => handleAddSongToPl(pl.id)}
+                    >
+                      {pl.name}
+                    </button>
+                  ))}
+                </>
+              )}
+            </div>
+          )}
+        </div>
 
-        <button className={styles.controlButton}>
+        <button
+          className={styles.controlButton}
+          onClick={() => navigate(isQueueActive ? "/" : "/queue")}
+          title="Queue"
+          style={isQueueActive ? { color: "#1db954" } : {}}
+        >
           <ListMusic size={18} />
         </button>
 
@@ -226,8 +351,13 @@ export function PlayerBar() {
           <MonitorSpeaker size={18} />
         </button>
 
-        <button className={styles.controlButton}>
-          <Volume2 size={18} />
+        <button
+          className={`${styles.controlButton} ${isMuted ? styles.activeControl : ""}`}
+          onClick={toggleMute}
+          title={isMuted ? "Unmute" : "Mute"}
+          aria-label={isMuted ? "Unmute" : "Mute"}
+        >
+          {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
         </button>
 
         <input
@@ -236,16 +366,24 @@ export function PlayerBar() {
           min={0}
           max={1}
           step={0.01}
-          value={volume}
-          onChange={(e) =>
-            setVolume(Number(e.target.value))
-          }
+          value={isMuted ? 0 : volume}
+          onChange={(e) => {
+            const val = Number(e.target.value);
+            if (isMuted && val > 0) setIsMuted(false);
+            prevVolumeRef.current = val;
+            setVolume(val);
+          }}
         />
 
-        <button className={styles.controlButton}>
-          <Maximize2 size={17} />
+        <button className={styles.controlButton} onClick={toggleExpand} aria-label={isExpanded ? "Collapse now playing view" : "Expand now playing view"}>
+          {isExpanded ? <Minimize2 size={17} /> : <Maximize2 size={17} />}
         </button>
       </div>
+
+      <CreatePlaylistModel 
+        isOpen={showCreateModel} 
+        onClose={() => setShowCreateModel(false)} 
+      />
     </footer>
   );
 }

@@ -147,6 +147,27 @@
   place-items: center;
 }
 
+.searchContainer {
+  display: inline-block;
+  margin-left: 8px;
+}
+
+.searchInput {
+  background: #1f1f1f;
+  border: 1px solid #2b2b2b;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 999px;
+  width: 180px;
+  outline: none;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.searchInput:focus {
+  border-color: #8884ff;
+  box-shadow: 0 0 0 4px rgba(136,132,255,0.08);
+}
+
 .recentsButton {
   display: inline-flex;
   align-items: center;
@@ -155,6 +176,17 @@
   background: transparent;
   font-size: 13px;
   gap: 6px;
+}
+
+.filterActive {
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+}
+
+.unimplementedMessage {
+  color: #b3b3b3;
+  padding: 16px;
+  font-size: 14px;
 }
 
 .libraryList {

@@ -2,8 +2,6 @@
   padding: 20px;
   background: #121212;
   color: white;
-  flex: 1;
-  overflow-y: auto;
 }
 
 .categoryButtons {
@@ -238,4 +236,199 @@
   .musicCard {
     min-width: 140px;
   }
+}
+
+/* ==========================================================================
+   SEARCH RESULTS STYLING
+   ========================================================================== */
+
+.searchLayout {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: 32px;
+  margin-top: 24px;
+}
+
+@media (max-width: 900px) {
+  .searchLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.topResultContainer,
+.songsResultContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.topResultCard {
+  background: #181818;
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  position: relative;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.topResultCard:hover {
+  background: #282828;
+}
+
+.topResultImage {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+
+.topResultName {
+  font-size: 28px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.topResultMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topResultBadge {
+  background: rgba(0,0,0,0.4);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.topResultArtist {
+  color: #b3b3b3;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.playOverlay {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #1db954;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+}
+
+.topResultCard:hover .playOverlay {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.searchSongList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.searchSongRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.searchSongRow:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+.searchSongCover {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.searchSongInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.searchSongTitle {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.searchSongArtist {
+  font-size: 13px;
+  color: #b3b3b3;
+  margin: 4px 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.searchSongControls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.searchLikeButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #b3b3b3;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.searchLikeButton:hover {
+  color: white;
+  transform: scale(1.05);
+}
+
+.searchLikeButton.liked {
+  color: #1db954;
+}
+
+.searchSongDuration {
+  color: #b3b3b3;
+  font-size: 14px;
+  min-width: 45px;
+  text-align: right;
+}
+
+.noResults {
+  text-align: center;
+  padding: 60px 20px;
+  color: #b3b3b3;
+}
+
+.noResults h3 {
+  color: white;
+  font-size: 20px;
+  margin-bottom: 8px;
 }

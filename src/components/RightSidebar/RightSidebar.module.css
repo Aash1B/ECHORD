@@ -2,7 +2,7 @@
   display: flex;
   min-width: 0;
   height: 100%;
-  overflow: hidden;
+  overflow: visible;
   border-radius: 8px;
   background: #121212;
   flex-direction: column;

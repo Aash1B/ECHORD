@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { usePlayer } from "../../context/playercontext";
+import { usePlayer } from "../../context/PlayerContext";
 import { getContentRecommendations } from "../../services/api";
 import styles from "./RecommendationCard.module.css";
 
