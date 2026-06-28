@@ -346,10 +346,53 @@ async function getListeningHistory(req, res) {
     }
 }
 
+async function getLikedSongs(req, res) {
+    try {
+        const userId = req.user.id;
+        const [songs] = await pool.query(`
+            SELECT
+                s.id,
+                s.title,
+                a.name AS artist,
+                a.bio AS artist_bio,
+                a.cover_url AS artist_image,
+                al.title AS album,
+                g.name AS genre,
+                s.duration,
+                s.b2_key,
+                s.cover_url,
+                s.play_count,
+                s.like_count AS like_count,
+                s.created_at,
+                1 AS is_liked
+            FROM likes l
+            JOIN songs s ON l.song_id = s.id
+            LEFT JOIN artists a ON s.artist_id = a.id
+            LEFT JOIN albums al ON s.album_id = al.id
+            LEFT JOIN genres g ON s.genre_id = g.id
+            WHERE l.user_id = ?
+            ORDER BY l.liked_at DESC
+        `, [userId]);
+
+        res.status(200).json({
+            success: true,
+            count: songs.length,
+            songs,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+        });
+    }
+}
+
 module.exports = {
     getAllSongs,
     searchSongs,
     streamSong,
     toggleLikeSong,
     getListeningHistory,
+    getLikedSongs,
 };

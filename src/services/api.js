@@ -115,6 +115,24 @@ export async function toggleLikeSong(songId) {
 
     return await response.json();
 }
+export async function getLikedSongs() {
+    const token = localStorage.getItem('token');
+    if (!token) return [];
+
+    const response = await fetch(`${API_URL}/songs/liked`, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    });
+
+    if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || err.message || "Failed to fetch liked songs");
+    }
+
+    const data = await response.json();
+    return data.songs;
+}
 export async function getPlaylists() {
 
     const token = localStorage.getItem("token");
@@ -224,4 +242,74 @@ export async function getPlaylist(playlistId) {
     }
 
     return data.playlist;
+}
+export async function updatePlaylist(playlistId, playlistData) {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("Please login first.");
+
+    const response = await fetch(`${API_URL}/playlists/${playlistId}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(playlistData),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.message || "Failed to update playlist.");
+    }
+    return data;
+}
+export async function deletePlaylist(playlistId) {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("Please login first.");
+
+    const response = await fetch(`${API_URL}/playlists/${playlistId}`, {
+        method: "DELETE",
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.message || "Failed to delete playlist.");
+    }
+    return data;
+}
+export async function removeSongFromPlaylist(playlistId, songId) {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("Please login first.");
+
+    const response = await fetch(`${API_URL}/playlists/${playlistId}/songs/${songId}`, {
+        method: "DELETE",
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.message || "Failed to remove song from playlist.");
+    }
+    return data;
+}
+export async function getGenres() {
+    const response = await fetch(`${API_URL}/genres`);
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch genres.");
+    }
+    return data.genres;
+}
+
+export async function getArtists() {
+    const response = await fetch(`${API_URL}/artists`);
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch creators.");
+    }
+    return data.artists;
 }

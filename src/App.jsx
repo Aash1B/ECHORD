@@ -17,6 +17,8 @@ import AccountPage from './components/Auth/AccountPage.jsx';
 import { HistoryView } from './components/HistoryView/HistoryView.jsx';
 import { usePlayer } from './context/PlayerContext.jsx';
 import { ExpandedPlayer } from './components/ExpandedPlayer/ExpandedPlayer.jsx';
+import { usePlaylists } from './context/playlistcontext.jsx';
+import { BrowseView } from './components/BrowseView/BrowseView.jsx';
 
 function ProtectedLayout({
   isAuthenticated,
@@ -81,7 +83,7 @@ function ProtectedLayout({
 }
 
 function App() {
-  const [selectedPlaylist, setSelectedPlaylist] = useState(null);
+  const { selectedPlaylist, setSelectedPlaylist, selectPlaylist } = usePlaylists();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   
@@ -97,27 +99,14 @@ function App() {
 
   const navigate = useNavigate();
   const handlePlaylistSelect = async (playlist) => {
-
-  try {
-
-    const fullPlaylist = await getPlaylist(
-      playlist.id
-    );
-
-    setSelectedPlaylist(fullPlaylist);
-
-    setSearchQuery("");
-
-    navigate("/");
-
-  } catch (err) {
-
-    console.error(err);
-    alert("Failed to load playlist.");
-
-  }
-
-};
+    try {
+      await selectPlaylist(playlist);
+      setSearchQuery("");
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+    }
+  };
   useEffect(() => {
 
     const timer = setTimeout(async () => {
@@ -282,6 +271,12 @@ function App() {
                 searchResults={searchResults}
               />
             )
+          }
+        />
+        <Route
+          path="/browse"
+          element={
+            <BrowseView />
           }
         />
         <Route

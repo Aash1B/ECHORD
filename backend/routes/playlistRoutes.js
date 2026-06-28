@@ -8,6 +8,9 @@ const {
     getUserPlaylists,
     getPlaylistById,
     addSongToPlaylist,
+    updatePlaylist,
+    deletePlaylist,
+    removeSongFromPlaylist,
 } = require("../controllers/playlistController");
 
 const expressAuth = async (req, res, next) => {
@@ -59,6 +62,36 @@ router.post(
     "/:playlistId/songs",
     expressAuth,
     addSongToPlaylist
+);
+
+// ==============================
+// UPDATE PLAYLIST
+// ==============================
+
+router.put(
+    "/:id",
+    expressAuth,
+    updatePlaylist
+);
+
+// ==============================
+// DELETE PLAYLIST
+// ==============================
+
+router.delete(
+    "/:id",
+    expressAuth,
+    deletePlaylist
+);
+
+// ==============================
+// REMOVE SONG FROM PLAYLIST
+// ==============================
+
+router.delete(
+    "/:playlistId/songs/:songId",
+    expressAuth,
+    removeSongFromPlaylist
 );
 
 module.exports = router;

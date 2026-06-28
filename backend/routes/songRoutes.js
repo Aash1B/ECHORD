@@ -8,6 +8,7 @@ const {
     streamSong,
     toggleLikeSong,
     getListeningHistory,
+    getLikedSongs,
 } = require("../controllers/songController");
 // const expressAuth = async (req, res, next) => {
 //     try {
@@ -31,6 +32,7 @@ const expressAuth = async (req, res, next) => {
 
 router.get("/", getAllSongs);
 router.get("/history", expressAuth, getListeningHistory);
+router.get("/liked", expressAuth, getLikedSongs);
 
 /* ==========================
    SEARCH SONGS

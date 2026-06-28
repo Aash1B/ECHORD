@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Search, Plus } from "lucide-react";
+import { X, Search, Plus, Check } from "lucide-react";
 import styles from "./CreatePlaylistModel.module.css";
 
 import {
@@ -9,6 +9,7 @@ import {
 } from "../../services/api";
 
 import { usePlaylists } from "../../context/playlistcontext";
+import placeholder from "../../assets/music-placeholder.jpg";
 
 export function CreatePlaylistModel({
     isOpen,
@@ -17,6 +18,7 @@ export function CreatePlaylistModel({
 
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
+    const [coverUrl, setCoverUrl] = useState("");
 
     const [search, setSearch] = useState("");
     const [results, setResults] = useState([]);
@@ -70,6 +72,10 @@ export function CreatePlaylistModel({
 
     };
 
+    const removeSong = (songId) => {
+        setSelectedSongs(prev => prev.filter(s => s.id !== songId));
+    };
+
     const handleCreate = async () => {
 
         if (!name.trim()) {
@@ -81,11 +87,12 @@ export function CreatePlaylistModel({
 
         try {
 
-            // Create playlist
+            // Create playlist with coverUrl
             const playlist = await createPlaylist({
 
                 name,
                 description,
+                cover_url: coverUrl.trim() ? coverUrl.trim() : null,
 
             });
 
@@ -107,6 +114,7 @@ export function CreatePlaylistModel({
             // Reset form
             setName("");
             setDescription("");
+            setCoverUrl("");
             setSearch("");
             setResults([]);
             setSelectedSongs([]);
@@ -139,23 +147,73 @@ export function CreatePlaylistModel({
 
                 </div>
 
-                <input
-                    placeholder="Playlist Name"
-                    value={name}
-                    onChange={(e) =>
-                        setName(e.target.value)
-                    }
-                />
+                <div className={styles.detailsRow}>
+                    <div className={styles.coverContainer}>
+                        <img 
+                            src={coverUrl.trim() ? coverUrl.trim() : placeholder} 
+                            alt="Playlist Cover Preview"
+                            onError={(e) => {
+                                e.target.src = placeholder;
+                            }}
+                        />
+                    </div>
 
-                <textarea
-                    placeholder="Description (optional)"
-                    value={description}
-                    onChange={(e) =>
-                        setDescription(e.target.value)
-                    }
-                />
+                    <div className={styles.inputsContainer}>
+                        <input
+                            placeholder="Playlist Name"
+                            value={name}
+                            onChange={(e) =>
+                                setName(e.target.value)
+                            }
+                        />
+
+                        <label className={styles.fileInputLabel}>
+                            {coverUrl ? "Change Cover Image" : "Choose Cover Image"}
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => {
+                                    const file = e.target.files[0];
+                                    if (file) {
+                                        const reader = new FileReader();
+                                        reader.onloadend = () => {
+                                            setCoverUrl(reader.result);
+                                        };
+                                        reader.readAsDataURL(file);
+                                    }
+                                }}
+                            />
+                        </label>
+
+                        <textarea
+                            placeholder="Description (optional)"
+                            value={description}
+                            onChange={(e) =>
+                                setDescription(e.target.value)
+                            }
+                        />
+                    </div>
+                </div>
+
+                {selectedSongs.length > 0 && (
+                    <div className={styles.selectedSongsContainer}>
+                        <h3>Songs to Add ({selectedSongs.length})</h3>
+                        <div className={styles.selectedSongsList}>
+                            {selectedSongs.map(song => (
+                                <div key={song.id} className={styles.selectedSongTag}>
+                                    <span>{song.title}</span>
+                                    <button onClick={() => removeSong(song.id)}>
+                                        <X size={12} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 <div className={styles.searchSection}>
+
+                    <h3>Add songs to start your playlist</h3>
 
                     <div className={styles.searchBox}>
 
@@ -190,13 +248,27 @@ export function CreatePlaylistModel({
 
                                 </div>
 
-                                <button
-                                    onClick={() =>
-                                        addSong(song)
-                                    }
-                                >
-                                    <Plus size={18} />
-                                </button>
+                                {(() => {
+                                    const isAdded = selectedSongs.some(s => s.id === song.id);
+                                    return (
+                                        <button
+                                            onClick={() =>
+                                                isAdded ? removeSong(song.id) : addSong(song)
+                                            }
+                                            style={{
+                                                background: isAdded ? "none" : "#1DB954",
+                                                color: isAdded ? "#1DB954" : "black"
+                                            }}
+                                            title={isAdded ? "Added" : "Add"}
+                                        >
+                                            {isAdded ? (
+                                                <Check size={18} strokeWidth={3} />
+                                            ) : (
+                                                <Plus size={18} />
+                                            )}
+                                        </button>
+                                    );
+                                })()}
 
                             </div>
 

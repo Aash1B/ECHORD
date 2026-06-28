@@ -1,4 +1,27 @@
 const db = require("../db");
+const fs = require("fs");
+const path = require("path");
+
+function saveBase64Image(base64String, req) {
+    if (!base64String) return null;
+    const matches = base64String.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+    if (!matches) {
+        return base64String;
+    }
+    const type = matches[1];
+    const buffer = Buffer.from(matches[2], "base64");
+    const extension = type.split("/")[1] || "png";
+    const filename = `playlist-${Date.now()}-${Math.floor(Math.random() * 10000)}.${extension}`;
+    const uploadsDir = path.join(__dirname, "../uploads");
+    if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+    fs.writeFileSync(path.join(uploadsDir, filename), buffer);
+    
+    const protocol = req.protocol;
+    const host = req.get("host");
+    return `${protocol}://${host}/uploads/${filename}`;
+}
 
 // ==========================================
 // CREATE PLAYLIST
@@ -8,13 +31,17 @@ exports.createPlaylist = async (req, res) => {
 
     try {
 
-        const {
+        let {
             name,
             description,
             cover_url,
         } = req.body;
 
         const userId = req.user.id;
+
+        if (cover_url && cover_url.startsWith("data:image/")) {
+            cover_url = saveBase64Image(cover_url, req);
+        }
 
         if (!name || name.trim() === "") {
 
@@ -340,4 +367,131 @@ exports.getPlaylistById = async (req, res) => {
 
     }
 
+};
+
+exports.updatePlaylist = async (req, res) => {
+    try {
+        const playlistId = req.params.id;
+        let { name, description, cover_url } = req.body;
+        const userId = req.user.id;
+
+        if (cover_url && cover_url.startsWith("data:image/")) {
+            cover_url = saveBase64Image(cover_url, req);
+        }
+
+        // Verify ownership
+        const [playlist] = await db.execute(
+            "SELECT id FROM playlists WHERE id = ? AND user_id = ?",
+            [playlistId, userId]
+        );
+
+        if (playlist.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Playlist not found or access denied."
+            });
+        }
+
+        if (!name || name.trim() === "") {
+            return res.status(400).json({
+                success: false,
+                message: "Playlist name is required."
+            });
+        }
+
+        await db.execute(
+            `UPDATE playlists 
+             SET name = ?, description = ?, cover_url = ? 
+             WHERE id = ?`,
+            [
+                name, 
+                description && description.trim() !== "" ? description : null, 
+                cover_url && cover_url.trim() !== "" ? cover_url : null, 
+                playlistId
+            ]
+        );
+
+        res.json({
+            success: true,
+            message: "Playlist updated successfully."
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            success: false,
+            message: "Failed to update playlist."
+        });
+    }
+};
+
+exports.deletePlaylist = async (req, res) => {
+    try {
+        const playlistId = req.params.id;
+        const userId = req.user.id;
+
+        // Verify ownership
+        const [playlist] = await db.execute(
+            "SELECT id FROM playlists WHERE id = ? AND user_id = ?",
+            [playlistId, userId]
+        );
+
+        if (playlist.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Playlist not found or access denied."
+            });
+        }
+
+        await db.execute(
+            "DELETE FROM playlists WHERE id = ?",
+            [playlistId]
+        );
+
+        res.json({
+            success: true,
+            message: "Playlist deleted successfully."
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            success: false,
+            message: "Failed to delete playlist."
+        });
+    }
+};
+
+exports.removeSongFromPlaylist = async (req, res) => {
+    try {
+        const { playlistId, songId } = req.params;
+        const userId = req.user.id;
+
+        // Verify ownership
+        const [playlist] = await db.execute(
+            "SELECT id FROM playlists WHERE id = ? AND user_id = ?",
+            [playlistId, userId]
+        );
+
+        if (playlist.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Playlist not found or access denied."
+            });
+        }
+
+        await db.execute(
+            "DELETE FROM playlist_songs WHERE playlist_id = ? AND song_id = ?",
+            [playlistId, songId]
+        );
+
+        res.json({
+            success: true,
+            message: "Song removed from playlist successfully."
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            success: false,
+            message: "Failed to remove song from playlist."
+        });
+    }
 };

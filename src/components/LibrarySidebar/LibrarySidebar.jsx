@@ -109,8 +109,13 @@ export function LibrarySidebar({
                 {/* Liked Songs */}
 
                 <button
-                    className={styles.libraryItem}
+                    className={`${styles.libraryItem} ${
+                        selectedPlaylist?.id === "liked-songs"
+                            ? styles.activePlaylist
+                            : ""
+                    }`}
                     type="button"
+                    onClick={() => onPlaylistSelect({ id: "liked-songs", name: "Liked Songs" })}
                 >
 
                     <div

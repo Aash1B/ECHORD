@@ -87,7 +87,7 @@ export function Header({
         </button>
 
         <div className={styles.searchContainer}>
-          <label className={styles.searchBox}>
+          <div className={styles.searchBox}>
           <Search size={22} strokeWidth={2.2} />
           <input
     type="text"
@@ -109,8 +109,20 @@ export function Header({
         }
     }}
 />
-          <Briefcase size={22} strokeWidth={2.1} />
-          </label>
+          <button
+            type="button"
+            className={styles.briefcaseButton}
+            onClick={() => {
+              setSearchQuery("");
+              setSearchResults([]);
+              navigate("/browse");
+            }}
+            title="Browse Genres & Creators"
+            aria-label="Browse"
+          >
+            <Briefcase size={22} strokeWidth={2.1} />
+          </button>
+          </div>
 
           <SearchDropdown
             results={searchResults}

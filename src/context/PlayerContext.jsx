@@ -7,10 +7,13 @@ import {
 } from "react";
 
 import { getSongStream, toggleLikeSong } from "../services/api";
+import { usePlaylists } from "./playlistcontext";
 
 const playercontext = createContext();
 
 export function PlayerProvider({ children }) {
+
+    const { refreshSelectedPlaylist } = usePlaylists();
 
     const audioRef = useRef(new Audio());
 
@@ -291,10 +294,30 @@ export function PlayerProvider({ children }) {
                 localStorage.setItem('last_queue', JSON.stringify(updatedQueue));
                 return updatedQueue;
             });
+            refreshSelectedPlaylist();
         } catch (err) {
             console.error("Failed to toggle like:", err);
             alert(err.message || "Please log in to like songs!");
         }
+    };
+
+    const initializeQueue = (songs) => {
+        setQueue(songs);
+        queueRef.current = songs;
+        localStorage.setItem('last_queue', JSON.stringify(songs));
+    };
+
+    const addToQueue = (song) => {
+        if (!song) return;
+        setQueue((prev) => {
+            const exists = prev.some(s => s.id === song.id);
+            if (exists) return prev;
+            const updated = [...prev, song];
+            queueRef.current = updated;
+            localStorage.setItem('last_queue', JSON.stringify(updated));
+            return updated;
+        });
+        alert(`Added "${song.title}" to queue.`);
     };
 
     return (
@@ -320,6 +343,8 @@ export function PlayerProvider({ children }) {
                 toggleShuffle,
                 isRepeat,
                 toggleRepeat,
+                initializeQueue,
+                addToQueue,
             }}
         >
 
