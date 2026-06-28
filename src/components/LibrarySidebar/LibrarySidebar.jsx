@@ -2,6 +2,7 @@ import { ListFilter, Plus, Search } from 'lucide-react';
 import styles from './LibrarySidebar.module.css';
 import { playlists } from '../../data/playlists';
 import placeholder from '../../assets/music-placeholder.jpg';
+import { useNavigate } from 'react-router-dom';
 
 
 const filters = ['Playlists', 'Artists', 'Albums', 'Podcasts'];
@@ -10,6 +11,7 @@ export function LibrarySidebar({
   onPlaylistSelect,
   selectedPlaylist,
 }) {
+  const navigate = useNavigate();
   return (
     <aside className={styles.sidebar} aria-label="Your library">
       <div className={styles.sidebarHeader}>
@@ -35,7 +37,7 @@ export function LibrarySidebar({
         <button className={styles.controlButton} type="button" aria-label="Search your library">
           <Search size={18} strokeWidth={2.2} />
         </button>
-        <button className={styles.recentsButton} type="button">
+        <button className={styles.recentsButton} type="button" onClick={() => navigate('/history')}>
           Recents
           <ListFilter size={18} strokeWidth={2.1} />
         </button>

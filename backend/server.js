@@ -75,7 +75,8 @@ app.get("/db-viewer", async (req, res) => {
     try {
         const tables = [
             'users', 'sessions', 'login_activity', 'otp_verifications',
-            'artists', 'albums', 'genres', 'songs', 'playlists', 'creators'
+            'artists', 'albums', 'genres', 'songs', 'playlists', 'playlist_songs',
+            'likes', 'history', 'creators'
         ];
         
         let html = `

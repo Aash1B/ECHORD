@@ -1,6 +1,7 @@
 import styles from './App.module.css';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate, Outlet } from 'react-router-dom';
+import { searchSongs } from "./services/api";
 import { Header } from './components/Header/Header.jsx';
 import { LibrarySidebar } from './components/LibrarySidebar/LibrarySidebar.jsx';
 import { PlayerBar } from './components/PlayerBar/PlayerBar.jsx';
@@ -10,6 +11,9 @@ import { PlaylistView } from "./components/PlaylistView/PlaylistView";
 import Login from './components/Auth/Login.jsx';
 import SignUp from './components/Auth/SignUp.jsx';
 import AccountPage from './components/Auth/AccountPage.jsx';
+import { HistoryView } from './components/HistoryView/HistoryView.jsx';
+import { usePlayer } from './context/PlayerContext.jsx';
+import { ExpandedPlayer } from './components/ExpandedPlayer/ExpandedPlayer.jsx';
 
 function ProtectedLayout({
   isAuthenticated,
@@ -23,6 +27,8 @@ function ProtectedLayout({
   searchResults,
   setSearchResults,
 }) {
+  const { isExpanded } = usePlayer();
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
@@ -44,24 +50,30 @@ function ProtectedLayout({
         setSearchResults={setSearchResults}
       />
 
-      <div className={styles.appShell}>
-        <LibrarySidebar
-          onPlaylistSelect={(playlist) => {
-            setSelectedPlaylist(playlist);
-            setSearchQuery("");
-            navigate('/');
-          }}
-          selectedPlaylist={selectedPlaylist}
-        />
-        <main
-          className={styles.mainPlaceholder}
-          aria-label="Main content"
-        >
-          <Outlet />
-        </main>
+      {isExpanded ? (
+        <div className={styles.appShellExpanded}>
+          <ExpandedPlayer />
+        </div>
+      ) : (
+        <div className={styles.appShell}>
+          <LibrarySidebar
+            onPlaylistSelect={(playlist) => {
+              setSelectedPlaylist(playlist);
+              setSearchQuery("");
+              navigate('/');
+            }}
+            selectedPlaylist={selectedPlaylist}
+          />
+          <main
+            className={styles.mainPlaceholder}
+            aria-label="Main content"
+          >
+            <Outlet />
+          </main>
 
-        <RightSidebar />
-      </div>
+          <RightSidebar />
+        </div>
+      )}
 
       <PlayerBar />
     </div>
@@ -72,7 +84,7 @@ function App() {
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  
+
 
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
   const [user, setUser] = useState(() => {
@@ -85,7 +97,32 @@ function App() {
 
   const navigate = useNavigate();
 
-  
+  useEffect(() => {
+
+    const timer = setTimeout(async () => {
+
+      if (!searchQuery.trim()) {
+        setSearchResults([]);
+        return;
+      }
+
+      try {
+
+        const results = await searchSongs(searchQuery);
+
+        setSearchResults(results);
+
+      } catch (err) {
+
+        console.error(err);
+
+      }
+
+    }, 300);
+
+    return () => clearTimeout(timer);
+
+  }, [searchQuery]);
   const handleLoginSuccess = (token, loggedInUser) => {
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(loggedInUser));
@@ -98,8 +135,7 @@ function App() {
     try {
       const token = localStorage.getItem('token');
       if (token) {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-        await fetch(`${apiUrl}/auth/logout`, {
+        await fetch('http://localhost:5000/api/auth/logout', {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -109,9 +145,56 @@ function App() {
     }
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('last_song');
+    localStorage.removeItem('last_queue');
+    localStorage.removeItem('playback_time');
     setIsAuthenticated(false);
     setUser(null);
     navigate('/login');
+  };
+
+  // Protected Layout component that renders the full Spotify layout
+  const AppLayout = () => {
+    if (!isAuthenticated) {
+      return <Navigate to="/login" replace />;
+    }
+
+    return (
+      <div className={styles.appFrame}>
+        <Header
+          onHomeClick={() => {
+            setSelectedPlaylist(null);
+            setSearchQuery("");
+            navigate("/");
+          }}
+          user={user}
+          onLogout={handleLogout}
+          onAccountClick={() => navigate("/profile")}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+        />
+
+        <div className={styles.appShell}>
+          <LibrarySidebar
+            onPlaylistSelect={(playlist) => {
+              setSelectedPlaylist(playlist);
+              navigate('/');
+            }}
+            selectedPlaylist={selectedPlaylist}
+          />
+          <main
+            className={styles.mainPlaceholder}
+            aria-label="Main content"
+          >
+            <Outlet />
+          </main>
+
+          <RightSidebar />
+        </div>
+
+        <PlayerBar />
+      </div>
+    );
   };
 
   return (
@@ -172,10 +255,10 @@ function App() {
             selectedPlaylist ? (
               <PlaylistView playlist={selectedPlaylist} />
             ) : (
-             <MainPage
-    searchQuery={searchQuery}
-    searchResults={searchResults}
-/>
+              <MainPage
+                searchQuery={searchQuery}
+                searchResults={searchResults}
+              />
             )
           }
         />
@@ -185,6 +268,17 @@ function App() {
             <AccountPage
               user={user}
               onProfileUpdate={(updated) => setUser(updated)}
+              onBackToMain={() => {
+                setSelectedPlaylist(null);
+                navigate('/');
+              }}
+            />
+          }
+        />
+        <Route
+          path="/history"
+          element={
+            <HistoryView
               onBackToMain={() => {
                 setSelectedPlaylist(null);
                 navigate('/');

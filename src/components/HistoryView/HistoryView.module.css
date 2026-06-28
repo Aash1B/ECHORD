@@ -1,0 +1,366 @@
+.container {
+  position: relative;
+  background: linear-gradient(180deg, #1f1f1f 0%, #121212 100%);
+  min-height: 100%;
+  overflow-y: auto;
+  color: #fff;
+  padding-bottom: 80px;
+}
+
+.headerGradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 300px;
+  background: linear-gradient(180deg, rgba(29, 185, 84, 0.2) 0%, rgba(18, 18, 18, 0) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.header {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding: 80px 32px 24px;
+  gap: 24px;
+  z-index: 1;
+}
+
+.backButton {
+  background: rgba(0, 0, 0, 0.7);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 12px;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.backButton:hover {
+  transform: scale(1.05);
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.headerContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.upperTitle {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0 0 8px 0;
+  color: #b3b3b3;
+}
+
+.title {
+  font-size: 48px;
+  font-weight: 900;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #b3b3b3;
+  margin: 0;
+}
+
+.content {
+  position: relative;
+  padding: 0 32px;
+  z-index: 1;
+}
+
+/* Empty State */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0;
+  text-align: center;
+  color: #b3b3b3;
+}
+
+.emptyIcon {
+  margin-bottom: 24px;
+  color: #535353;
+  animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.7; }
+}
+
+.emptyState h2 {
+  color: #fff;
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.emptyState p {
+  font-size: 14px;
+  max-width: 320px;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.startListeningBtn {
+  background-color: #1db954;
+  color: #000;
+  border: none;
+  border-radius: 500px;
+  padding: 12px 32px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.startListeningBtn:hover {
+  transform: scale(1.04);
+  background-color: #1ed760;
+}
+
+/* Song Table */
+.songTable {
+  display: flex;
+  flex-direction: column;
+}
+
+.tableHeader {
+  display: grid;
+  grid-template-columns: 50px 4fr 3fr 2fr 120px;
+  padding: 8px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #b3b3b3;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.colNumber {
+  text-align: right;
+  padding-right: 16px;
+}
+
+.colDuration {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 16px;
+}
+
+.songRow {
+  display: grid;
+  grid-template-columns: 50px 4fr 3fr 2fr 120px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  align-items: center;
+}
+
+.songRow:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.activeRow {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.playingIcon {
+  color: #1db954;
+  animation: bounce 0.6s infinite alternate;
+}
+
+@keyframes bounce {
+  from { transform: scaleY(0.6); }
+  to { transform: scaleY(1.2); }
+}
+
+.songInfoBlock {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.coverWrapper {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.coverWrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.coverPlayOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.songRow:hover .coverPlayOverlay {
+  opacity: 1;
+}
+
+.titleArtist {
+  display: flex;
+  flex-direction: column;
+}
+
+.songTitle {
+  font-size: 15px;
+  font-weight: 500;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.greenText {
+  color: #1db954 !important;
+}
+
+.songArtist {
+  font-size: 13px;
+  color: #b3b3b3;
+}
+
+.songRow:hover .songArtist {
+  color: #fff;
+}
+
+.colAlbum {
+  color: #b3b3b3;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.songRow:hover .colAlbum {
+  color: #fff;
+}
+
+.colTime {
+  color: #b3b3b3;
+  font-size: 14px;
+}
+
+.songRow:hover .colTime {
+  color: #fff;
+}
+
+.colDuration {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: flex-end;
+  color: #b3b3b3;
+  font-size: 14px;
+}
+
+.likeBtn {
+  background: none;
+  border: none;
+  color: #b3b3b3;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s, color 0.2s, transform 0.2s;
+}
+
+.songRow:hover .likeBtn {
+  opacity: 1;
+}
+
+.likeBtn.liked {
+  opacity: 1;
+  color: #1db954;
+}
+
+.likeBtn:hover {
+  transform: scale(1.1);
+  color: #fff;
+}
+
+.likeBtn.liked:hover {
+  color: #1ed760;
+}
+
+.durationText {
+  width: 40px;
+  text-align: right;
+}
+
+/* Loading state spinner */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: #b3b3b3;
+}
+
+.loader {
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-left-color: #1db954;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .tableHeader {
+    grid-template-columns: 40px 1fr 1fr;
+  }
+  
+  .songRow {
+    grid-template-columns: 40px 1fr 1fr;
+  }
+  
+  .colAlbum, .colTime {
+    display: none;
+  }
+  
+  .title {
+    font-size: 32px;
+  }
+}

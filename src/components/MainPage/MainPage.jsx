@@ -2,8 +2,9 @@ import { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import styles from './MainPage.module.css';
 import placeholder from "../../assets/music-placeholder.jpg";
-import { getSongs } from "../../services/api";
+import { getSongs, getListeningHistory } from "../../services/api";
 import { usePlayer } from "../../context/PlayerContext";
+import { useNavigate } from "react-router-dom";
 
 
 const QUICK_PICKS = [
@@ -59,7 +60,9 @@ export function MainPage({
   const recentRef = useRef(null);
   const mixesRef = useRef(null);
   const featuredRef = useRef(null);
+  const navigate = useNavigate();
   const [songs, setSongs] = useState([]);
+  const [historySongs, setHistorySongs] = useState([]);
 
   const {
   playSong,
@@ -82,7 +85,20 @@ initializeQueue(data);
       }
     }
 
+    async function loadHistory() {
+      try {
+        const token = localStorage.getItem('token');
+        if (token) {
+          const history = await getListeningHistory();
+          setHistorySongs(history);
+        }
+      } catch (err) {
+        console.error("Error loading listening history:", err);
+      }
+    }
+
     loadSongs();
+    loadHistory();
   }, []);
 
   const scrollRight = (ref) => {
@@ -99,11 +115,11 @@ initializeQueue(data);
 
   //   
 
-  const MusicCard = ({ song }) => (
+  const MusicCard = ({ song, playlist }) => (
     <div
       className={styles.musicCard}
       onClick={() => {
-        playSong(song, displayedSongs);
+        playSong(song, playlist || displayedSongs);
       }}
     >
       <img
@@ -149,7 +165,7 @@ initializeQueue(data);
 
       <div className={styles.sectionHeader}>
         <h2>Recents</h2>
-        <span>Show all</span>
+        <span style={{ cursor: "pointer" }} onClick={() => navigate('/history')}>Show all</span>
       </div>
       <div className={styles.cardsContainer}>
         {showRecentLeftArrow && (
@@ -161,10 +177,11 @@ initializeQueue(data);
           <ChevronRight size={20} />
         </button>
         <div className={styles.cardsRow} ref={recentRef}>
-          {displayedSongs.slice(0, 7).map(song => (
+          {(historySongs.length > 0 ? historySongs.slice(0, 7) : displayedSongs.slice(0, 7)).map(song => (
             <MusicCard
-              key={song.id}
+              key={song.history_id || song.id}
               song={song}
+              playlist={historySongs.length > 0 ? historySongs : displayedSongs}
             />
           ))}
         </div>

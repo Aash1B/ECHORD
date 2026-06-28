@@ -2,6 +2,7 @@ import {
     Heart,
   ListMusic,
   Maximize2,
+  Minimize2,
   Mic2,
   MonitorSpeaker,
   Pause,
@@ -30,6 +31,12 @@ export function PlayerBar() {
     volume,
     setVolume,
     toggleLike,
+    isExpanded,
+    toggleExpand,
+    isShuffle,
+    toggleShuffle,
+    isRepeat,
+    toggleRepeat,
   } = usePlayer();
 
   // Nothing selected yet
@@ -146,7 +153,11 @@ export function PlayerBar() {
       {/* CENTER */}
       <div className={styles.playerCenter}>
         <div className={styles.controls}>
-          <button className={styles.controlButton}>
+          <button 
+            className={`${styles.controlButton} ${isShuffle ? styles.activeControl : ""}`}
+            onClick={toggleShuffle}
+            aria-label="Toggle Shuffle"
+          >
             <Shuffle size={18} />
           </button>
 
@@ -190,7 +201,11 @@ export function PlayerBar() {
             />
           </button>
 
-          <button className={styles.controlButton}>
+          <button 
+            className={`${styles.controlButton} ${isRepeat ? styles.activeControl : ""}`}
+            onClick={toggleRepeat}
+            aria-label="Toggle Repeat"
+          >
             <Repeat2 size={18} />
           </button>
         </div>
@@ -242,8 +257,8 @@ export function PlayerBar() {
           }
         />
 
-        <button className={styles.controlButton}>
-          <Maximize2 size={17} />
+        <button className={styles.controlButton} onClick={toggleExpand} aria-label={isExpanded ? "Collapse now playing view" : "Expand now playing view"}>
+          {isExpanded ? <Minimize2 size={17} /> : <Maximize2 size={17} />}
         </button>
       </div>
     </footer>

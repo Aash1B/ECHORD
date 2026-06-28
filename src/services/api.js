@@ -46,8 +46,15 @@ export async function searchSongs(query, options = {}) {
 }
 
 export async function getSongStream(songId) {
+    const token = localStorage.getItem('token');
+    const headers = {};
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(
-        `${API_URL}/songs/${songId}/stream`
+        `${API_URL}/songs/${songId}/stream`,
+        { headers }
     );
 
     if (!response.ok) {
@@ -57,6 +64,24 @@ export async function getSongStream(songId) {
     const data = await response.json();
 
     return data.streamUrl;
+}
+
+export async function getListeningHistory() {
+    const token = localStorage.getItem('token');
+    if (!token) return [];
+
+    const response = await fetch(`${API_URL}/songs/history`, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to fetch listening history");
+    }
+
+    const data = await response.json();
+    return data.songs;
 }
 
 export async function getContentRecommendations(songId) {
