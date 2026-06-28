@@ -17,7 +17,7 @@ export function SearchDropdown({ results = [], visible, onClose }) {
                         key={song.id}
                         className={styles.result}
                         onClick={() => {
-                            playSong(song, results);
+                           playSong(song);
                             onClose();
                         }}
                     >

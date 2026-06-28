@@ -61,7 +61,10 @@ export function MainPage({
   const featuredRef = useRef(null);
   const [songs, setSongs] = useState([]);
 
-  const { playSong } = usePlayer();
+  const {
+  playSong,
+  initializeQueue,
+} = usePlayer();
 
   const displayedSongs = songs;
 
@@ -69,7 +72,11 @@ export function MainPage({
     async function loadSongs() {
       try {
         const data = await getSongs();
-        setSongs(data);
+
+setSongs(data);
+
+// Register the complete library with PlayerContext
+initializeQueue(data);
       } catch (err) {
         console.error(err);
       }

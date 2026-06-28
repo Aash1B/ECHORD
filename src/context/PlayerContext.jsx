@@ -15,7 +15,7 @@ export function PlayerProvider({ children }) {
     const audioRef = useRef(new Audio());
 
     const [queue, setQueue] = useState([]);
-
+    const [allSongs, setAllSongs] = useState([]);
     const [currentSong, setCurrentSong] = useState(null);
 
     const [isPlaying, setIsPlaying] = useState(false);
@@ -50,7 +50,6 @@ export function PlayerProvider({ children }) {
         };
 
     }, []);
-
     const playSong = async (song, playlist = []) => {
 
         try {
