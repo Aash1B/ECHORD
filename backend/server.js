@@ -5,6 +5,7 @@ require("dotenv").config({
 
 const { authenticateRequest } = require('./authMiddleware');
 const auth = require('./authController');
+const database = require('./db');
 
 const express = require("express");
 const cors = require("cors");
@@ -35,6 +36,27 @@ app.get("/api/health", (req, res) => {
         message: "Spotify Backend Running"
     });
 });
+
+// Startup schema validation for users role constraint
+(async function ensureUsersConstraint() {
+    try {
+        const [rows] = await database.query(
+            "SELECT CONSTRAINT_NAME, CHECK_CLAUSE FROM INFORMATION_SCHEMA.CHECK_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = ? AND CONSTRAINT_NAME = 'users_chk_1'",
+            [process.env.DB_NAME]
+        );
+
+        if (rows.length > 0) {
+            const checkClause = rows[0].CHECK_CLAUSE;
+            if (!checkClause.includes("'creator'")) {
+                console.warn('users_chk_1 does not include creator; updating constraint.');
+                await database.query('ALTER TABLE users DROP CHECK users_chk_1');
+                await database.query("ALTER TABLE users ADD CONSTRAINT users_chk_1 CHECK (role IN ('user', 'admin', 'creator'))");
+            }
+        }
+    } catch (error) {
+        console.warn('Failed to validate/update users role constraint:', error.message);
+    }
+})();
 
 // Express middleware to authenticate requests using the existing authenticateRequest helper
 const expressAuth = async (req, res, next) => {
