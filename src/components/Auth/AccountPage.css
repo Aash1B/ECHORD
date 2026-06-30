@@ -376,6 +376,7 @@
   position: relative;
   cursor: pointer;
   -webkit-appearance: none;
+  appearance: none;
   transition: background 0.3s;
   outline: none;
 }
