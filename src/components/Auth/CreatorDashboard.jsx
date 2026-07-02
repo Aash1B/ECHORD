@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Music, Heart, Plus, Edit, Trash2, LogOut, ArrowRight, X, Upload, Check } from 'lucide-react';
 import './CreatorDashboard.css';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 function CreatorDashboard({ user, onLogout }) {
   const navigate = useNavigate();
 
@@ -15,39 +17,7 @@ function CreatorDashboard({ user, onLogout }) {
     }
   }, [user, navigate]);
 
-  // Local state for creator's mock songs
-  const [songs, setSongs] = useState([
-    {
-      id: 1,
-      title: 'Midnight Shadows',
-      genre: 'Pop',
-      duration: 184,
-      play_count: 14502,
-      like_count: 852,
-      cover_url: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=200&auto=format&fit=crop',
-      created_at: '2026-06-15T12:00:00Z'
-    },
-    {
-      id: 2,
-      title: 'Echoes of You',
-      genre: 'Rock',
-      duration: 215,
-      play_count: 9284,
-      like_count: 512,
-      cover_url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=200&auto=format&fit=crop',
-      created_at: '2026-06-20T12:00:00Z'
-    },
-    {
-      id: 3,
-      title: 'Summer Breeze',
-      genre: 'Folk',
-      duration: 168,
-      play_count: 2491,
-      like_count: 198,
-      cover_url: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=200&auto=format&fit=crop',
-      created_at: '2026-06-28T12:00:00Z'
-    }
-  ]);
+  const [songs, setSongs] = useState([]);
 
   // Modal / UI states
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -78,6 +48,10 @@ function CreatorDashboard({ user, onLogout }) {
     setShowUploadModal(true);
   };
 
+  useEffect(() => {
+    loadSongs();
+  }, []);
+
   const handleAudioChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setAudioFile(e.target.files[0]);
@@ -92,7 +66,40 @@ function CreatorDashboard({ user, onLogout }) {
 
   const [errorMsg, setErrorMsg] = useState('');
 
-  const handleUploadSubmit = (e) => {
+  const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = reader.result;
+        const base64 = dataUrl.split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const loadSongs = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      const res = await fetch(`${API_URL}/songs/creator/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || 'Unable to load creator songs.');
+      }
+      setSongs(data.songs || []);
+    } catch (err) {
+      console.error(err);
+      setErrorMsg(err.message);
+    }
+  };
+
+  const handleUploadSubmit = async (e) => {
     e.preventDefault();
     if (!title.trim()) {
       setErrorMsg('Please enter a song title.');
@@ -106,30 +113,46 @@ function CreatorDashboard({ user, onLogout }) {
     setLoading(true);
     setErrorMsg('');
 
-    // Simulate upload delay
-    setTimeout(() => {
-      const newSong = {
-        id: Date.now(),
-        title: title,
-        genre: genre,
-        duration: 180, // dummy duration
-        play_count: 0,
-        like_count: 0,
-        cover_url: coverImage 
-          ? URL.createObjectURL(coverImage) 
-          : 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=200&auto=format&fit=crop',
-        created_at: new Date().toISOString()
-      };
+    try {
+      const audioBase64 = await fileToBase64(audioFile);
+      const coverBase64 = coverImage ? await fileToBase64(coverImage) : null;
+      const token = localStorage.getItem('token');
 
-      setSongs([newSong, ...songs]);
-      setSuccessMsg('Song uploaded successfully (Simulated B2 Upload)!');
+      const res = await fetch(`${API_URL}/songs/creator/me`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title,
+          genre,
+          audioFileName: audioFile.name,
+          audioFileType: audioFile.type,
+          audioBase64,
+          coverFileName: coverImage?.name,
+          coverFileType: coverImage?.type,
+          coverBase64,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || 'Upload failed.');
+      }
+
+      setSongs((currentSongs) => [data.song, ...currentSongs]);
+      setSuccessMsg('Song uploaded successfully!');
       setLoading(false);
-      
+
       setTimeout(() => {
         setShowUploadModal(false);
         setSuccessMsg('');
       }, 1500);
-    }, 1500);
+    } catch (err) {
+      setErrorMsg(err.message);
+      setLoading(false);
+    }
   };
 
   // Handlers for Edit Modal
