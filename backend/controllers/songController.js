@@ -247,6 +247,32 @@ async function uploadCreatorSong(req, res) {
     }
 }
 
+async function deleteCreatorSong(req, res) {
+    try {
+        const creator = await ensureCreatorRecord(req.user);
+        if (!creator) {
+            return res.status(403).json({ success: false, message: 'Creator access required.' });
+        }
+
+        const songId = Number(req.params.id);
+        if (!songId) {
+            return res.status(400).json({ success: false, message: 'Invalid song id.' });
+        }
+
+        const [rows] = await pool.query('SELECT id, b2_key FROM songs WHERE id = ? AND uploaded_by = ?', [songId, creator.id]);
+        if (rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Song not found or not owned by creator.' });
+        }
+
+        await pool.query('DELETE FROM songs WHERE id = ? AND uploaded_by = ?', [songId, creator.id]);
+
+        res.status(200).json({ success: true, message: 'Song deleted successfully.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Unable to delete song.' });
+    }
+}
+
 /* ==========================
    SEARCH SONGS
 ========================== */
@@ -575,6 +601,7 @@ module.exports = {
     getAllSongs,
     getCreatorSongs,
     uploadCreatorSong,
+    deleteCreatorSong,
     searchSongs,
     streamSong,
     toggleLikeSong,
