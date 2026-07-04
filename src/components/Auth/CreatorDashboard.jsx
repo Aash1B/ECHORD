@@ -153,7 +153,8 @@ function CreatorDashboard({ user, onLogout }) {
 
       const uploadedSong = {
         ...data.song,
-        cover_url: data.song?.cover_url || coverImagePreview || null,
+        cover_url: data.song?.cover_url || null,
+        coverPreview: data.song?.cover_url ? null : coverImagePreview,
       };
 
       setSongs((currentSongs) => [uploadedSong, ...currentSongs]);
@@ -312,7 +313,7 @@ function CreatorDashboard({ user, onLogout }) {
                     <td>
                       <div className="creator-song-info">
                         <img
-                          src={song.cover_url || placeholder}
+                          src={song.cover_url || song.coverPreview || placeholder}
                           alt={song.title}
                           className="creator-song-cover"
                           onError={(e) => { e.target.onerror = null; e.target.src = placeholder; }}
