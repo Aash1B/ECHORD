@@ -393,10 +393,30 @@ setIsPlaying(true);
         }
     };
 
+    const selectSongWithoutPlaying = async (song) => {
+        try {
+            setCurrentSong(song);
+            currentSongRef.current = song;
+            localStorage.setItem('last_song', JSON.stringify(song));
+            
+            const streamUrl = await getSongStream(song.id);
+            audioRef.current.src = streamUrl;
+            audioRef.current.volume = volume;
+            audioRef.current.load();
+            setIsPlaying(false);
+        } catch (err) {
+            console.error("Error selecting default song:", err);
+        }
+    };
+
     const initializeQueue = (songs) => {
         setQueue(songs);
         queueRef.current = songs;
         localStorage.setItem('last_queue', JSON.stringify(songs));
+
+        if (!currentSongRef.current && songs && songs.length > 0) {
+            selectSongWithoutPlaying(songs[0]);
+        }
     };
 
     const addToQueue = (song) => {
