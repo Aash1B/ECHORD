@@ -56,7 +56,7 @@ function ProtectedLayout({
         }}
         user={user}
         onLogout={handleLogout}
-        onAccountClick={() => navigate("/account")}
+        onAccountClick={() => window.open("/account", "_blank")}
         onProfileClick={() => navigate("/profile")}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -409,20 +409,6 @@ function App() {
           }
         />
         <Route
-          path="/account"
-          element={
-            <AccountPage
-              user={user}
-              onProfileUpdate={(updated) => setUser(updated)}
-              onLogout={handleLogout}
-              onBackToMain={() => {
-                setSelectedPlaylist(null);
-                navigate('/');
-              }}
-            />
-          }
-        />
-        <Route
           path="/history"
           element={
             <HistoryView
@@ -440,6 +426,26 @@ function App() {
           }
         />
       </Route>
+
+      {/* Standalone Protected Route for Account Page */}
+      <Route
+        path="/account"
+        element={
+          isAuthenticated ? (
+            <AccountPage
+              user={user}
+              onProfileUpdate={(updated) => setUser(updated)}
+              onLogout={handleLogout}
+              onBackToMain={() => {
+                setSelectedPlaylist(null);
+                navigate('/');
+              }}
+            />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
 
       {/* Fallback route */}
       <Route path="*" element={<Navigate to="/" replace />} />
