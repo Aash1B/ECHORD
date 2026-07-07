@@ -44,10 +44,6 @@
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  border-radius: 8px !important;
-}
-
-.mainPlaceholder {
   border-radius: 8px;
   background:
     linear-gradient(180deg, rgba(135, 3, 57, 0.08), transparent 28%),
@@ -111,10 +107,10 @@
 }
 
 .mainPlaceholder::-webkit-scrollbar-thumb {
-  background: #870339;
+  background: #555;
   border-radius: 4px;
 }
 
 .mainPlaceholder::-webkit-scrollbar-thumb:hover {
-  background: #a8044a;
+  background: #777;
 }
