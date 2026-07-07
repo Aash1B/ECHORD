@@ -50,7 +50,7 @@ export function LibrarySidebar({
                     title="Create Playlist"
                     aria-label="Create Playlist"
                 >
-                    <Plus size={14} strokeWidth={2.5} />
+                    <Plus size={24} strokeWidth={2.2} />
                 </button>
 
             </div>
