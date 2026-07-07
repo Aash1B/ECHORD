@@ -101,10 +101,10 @@
   display: flex;
   gap: 20px;
   overflow-x: auto;
+  overflow-y: visible;
   margin-bottom: 40px;
-
-  padding-top: 12px;   /* Add this */
-
+  padding-top: 12px;
+  padding-bottom: 16px;
   scroll-behavior: smooth;
   scrollbar-width: none;
 }
@@ -185,19 +185,19 @@ position:relative;
 
 .musicCard p {
   font-size: 11px;
-  color: #B3B3B3;
+  color: #C98AB3;
   margin: 0;
   line-height: 1.3;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  opacity: 0.9;
   transition: color 0.3s ease;
 }
 
 .cardsContainer {
   position: relative;
   margin-bottom: 40px;
+  isolation: isolate;
 }
 
 .spotifyArrow {
