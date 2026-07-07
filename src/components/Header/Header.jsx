@@ -213,7 +213,6 @@ export function Header({
                 <span>Download</span>
                 <ExternalLink size={16} />
               </div>
-              <div className={styles.menuItem} role="menuitem">Settings</div>
               <div className={styles.menuItem} role="menuitem" onClick={onLogout} style={{ cursor: 'pointer' }}>Log out</div>
             </div>
           )}
