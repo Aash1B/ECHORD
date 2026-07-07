@@ -10,7 +10,7 @@ import { PlaylistCover } from "../PlaylistCover/PlaylistCover";
 import { usePlaylists } from "../../context/playlistcontext";
 import { CreatePlaylistModel } from "../CreatePlaylistModel/CreatePlaylistModel";
 
-const filters = ["Playlists", "Artists", "Albums", "Podcasts"];
+const filters = ["Playlists", "Artists", "Albums"];
 
 export function LibrarySidebar({
     onPlaylistSelect,
@@ -50,7 +50,7 @@ export function LibrarySidebar({
                     title="Create Playlist"
                     aria-label="Create Playlist"
                 >
-                    <Plus size={14} strokeWidth={2.5} />
+                    <Plus size={24} strokeWidth={2.2} />
                 </button>
 
             </div>

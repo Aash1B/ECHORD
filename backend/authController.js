@@ -666,12 +666,12 @@ async function handleUpdateSessionTimeout(request, response) {
     }
 
     const body = await readBody(request);
-    const { timeout_seconds } = body;
-    const timeoutVal = Number(timeout_seconds);
+    const rawTimeout = body.session_timeout_seconds !== undefined ? body.session_timeout_seconds : body.timeout_seconds;
+    const timeoutVal = Number(rawTimeout);
 
-    if (isNaN(timeoutVal) || timeoutVal < 15 || timeoutVal > 604800) {
+    if (isNaN(timeoutVal) || timeoutVal < 15 || timeoutVal > 31536000) {
       return sendJson(response, 400, {
-        error: 'Session timeout must be between 15 seconds and 7 days (604,800 seconds).'
+        error: 'Session timeout must be between 15 seconds and 365 days (31,536,000 seconds).'
       });
     }
 

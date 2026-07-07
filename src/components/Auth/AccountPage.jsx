@@ -36,6 +36,80 @@ function AccountPage({ user, onProfileUpdate, onLogout, onBackToMain }) {
   const [picture, setPicture] = useState(user?.profile_picture && !user.profile_picture.includes('googleusercontent.com') ? user.profile_picture : '');
   
   const [currentPassword, setCurrentPassword] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const settingCategories = [
+    {
+      title: 'Account',
+      items: [
+        { label: 'Edit personal info', icon: User, action: () => setActiveTab('edit') },
+        { label: 'Recover playlists', icon: RotateCcw, action: () => triggerMockToast('Recover playlists') },
+        { label: 'Address', icon: MapPin, action: () => triggerMockToast('Address') }
+      ]
+    },
+    {
+      title: 'Subscription',
+      items: [
+        { label: 'Manage your subscription', icon: CreditCard, action: () => triggerMockToast('Manage your subscription') },
+        { label: 'Manage members', icon: Users, action: () => triggerMockToast('Manage members') },
+        { label: 'Cancel subscription', icon: XCircle, action: () => triggerMockToast('Cancel subscription') }
+      ]
+    },
+    {
+      title: 'Payment',
+      items: [
+        { label: 'Payment history', icon: FileText, action: () => triggerMockToast('Payment history') }
+      ]
+    },
+    {
+      title: 'Security and privacy',
+      items: [
+        { label: 'Manage apps', icon: Grid, action: () => triggerMockToast('Manage apps') },
+        { label: 'Notification settings', icon: Bell, action: () => setActiveTab('notifications') },
+        { label: 'Account privacy', icon: Eye, action: () => triggerMockToast('Account privacy') },
+        { label: 'Edit login methods', icon: Key, action: () => triggerMockToast('Edit login methods') },
+        { label: 'Set device password', icon: Lock, action: () => setActiveTab('password') },
+        { label: 'Delete account', icon: Trash2, action: () => triggerMockToast('Delete account') },
+        { label: 'Sign out everywhere (Sessions)', icon: LogOut, action: () => setActiveTab('sessions') }
+      ]
+    },
+    {
+      title: 'Advertising',
+      items: [
+        { label: 'Ad preferences', icon: Sliders, action: () => triggerMockToast('Ad preferences') }
+      ]
+    },
+    {
+      title: 'Help',
+      items: [
+        { label: 'Ghostt support', icon: HelpCircle, action: () => triggerMockToast('Ghostt support') }
+      ]
+    }
+  ];
+
+  const helpArticles = [
+    { title: "How to change your account password", content: "Navigate to Security and privacy > Set device password. Enter your current password and choose a new secure password." },
+    { title: "Updating your display name, email, or phone number", content: "Go to Account > Edit personal info to modify your profile picture, display name, email address, or phone number." },
+    { title: "Managing active devices and sessions", content: "Under Security and privacy, choose Sign out everywhere (Sessions) to view, configure inactivity logout timeout, or log out of individual devices." },
+    { title: "Canceling your Premium plan subscription", content: "Navigate to Subscription > Cancel subscription to cancel your subscription and transition to a free plan." },
+    { title: "Recovering recently deleted playlists", content: "Go to Account > Recover playlists to find and restore deleted playlists." },
+    { title: "Updating your account billing address", content: "Go to Account > Address to update your billing details and address information." }
+  ];
+
+  const filteredCategories = settingCategories.map(cat => {
+    const titleMatches = cat.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchedItems = cat.items.filter(item => 
+      titleMatches || item.label.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    return { ...cat, items: matchedItems };
+  }).filter(cat => cat.items.length > 0);
+
+  const filteredArticles = searchQuery.trim() 
+    ? helpArticles.filter(art => 
+        art.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        art.content.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : [];
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -300,14 +374,12 @@ function AccountPage({ user, onProfileUpdate, onLogout, onBackToMain }) {
         </div>
       )}
 
-      {/* Spotify Top Header */}
+      {/* Ghostt Top Header */}
       <header className="spotify-account-header">
         <div className="header-inner">
           <div className="spotify-logo-clickable" onClick={onBackToMain} style={{ cursor: 'pointer' }}>
-            <svg viewBox="0 0 24 24" style={{ width: '36px', height: '36px', fill: '#1db954' }}>
-              <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424c-.18.295-.565.387-.86.207-2.377-1.454-5.37-1.783-8.893-.982-.336.075-.67-.138-.747-.473-.075-.335.138-.67.473-.746 3.854-.88 7.148-.507 9.82 1.13.295.18.387.563.207.864zm1.225-2.72c-.227.367-.707.487-1.074.26-2.72-1.672-6.87-2.157-10.076-1.185-.412.125-.845-.107-.97-.52-.125-.413.108-.847.52-.972 3.666-1.11 8.24-.564 11.34 1.345.367.228.487.708.26 1.072zm.105-2.833C14.383 8.8 8.44 8.604 5.01 9.645c-.53.16-1.09-.142-1.25-.67-.16-.53.14-1.09.67-1.25 3.96-1.202 10.51-.976 14.59 1.45.476.282.63.896.347 1.373-.28.477-.895.63-1.373.348z" />
-            </svg>
-            <span className="logo-text">Spotify</span>
+            <img src="/logo.svg" alt="Ghostt Logo" style={{ width: '36px', height: '36px' }} />
+            <span className="logo-text">Ghostt</span>
           </div>
 
           <nav className="header-nav-links">
@@ -356,199 +428,96 @@ function AccountPage({ user, onProfileUpdate, onLogout, onBackToMain }) {
                 <input 
                   type="text" 
                   placeholder="Search account or help articles" 
-                  onClick={() => triggerMockToast('Account search')}
-                  readOnly
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
+                {searchQuery && (
+                  <button 
+                    onClick={() => setSearchQuery('')}
+                    className="clear-search-btn"
+                    title="Clear search"
+                  >
+                    ✕
+                  </button>
+                )}
               </div>
             </div>
 
-            {/* Plan Section */}
-            <div className="plan-section-card">
-              <div className="plan-card-header">
-                <span className="plan-badge-green">Your plan</span>
-              </div>
-              <div className="plan-card-body">
-                <div className="plan-details-left">
-                  <div className="plan-icon-logo">
-                    <svg viewBox="0 0 24 24" style={{ width: '40px', height: '40px', fill: '#1db954' }}>
-                      <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424c-.18.295-.565.387-.86.207-2.377-1.454-5.37-1.783-8.893-.982-.336.075-.67-.138-.747-.473-.075-.335.138-.67.473-.746 3.854-.88 7.148-.507 9.82 1.13.295.18.387.563.207.864zm1.225-2.72c-.227.367-.707.487-1.074.26-2.72-1.672-6.87-2.157-10.076-1.185-.412.125-.845-.107-.97-.52-.125-.413.108-.847.52-.972 3.666-1.11 8.24-.564 11.34 1.345.367.228.487.708.26 1.072zm.105-2.833C14.383 8.8 8.44 8.604 5.01 9.645c-.53.16-1.09-.142-1.25-.67-.16-.53.14-1.09.67-1.25 3.96-1.202 10.51-.976 14.59 1.45.476.282.63.896.347 1.373-.28.477-.895.63-1.373.348z" />
-                    </svg>
-                    <span className="plan-name-spotify">Premium</span>
+            {/* Show Plan Section and categories only if we aren't searching support articles specifically or if we have settings matches */}
+            {(!searchQuery || filteredCategories.length > 0) && (
+              <>
+                {/* Plan Section */}
+                <div className="plan-section-card">
+                  <div className="plan-card-header">
+                    <span className="plan-badge-green">Your plan</span>
                   </div>
-                  <h2 className="plan-family-title">Family</h2>
-                  <p className="plan-family-desc">You're a member of a Family plan.</p>
-                </div>
-                <div className="plan-members-right">
-                  <div className="family-members-stack">
-                    <div className="member-avatar" style={{ backgroundColor: '#1db954', zIndex: 6 }}>👩</div>
-                    <div className="member-avatar" style={{ backgroundColor: '#4a90e2', zIndex: 5 }}>🧑</div>
-                    <div className="member-avatar" style={{ backgroundColor: '#f5a623', zIndex: 4 }}>👧</div>
-                    <div className="member-avatar" style={{ backgroundColor: '#e28490', zIndex: 3 }}>🧒</div>
-                    <div className="member-avatar" style={{ backgroundColor: '#9b59b6', zIndex: 2 }}>👶</div>
-                    <div className="member-avatar" style={{ backgroundColor: '#1abc9c', zIndex: 1 }}>👵</div>
+                  <div className="plan-card-body">
+                    <div className="plan-icon-logo">
+                      <img src="/logo.svg" alt="Ghostt Logo" style={{ width: '24px', height: '24px' }} />
+                      <span className="plan-name-spotify">Premium</span>
+                    </div>
+                    <h2 className="plan-family-title">Family</h2>
+                    <p className="plan-family-desc">You're a member of a Family plan.</p>
+                    <div className="family-members-stack">
+                      <div className="member-avatar" style={{ backgroundColor: '#1db954', zIndex: 6 }}>👩</div>
+                      <div className="member-avatar" style={{ backgroundColor: '#4a90e2', zIndex: 5 }}>🧑</div>
+                      <div className="member-avatar" style={{ backgroundColor: '#f5a623', zIndex: 4 }}>👧</div>
+                      <div className="member-avatar" style={{ backgroundColor: '#e28490', zIndex: 3 }}>🧒</div>
+                      <div className="member-avatar" style={{ backgroundColor: '#9b59b6', zIndex: 2 }}>👶</div>
+                      <div className="member-avatar" style={{ backgroundColor: '#1abc9c', zIndex: 1 }}>👵</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              </>
+            )}
 
             {/* Account settings categorized lists */}
             <div className="account-settings-categories">
-              
-              {/* Category: Account */}
-              <div className="setting-category-block">
-                <h3>Account</h3>
-                <div className="setting-rows-list">
-                  <div className="setting-row-item" onClick={() => setActiveTab('edit')}>
-                    <div className="row-left">
-                      <User className="row-icon" size={20} />
-                      <span className="row-label">Edit personal info</span>
-                    </div>
-                    <ChevronRight className="row-chevron" size={20} />
-                  </div>
-                  <div className="setting-row-item" onClick={() => triggerMockToast('Recover playlists')}>
-                    <div className="row-left">
-                      <RotateCcw className="row-icon" size={20} />
-                      <span className="row-label">Recover playlists</span>
-                    </div>
-                    <ChevronRight className="row-chevron" size={20} />
-                  </div>
-                  <div className="setting-row-item" onClick={() => triggerMockToast('Address')}>
-                    <div className="row-left">
-                      <MapPin className="row-icon" size={20} />
-                      <span className="row-label">Address</span>
-                    </div>
-                    <ChevronRight className="row-chevron" size={20} />
+              {filteredCategories.map((cat, catIdx) => (
+                <div key={catIdx} className="setting-category-block">
+                  <h3>{cat.title}</h3>
+                  <div className="setting-rows-list">
+                    {cat.items.map((item, itemIdx) => {
+                      const IconComponent = item.icon;
+                      return (
+                        <div key={itemIdx} className="setting-row-item" onClick={item.action}>
+                          <div className="row-left">
+                            <IconComponent className="row-icon" size={20} />
+                            <span className="row-label">{item.label}</span>
+                          </div>
+                          <ChevronRight className="row-chevron" size={20} />
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-              </div>
-
-              {/* Category: Subscription */}
-              <div className="setting-category-block">
-                <h3>Subscription</h3>
-                <div className="setting-rows-list">
-                  <div className="setting-row-item" onClick={() => triggerMockToast('Manage your subscription')}>
-                    <div className="row-left">
-                      <CreditCard className="row-icon" size={20} />
-                      <span className="row-label">Manage your subscription</span>
-                    </div>
-                    <ChevronRight className="row-chevron" size={20} />
-                  </div>
-                  <div className="setting-row-item" onClick={() => triggerMockToast('Manage members')}>
-                    <div className="row-left">
-                      <Users className="row-icon" size={20} />
-                      <span className="row-label">Manage members</span>
-                    </div>
-                    <ChevronRight className="row-chevron" size={20} />
-                  </div>
-                  <div className="setting-row-item" onClick={() => triggerMockToast('Cancel subscription')}>
-                    <div className="row-left">
-                      <XCircle className="row-icon" size={20} />
-                      <span className="row-label">Cancel subscription</span>
-                    </div>
-                    <ChevronRight className="row-chevron" size={20} />
-                  </div>
-                </div>
-              </div>
-
-              {/* Category: Payment */}
-              <div className="setting-category-block">
-                <h3>Payment</h3>
-                <div className="setting-rows-list">
-                  <div className="setting-row-item" onClick={() => triggerMockToast('Payment history')}>
-                    <div className="row-left">
-                      <FileText className="row-icon" size={20} />
-                      <span className="row-label">Payment history</span>
-                    </div>
-                    <ChevronRight className="row-chevron" size={20} />
-                  </div>
-                </div>
-              </div>
-
-              {/* Category: Security and privacy */}
-              <div className="setting-category-block">
-                <h3>Security and privacy</h3>
-                <div className="setting-rows-list">
-                  <div className="setting-row-item" onClick={() => triggerMockToast('Manage apps')}>
-                    <div className="row-left">
-                      <Grid className="row-icon" size={20} />
-                      <span className="row-label">Manage apps</span>
-                    </div>
-                    <ChevronRight className="row-chevron" size={20} />
-                  </div>
-                  <div className="setting-row-item" onClick={() => setActiveTab('notifications')}>
-                    <div className="row-left">
-                      <Bell className="row-icon" size={20} />
-                      <span className="row-label">Notification settings</span>
-                    </div>
-                    <ChevronRight className="row-chevron" size={20} />
-                  </div>
-                  <div className="setting-row-item" onClick={() => triggerMockToast('Account privacy')}>
-                    <div className="row-left">
-                      <Eye className="row-icon" size={20} />
-                      <span className="row-label">Account privacy</span>
-                    </div>
-                    <ChevronRight className="row-chevron" size={20} />
-                  </div>
-                  <div className="setting-row-item" onClick={() => triggerMockToast('Edit login methods')}>
-                    <div className="row-left">
-                      <Key className="row-icon" size={20} />
-                      <span className="row-label">Edit login methods</span>
-                    </div>
-                    <ChevronRight className="row-chevron" size={20} />
-                  </div>
-                  <div className="setting-row-item" onClick={() => setActiveTab('password')}>
-                    <div className="row-left">
-                      <Lock className="row-icon" size={20} />
-                      <span className="row-label">Set device password</span>
-                    </div>
-                    <ChevronRight className="row-chevron" size={20} />
-                  </div>
-                  <div className="setting-row-item" onClick={() => triggerMockToast('Delete account')}>
-                    <div className="row-left">
-                      <Trash2 className="row-icon" size={20} />
-                      <span className="row-label">Delete account</span>
-                    </div>
-                    <ChevronRight className="row-chevron" size={20} />
-                  </div>
-                  <div className="setting-row-item" onClick={() => setActiveTab('sessions')}>
-                    <div className="row-left">
-                      <LogOut className="row-icon" size={20} />
-                      <span className="row-label">Sign out everywhere (Sessions)</span>
-                    </div>
-                    <ChevronRight className="row-chevron" size={20} />
-                  </div>
-                </div>
-              </div>
-
-              {/* Category: Advertising */}
-              <div className="setting-category-block">
-                <h3>Advertising</h3>
-                <div className="setting-rows-list">
-                  <div className="setting-row-item" onClick={() => triggerMockToast('Ad preferences')}>
-                    <div className="row-left">
-                      <Sliders className="row-icon" size={20} />
-                      <span className="row-label">Ad preferences</span>
-                    </div>
-                    <ChevronRight className="row-chevron" size={20} />
-                  </div>
-                </div>
-              </div>
-
-              {/* Category: Help */}
-              <div className="setting-category-block">
-                <h3>Help</h3>
-                <div className="setting-rows-list">
-                  <div className="setting-row-item" onClick={() => triggerMockToast('Spotify support')}>
-                    <div className="row-left">
-                      <HelpCircle className="row-icon" size={20} />
-                      <span className="row-label">Spotify support</span>
-                    </div>
-                    <ChevronRight className="row-chevron" size={20} />
-                  </div>
-                </div>
-              </div>
-
+              ))}
             </div>
+
+            {/* Help Articles Section */}
+            {searchQuery && filteredArticles.length > 0 && (
+              <div className="help-articles-section">
+                <h3>Matching Help Articles</h3>
+                <div className="help-articles-list">
+                  {filteredArticles.map((art, idx) => (
+                    <div key={idx} className="help-article-item">
+                      <h4>{art.title}</h4>
+                      <p>{art.content}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* No results placeholder */}
+            {searchQuery && filteredCategories.length === 0 && filteredArticles.length === 0 && (
+              <div className="search-no-results">
+                <p>No settings or help articles found matching "<strong>{searchQuery}</strong>"</p>
+                <button className="clear-search-btn-large" onClick={() => setSearchQuery('')}>
+                  Clear search
+                </button>
+              </div>
+            )}
 
           </div>
         )}
@@ -752,6 +721,7 @@ function AccountPage({ user, onProfileUpdate, onLogout, onBackToMain }) {
               </div>
               {sessions.length > 0 && (
                 <button className="revoke-all-btn" onClick={handleRevokeAllSessions}>
+                  <LogOut size={16} />
                   Log Out of All Devices
                 </button>
               )}
@@ -767,7 +737,7 @@ function AccountPage({ user, onProfileUpdate, onLogout, onBackToMain }) {
                   </span>
                 </div>
                 <p>
-                  Choose how long your account can remain unused before your session automatically expires (minimum 15 seconds, maximum 7 days).
+                  Choose how long your account can remain unused before your session automatically expires (minimum 15 seconds, maximum 365 days).
                 </p>
               </div>
 
@@ -839,11 +809,11 @@ function AccountPage({ user, onProfileUpdate, onLogout, onBackToMain }) {
                 <table className="sessions-table">
                   <thead>
                     <tr>
-                      <th>Device & IP</th>
-                      <th>First Logged In</th>
-                      <th>Last Active</th>
-                      <th>Status</th>
-                      <th>Action</th>
+                      <th>DEVICE & IP</th>
+                      <th>FIRST LOGGED IN</th>
+                      <th>LAST ACTIVE</th>
+                      <th>STATUS</th>
+                      <th>ACTION</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -851,7 +821,7 @@ function AccountPage({ user, onProfileUpdate, onLogout, onBackToMain }) {
                       <tr key={s.id} className={s.is_current ? 'current-row' : ''}>
                         <td>
                           <div className="device-cell">
-                            <Monitor size={18} color={s.is_current ? "#1db954" : "#b3b3b3"} />
+                            <Monitor size={18} className="device-icon" />
                             <div>
                               <div className="device-name">{s.device_info}</div>
                               <div className="device-ip">{s.ip_address}</div>
@@ -862,14 +832,20 @@ function AccountPage({ user, onProfileUpdate, onLogout, onBackToMain }) {
                         <td>{s.last_used_at ? new Date(s.last_used_at).toLocaleString() : 'Just now'}</td>
                         <td>
                           {s.is_current ? (
-                            <span className="current-badge">Current Device</span>
+                            <span className="current-badge">
+                              <span className="status-dot green-dot"></span>
+                              Current Device
+                            </span>
                           ) : (
-                            <span className="active-status-badge">Active</span>
+                            <span className="active-status-badge">
+                              <span className="status-dot blue-dot"></span>
+                              Active
+                            </span>
                           )}
                         </td>
                         <td>
                           <button
-                            className="revoke-btn"
+                            className={`revoke-btn ${s.is_current ? 'end-session-btn' : 'logout-device-btn'}`}
                             onClick={() => handleRevokeSession(s.id, s.is_current)}
                           >
                             {s.is_current ? 'End Session' : 'Log Out Device'}
@@ -893,11 +869,9 @@ function AccountPage({ user, onProfileUpdate, onLogout, onBackToMain }) {
       <footer className="spotify-account-footer">
         <div className="footer-top">
           <div className="footer-logo-col">
-            <div className="footer-logo">
-              <svg viewBox="0 0 24 24" style={{ width: '32px', height: '32px', fill: 'white' }}>
-                <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424c-.18.295-.565.387-.86.207-2.377-1.454-5.37-1.783-8.893-.982-.336.075-.67-.138-.747-.473-.075-.335.138-.67.473-.746 3.854-.88 7.148-.507 9.82 1.13.295.18.387.563.207.864zm1.225-2.72c-.227.367-.707.487-1.074.26-2.72-1.672-6.87-2.157-10.076-1.185-.412.125-.845-.107-.97-.52-.125-.413.108-.847.52-.972 3.666-1.11 8.24-.564 11.34 1.345.367.228.487.708.26 1.072zm.105-2.833C14.383 8.8 8.44 8.604 5.01 9.645c-.53.16-1.09-.142-1.25-.67-.16-.53.14-1.09.67-1.25 3.96-1.202 10.51-.976 14.59 1.45.476.282.63.896.347 1.373-.28.477-.895.63-1.373.348z" />
-              </svg>
-              <span>Spotify</span>
+            <div className="footer-logo" onClick={onBackToMain} style={{ cursor: 'pointer' }}>
+              <img src="/logo.svg" alt="Ghostt Logo" style={{ width: '32px', height: '32px' }} />
+              <span>Ghostt</span>
             </div>
           </div>
           
@@ -924,11 +898,11 @@ function AccountPage({ user, onProfileUpdate, onLogout, onBackToMain }) {
               <a href="#" onClick={(e) => { e.preventDefault(); triggerMockToast('Import your music'); }}>Import your music</a>
             </div>
             <div className="footer-col">
-              <h4>Spotify Plans</h4>
+              <h4>Ghostt Plans</h4>
               <a href="#" onClick={(e) => { e.preventDefault(); triggerMockToast('Premium Standard'); }}>Premium Standard</a>
-              <a href="#" onClick={(e) => { e.preventDefault(); triggerMockToast('Premium Family'); }}>Premium Family</a>
+              <a href="#" onClick={(e) => { e.preventDefault(); triggerMockToast('Premium Platinum'); }}>Premium Platinum</a>
               <a href="#" onClick={(e) => { e.preventDefault(); triggerMockToast('Premium Student'); }}>Premium Student</a>
-              <a href="#" onClick={(e) => { e.preventDefault(); triggerMockToast('Spotify Free'); }}>Spotify Free</a>
+              <a href="#" onClick={(e) => { e.preventDefault(); triggerMockToast('Ghostt Free'); }}>Ghostt Free</a>
             </div>
           </div>
 
@@ -965,7 +939,7 @@ function AccountPage({ user, onProfileUpdate, onLogout, onBackToMain }) {
               <Globe size={16} />
               <span>India (English)</span>
             </div>
-            <p className="copyright">&copy; {new Date().getFullYear()} Spotify AB</p>
+            <p className="copyright">&copy; {new Date().getFullYear()} Ghostt AB</p>
           </div>
         </div>
       </footer>

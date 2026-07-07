@@ -24,7 +24,6 @@ import { usePlayer } from './context/PlayerContext.jsx';
 import { ExpandedPlayer } from './components/ExpandedPlayer/ExpandedPlayer.jsx';
 import { usePlaylists } from './context/playlistcontext.jsx';
 import { BrowseView } from './components/BrowseView/BrowseView.jsx';
-import ShaderBackground from "./components/shaderBackground/ShaderBackground";
 
 function ProtectedLayout({
   isAuthenticated,
@@ -70,11 +69,11 @@ function ProtectedLayout({
           <ExpandedPlayer />
         </div>
       ) : (
-        <div className={`${styles.appShell} ${isProfilePage ? styles.sidebarCollapsed : ''}`}>
+        <div className={styles.appShell}>
           <LibrarySidebar
             onPlaylistSelect={handlePlaylistSelect}
             selectedPlaylist={selectedPlaylist}
-            collapsed={isProfilePage}
+            collapsed={false}
           />
          <main
   className={styles.mainPlaceholder}
@@ -265,14 +264,14 @@ function App() {
           setSearchQuery={setSearchQuery}
         />
 
-        <div className={`${styles.appShell} ${isProfilePage ? styles.sidebarCollapsed : ''}`}>
+        <div className={styles.appShell}>
           <LibrarySidebar
             onPlaylistSelect={(playlist) => {
               setSelectedPlaylist(playlist);
               navigate('/');
             }}
             selectedPlaylist={selectedPlaylist}
-            collapsed={isProfilePage}
+            collapsed={false}
           />
           <main
             className={styles.mainPlaceholder}
@@ -403,6 +402,18 @@ function App() {
           path="/browse"
           element={
             <BrowseView />
+          }
+        />
+        <Route
+          path="/albums"
+          element={
+            <AlbumsView />
+          }
+        />
+        <Route
+          path="/playlists"
+          element={
+            <PlaylistsView />
           }
         />
         <Route

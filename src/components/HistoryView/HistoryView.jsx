@@ -114,7 +114,7 @@ export function HistoryView({ onBackToMain }) {
           <ArrowLeft size={24} />
         </button>
         <div className={styles.headerContent}>
-          <p className={styles.upperTitle}>PLAYLIST</p>
+          <p className={styles.upperTitle}>RECENTS</p>
           <h1 className={styles.title}>Listening History</h1>
           <p className={styles.subtitle}>
             Your recently played tracks • {history.length} song{history.length !== 1 ? "s" : ""}
@@ -164,7 +164,7 @@ export function HistoryView({ onBackToMain }) {
                       <div className={styles.coverWrapper}>
                         <img src={song.cover_url || placeholder} alt={song.title} />
                         <div className={styles.coverPlayOverlay}>
-                          <Play size={16} fill="#fff" />
+                          <Play size={16} fill="#E19FC7" />
                         </div>
                       </div>
                       <div className={styles.titleArtist}>
@@ -186,7 +186,7 @@ export function HistoryView({ onBackToMain }) {
                       onClick={(e) => handleLike(e, song.id)}
                       aria-label="Like song"
                     >
-                      <Heart size={16} fill={song.is_liked ? "#870339" : "none"} color={song.is_liked ? "#870339" : "#b3b3b3"} />
+                      <Heart size={16} fill={song.is_liked ? "#870339" : "none"} color={song.is_liked ? "#870339" : "#E19FC7"} />
                     </button>
                     <span className={styles.durationText}>{formatDuration(song.duration)}</span>
                   </span>

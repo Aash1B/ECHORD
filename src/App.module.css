@@ -4,9 +4,10 @@
 .appFrame {
   display: grid;
   height: 100vh;
-  height: 100dvh; /* Android Chrome: dynamic viewport height */
+  height: 100dvh;
+  /* Android Chrome: dynamic viewport height */
   overflow: hidden;
-  background: #000;
+  background: #0d0d0d;
   grid-template-rows: auto minmax(0, 1fr) auto;
 }
 
@@ -15,13 +16,13 @@
    ===================================================== */
 .appShell {
   display: grid;
-  grid-template-columns: 280px minmax(0, 1fr) 380px;
+  grid-template-columns: 340px minmax(0, 1fr) 340px;
   grid-template-rows: minmax(0, 1fr);
-  gap: 8px;
+  gap: 8px !important;
   min-height: 0;
-  padding: 8px;
+  padding: 8px !important;
   overflow: hidden;
-  background: #000;
+  background: #000000;
 }
 
 /* Expanded player takes full width */
@@ -32,7 +33,7 @@
   min-height: 0;
   padding: 8px;
   overflow: hidden;
-  background: #000;
+  background: #0d0d0d;
 }
 
 /* =====================================================
@@ -112,4 +113,21 @@
   .sidebarCollapsed {
     grid-template-columns: 1fr !important;
   }
+}
+
+.mainPlaceholder::-webkit-scrollbar {
+  width: 8px;
+}
+
+.mainPlaceholder::-webkit-scrollbar-track {
+  background: #121212 !important;
+}
+
+.mainPlaceholder::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 4px;
+}
+
+.mainPlaceholder::-webkit-scrollbar-thumb:hover {
+  background: #777;
 }

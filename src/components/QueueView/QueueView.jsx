@@ -126,7 +126,7 @@ export function QueueView() {
             <div className={styles.headerGradient} />
 
             <div className={styles.header}>
-                <ListMusic size={28} color="#6366f1" />
+                <ListMusic size={28} color="#E19FC7" />
                 <h1>Queue</h1>
                 {userQueue.length > 0 && (
                     <button className={styles.clearBtn} onClick={clearUserQueue}>

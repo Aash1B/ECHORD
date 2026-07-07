@@ -78,12 +78,12 @@
 }
 
 .option-card.selected {
-  border-color: #1ed760;
-  background: #1f2d24;
+  border-color: #870339;
+  background: rgba(135, 3, 57, 0.08);
 }
 
 .option-card input[type="radio"] {
-  accent-color: #1ed760;
+  accent-color: #870339;
   margin-top: 3px;
   width: 18px;
   height: 18px;
@@ -128,14 +128,15 @@
   border: 1px solid #333;
   border-radius: 8px;
   padding: 10px 14px;
-  color: #ffffff;
+  color: #E19FC7;
   font-size: 14px;
   outline: none;
   transition: border-color 0.2s;
 }
 
 .custom-name-input-group input:focus {
-  border-color: #1ed760;
+  border-color: #870339;
+  box-shadow: 0 0 8px 2px rgba(135, 3, 57, 0.8);
 }
 
 .google-modal-actions {
@@ -148,7 +149,7 @@
 .btn-cancel {
   background: transparent;
   border: 1px solid #404040;
-  color: #ffffff;
+  color: #E19FC7;
   padding: 10px 20px;
   border-radius: 50px;
   font-weight: 700;
@@ -158,12 +159,13 @@
 }
 
 .btn-cancel:hover {
-  border-color: #ffffff;
+  border-color: #E19FC7;
+  background: rgba(225, 159, 199, 0.05);
   transform: scale(1.02);
 }
 
 .btn-confirm {
-  background: #1ed760;
+  background: #E19FC7;
   border: none;
   color: #000000;
   padding: 12px 28px;
@@ -175,7 +177,7 @@
 }
 
 .btn-confirm:hover {
-  background: #1fdf64;
+  background: #ebbad7;
   transform: scale(1.04);
 }
 
@@ -187,4 +189,16 @@
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-error-message {
+  color: #ff4444;
+  background: rgba(255, 68, 68, 0.1);
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 14px;
 }

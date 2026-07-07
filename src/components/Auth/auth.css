@@ -8,19 +8,41 @@
 }
 
 .auth-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow-y: auto;
-  background: #121212;
+  min-height: 100vh;
+  width: 100%;
+  background: #0d0d0d;
   display: flex;
   justify-content: center;
   align-items: center;
   color: white;
   padding: 20px 0;
+  color: #E19FC7;
+  padding: 0;
   margin: 0;
+  overflow-x: hidden;
+}
+
+/* Reset scrollbar to default grey on auth pages (page-level) */
+body.auth-page {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+body.auth-page::-webkit-scrollbar {
+  width: 8px;
+}
+
+body.auth-page::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3) !important;
+  border-radius: 4px;
+}
+
+body.auth-page::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5) !important;
+}
+
+body.auth-page::-webkit-scrollbar-track {
+  background: transparent !important;
 }
 
 .auth-wrapper {
@@ -74,7 +96,7 @@
   background: transparent;
   border: 1px solid #878787;
   border-radius: 4px;
-  color: white;
+  color: #E19FC7;
   margin-bottom: 24px;
   font-size: 14px;
   transition: border-color 0.2s;
@@ -85,9 +107,9 @@
 }
 
 .auth-card input:focus {
-  border-color: #1db954;
+  border-color: #870339;
   outline: none;
-  box-shadow: 0 0 0 3px rgba(29, 185, 84, 0.1);
+  box-shadow: 0 0 8px 2px rgba(135, 3, 57, 0.8);
 }
 
 .auth-btn {
@@ -95,7 +117,7 @@
   padding: 12px 32px;
   border: none;
   border-radius: 500px;
-  background: #1db954;
+  background: #E19FC7;
   color: black;
   font-weight: 700;
   font-size: 16px;
@@ -105,7 +127,7 @@
 }
 
 .auth-btn:hover {
-  background: #1ed760;
+  background: #ebbad7;
   transform: scale(1.02);
 }
 
@@ -130,7 +152,7 @@
 }
 
 .divider span {
-  background: #121212;
+  background: #0d0d0d;
   padding: 0 12px;
   position: relative;
   z-index: 1;
@@ -146,7 +168,7 @@
   padding: 12px 32px;
   margin-bottom: 13px;
   background: transparent;
-  color: white;
+  color: #E19FC7;
   border: 1px solid #878787;
   border-radius: 500px;
   cursor: pointer;
@@ -160,12 +182,19 @@
 }
 
 .social-btn:hover {
-  border-color: white;
+  border-color: #E19FC7;
   background: rgba(255, 255, 255, 0.05);
 }
 
-.social-btn:active {
-  background: rgba(255, 255, 255, 0.1);
+.social-btn:focus,
+.social-btn:active,
+.social-btn:focus-visible,
+.social-btn:hover:focus,
+.social-btn:hover:active {
+  outline: none !important;
+  border-color: #870339 !important;
+  box-shadow: 0 0 8px 2px rgba(135, 3, 57, 0.8) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
 }
 
 .social-icon {
@@ -188,7 +217,7 @@
 }
 
 .auth-footer-text a {
-  color: white;
+  color: #E19FC7;
   text-decoration: none;
   font-weight: 700;
   cursor: pointer;
@@ -196,8 +225,10 @@
   margin-left: 4px;
 }
 
-.auth-footer-text a:hover {
-  color: #1db954;
+.auth-footer-text a:hover,
+.auth-footer-text a:focus,
+.auth-footer-text a:active {
+  color: #870339;
 }
 
 .auth-extra-footer {
@@ -234,4 +265,3 @@
     height: 60px;
   }
 }
-

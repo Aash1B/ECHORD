@@ -1,11 +1,20 @@
 .profileContainer {
   display: flex;
   flex-direction: column;
-  background: #121212;
+  background: linear-gradient(
+    180deg,
+    rgba(135, 3, 57, 0.45) 0%,
+    rgba(225, 159, 199, 0.08) 40%,
+    #0f0f0f 100%
+  ) !important;
   min-height: 100%;
-  color: #ffffff;
+  color: #E19FC7;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   position: relative;
+}
+
+.profileContainer * {
+  color: #E19FC7 !important;
 }
 
 /* Toast */
@@ -67,7 +76,7 @@
   align-items: flex-end;
   gap: 24px;
   padding: 24px 32px 24px;
-  background: linear-gradient(to bottom, #535353, #121212);
+  background: linear-gradient(to bottom, rgba(83, 83, 83, 0.5), transparent) !important;
   min-height: 340px;
 }
 
@@ -134,7 +143,7 @@
   align-items: center;
   gap: 16px;
   padding: 24px 32px;
-  background: #121212;
+  background: transparent;
 }
 
 .iconButton {
@@ -405,7 +414,7 @@
 }
 
 .trackIndex {
-  color: #b3b3b3;
+  color: #ffffff !important;
   font-size: 16px;
   text-align: left;
 }
@@ -427,12 +436,12 @@
   font-size: 16px;
   font-weight: 600;
   margin: 0;
-  color: #ffffff;
+  color: #ffffff !important;
 }
 
 .trackSubtitle {
   font-size: 13px;
-  color: #b3b3b3;
+  color: #ffffff !important;
   margin: 4px 0 0 0;
   display: flex;
   align-items: center;
@@ -450,7 +459,7 @@
 }
 
 .trackAlbum {
-  color: #b3b3b3;
+  color: #ffffff !important;
   font-size: 14px;
   white-space: nowrap;
   overflow: hidden;
@@ -465,7 +474,7 @@
 }
 
 .trackDuration {
-  color: #b3b3b3;
+  color: #ffffff !important;
   font-size: 14px;
   text-align: right;
   padding-right: 8px;
@@ -680,13 +689,13 @@
 
 .inputGroup input:focus {
   background: #4a4a4a;
-  border-color: #777;
+  border-color: #870339 !important;
 }
 
 .modalSaveBtn {
   align-self: flex-end;
-  background-color: #fff;
-  color: #000;
+  background-color: #E19FC7 !important;
+  color: #000 !important;
   border: none;
   padding: 12px 32px;
   border-radius: 500px;
@@ -698,7 +707,7 @@
 
 .modalSaveBtn:hover {
   transform: scale(1.04);
-  background-color: #f6f6f6;
+  background-color: #d48db5 !important;
 }
 
 .modalSaveBtn:disabled {

@@ -2,7 +2,6 @@
   display: flex;
   min-width: 0;
   padding: 16px;
-  overflow-y: auto;
   border-radius: 8px;
   color: #E19FC7;
   height: 100%;
@@ -23,13 +22,13 @@
 }
 
 .sidebar::-webkit-scrollbar-track {
-  background: transparent;
+  background: #121212 !important;
 }
 
 .sidebar::-webkit-scrollbar-thumb {
   border: 3px solid #0d0d0d;
   border-radius: 999px;
-  background: #5f5f5f;
+  background: #870339;
 }
 
 .sidebarHeader {
@@ -49,7 +48,7 @@
   margin: 0;
   overflow: hidden;
   color: #E19FC7;
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 600;
   line-height: 1.25;
   text-overflow: ellipsis;
@@ -57,12 +56,12 @@
 }
 
 .createButton {
-  border: 1px solid #870339;
+  border: none;
   color: #E19FC7;
-  background: #0d0d0d;
+  background: transparent;
   cursor: pointer;
-  width: 22px;
-  height: 22px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;

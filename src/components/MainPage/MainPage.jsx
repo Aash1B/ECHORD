@@ -282,9 +282,9 @@ export function MainPage({
   return (
     <div className={styles.mainContent}>
       <div className={styles.categoryButtons}>
-        <button>All</button>
-        <button>Music</button>
-        <button>Podcasts</button>
+        <button onClick={() => navigate("/playlists")}>All</button>
+        <button onClick={() => navigate("/browse")}>Music</button>
+        <button onClick={() => navigate("/albums")}>Album</button>
       </div>
 
       <div className={styles.quickPicks}>
