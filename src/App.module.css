@@ -96,6 +96,7 @@
     grid-template-columns: 1fr !important;
   }
 }
+
 .mainPlaceholder::-webkit-scrollbar {
   width: 8px;
 }
