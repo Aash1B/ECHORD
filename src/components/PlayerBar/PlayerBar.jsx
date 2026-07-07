@@ -3,8 +3,6 @@ import {
   ListMusic,
   Maximize2,
   Minimize2,
-  Mic2,
-  MonitorSpeaker,
   Pause,
   Play,
   Repeat2,
@@ -144,13 +142,7 @@ export function PlayerBar() {
         {/* RIGHT – extras (disabled look) */}
         <div className={styles.extras}>
           <button className={`${styles.controlButton} ${styles.disabled}`} disabled>
-            <Mic2 size={18} />
-          </button>
-          <button className={`${styles.controlButton} ${styles.disabled}`} disabled>
             <ListMusic size={18} />
-          </button>
-          <button className={`${styles.controlButton} ${styles.disabled}`} disabled>
-            <MonitorSpeaker size={18} />
           </button>
           <button className={`${styles.controlButton} ${styles.disabled}`} disabled>
             {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
@@ -347,10 +339,6 @@ export function PlayerBar() {
           style={isQueueActive ? { color: "#870339" } : {}}
         >
           <ListMusic size={18} />
-        </button>
-
-        <button className={styles.controlButton}>
-          <MonitorSpeaker size={18} />
         </button>
 
         <button

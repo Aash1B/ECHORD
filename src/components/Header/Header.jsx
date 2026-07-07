@@ -1,12 +1,10 @@
 import { SearchDropdown } from "../SearchDropdown/SearchDropdown";
 import {
-  Bell,
   Briefcase,
   ChevronLeft,
   ChevronRight,
   Home,
   Search,
-  UsersRound,
   ExternalLink,
   Check,
   User,
@@ -146,12 +144,6 @@ export function Header({
       </div>
 
       <div className={styles.right}>
-        <button className={styles.iconButton} type="button" aria-label="Notifications">
-          <Bell size={21} strokeWidth={2.2} />
-        </button>
-        <button className={styles.iconButton} type="button" aria-label="Friends activity">
-          <UsersRound size={22} strokeWidth={2.2} />
-        </button>
         <div className={styles.profileWrapper} ref={profileWrapperRef}>
           <div
             className={`${styles.profile} ${!(user?.profile_picture && !user.profile_picture.includes('googleusercontent.com')) ? styles.profileDefault : ''}`}
