@@ -175,6 +175,17 @@
 
 .progressSection input {
   width: 100%;
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
+.progressSection input:focus,
+.progressSection input:focus-visible,
+.progressSection input:active {
+  outline: none;
+  border: none;
+  box-shadow: none;
 }
 
 .volumeSlider {
