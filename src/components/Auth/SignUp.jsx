@@ -177,7 +177,11 @@ function SignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onCreatorSignUpC
               <p style={{ color: '#b3b3b3', fontSize: '14px', marginBottom: '20px', textAlign: 'center' }}>
                 We sent a 6-digit verification code to <strong>{email}</strong>. Please enter it below to activate your account.
               </p>
-
+              {dummyOtp && (
+                <div style={{ background: 'rgba(29, 185, 84, 0.1)', color: '#1db954', border: '1px solid #1db954', padding: '10px', borderRadius: '4px', marginBottom: '15px', fontSize: '14px', fontWeight: 'bold', textAlign: 'center' }}>
+                  Local Dev OTP: {dummyOtp}
+                </div>
+              )}
               {error && <div style={{ color: '#ff4444', marginBottom: '15px', fontSize: '14px', fontWeight: 'bold' }}>{error}</div>}
 
               <form onSubmit={handleVerifyOtp}>
