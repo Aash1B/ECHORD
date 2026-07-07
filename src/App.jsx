@@ -24,6 +24,9 @@ import { usePlayer } from './context/PlayerContext.jsx';
 import { ExpandedPlayer } from './components/ExpandedPlayer/ExpandedPlayer.jsx';
 import { usePlaylists } from './context/playlistcontext.jsx';
 import { BrowseView } from './components/BrowseView/BrowseView.jsx';
+import ShaderBackground from "./components/shaderBackground/ShaderBackground";
+import { AlbumsView } from "./components/AlbumsView/AlbumsView";
+import { PlaylistsView } from "./components/PlaylistsView/PlaylistsView";
 
 function ProtectedLayout({
   isAuthenticated,
@@ -290,7 +293,6 @@ function App() {
 
   return (
     <>
-      <ShaderBackground />
       <Routes>
       {/* Public/Guest Routes */}
       <Route
