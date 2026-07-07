@@ -3,7 +3,7 @@
   min-width: 0;
   height: 100%;
   overflow: visible;
-  border-radius: 8px;
+  border-radius: 8px !important;
   background: #121212;
   flex-direction: column;
 }
@@ -25,17 +25,17 @@
 }
 
 .scrollArea::-webkit-scrollbar-track {
-  background: transparent;
+  background: #121212 !important;
 }
 
 .scrollArea::-webkit-scrollbar-thumb {
   border: 3px solid #121212;
   border-radius: 999px;
-  background: #5f5f5f;
+  background: #870339;
 }
 
 .scrollArea::-webkit-scrollbar-thumb:hover {
-  background: #7c7c7c;
+  background: #a8044a;
 }
 
 @media (max-width: 860px) {

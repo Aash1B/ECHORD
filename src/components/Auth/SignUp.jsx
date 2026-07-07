@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './auth.css';
 import { FaSpotify } from 'react-icons/fa';
 import { SocialButtons } from './SocialButtons';
@@ -20,6 +20,11 @@ function SignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onCreatorSignUpC
   const [verificationOtp, setVerificationOtp] = useState('');
   const [dummyOtp, setDummyOtp] = useState('');
   const [pendingGoogleUser, setPendingGoogleUser] = useState(null);
+
+  useEffect(() => {
+    document.body.classList.add('auth-page');
+    return () => document.body.classList.remove('auth-page');
+  }, []);
 
   const triggerGoogleAuth = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
@@ -312,7 +317,11 @@ function SignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onCreatorSignUpC
         <GoogleNameModal
           googleUser={pendingGoogleUser}
           onConfirm={handleGoogleModalConfirm}
-          onCancel={() => setPendingGoogleUser(null)}
+          onCancel={() => {
+            setPendingGoogleUser(null);
+            setError('');
+          }}
+          error={error}
         />
       )}
     </div>

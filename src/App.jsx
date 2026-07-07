@@ -69,11 +69,11 @@ function ProtectedLayout({
           <ExpandedPlayer />
         </div>
       ) : (
-        <div className={`${styles.appShell} ${isProfilePage ? styles.sidebarCollapsed : ''}`}>
+        <div className={styles.appShell}>
           <LibrarySidebar
             onPlaylistSelect={handlePlaylistSelect}
             selectedPlaylist={selectedPlaylist}
-            collapsed={isProfilePage}
+            collapsed={false}
           />
           <main
             className={styles.mainPlaceholder}
@@ -257,14 +257,14 @@ function App() {
           setSearchQuery={setSearchQuery}
         />
 
-        <div className={`${styles.appShell} ${isProfilePage ? styles.sidebarCollapsed : ''}`}>
+        <div className={styles.appShell}>
           <LibrarySidebar
             onPlaylistSelect={(playlist) => {
               setSelectedPlaylist(playlist);
               navigate('/');
             }}
             selectedPlaylist={selectedPlaylist}
-            collapsed={isProfilePage}
+            collapsed={false}
           />
           <main
             className={styles.mainPlaceholder}

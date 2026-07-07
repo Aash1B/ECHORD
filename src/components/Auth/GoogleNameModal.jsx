@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './GoogleNameModal.css';
 
-export function GoogleNameModal({ googleUser, onConfirm, onCancel }) {
+export function GoogleNameModal({ googleUser, onConfirm, onCancel, error }) {
   const [shareName, setShareName] = useState(true);
   const [customName, setCustomName] = useState(googleUser?.name || '');
 
@@ -78,6 +78,12 @@ export function GoogleNameModal({ googleUser, onConfirm, onCancel }) {
                 placeholder="e.g. Spotify Listener"
                 maxLength={40}
               />
+            </div>
+          )}
+
+          {error && (
+            <div className="modal-error-message">
+              {error}
             </div>
           )}
 

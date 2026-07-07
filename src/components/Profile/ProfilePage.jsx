@@ -300,7 +300,7 @@ export function ProfilePage({ user, onProfileUpdate, onBackToMain }) {
                 </div>
                 <span className={styles.trackAlbum}>{track.album || "Single"}</span>
                 <span className={styles.checkIcon}>
-                  <Check size={16} color="#1db954" strokeWidth={3} />
+                  <Check size={16} color="#E19FC7" strokeWidth={3} />
                 </span>
                 <span className={styles.trackDuration}>
                   {formatDuration(track.duration)}

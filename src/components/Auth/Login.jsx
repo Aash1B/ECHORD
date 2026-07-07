@@ -295,7 +295,7 @@ function Login({ onShowSignUp, onLoginSuccess }) {
   };
 
   return (
-    <div className="auth-container">
+    <div className="auth-container" style={{ height: '100vh', overflow: 'hidden' }}>
       <div className="auth-wrapper">
         <div className="auth-card">
           {/* Spotify Logo */}
@@ -303,7 +303,7 @@ function Login({ onShowSignUp, onLoginSuccess }) {
             <img src="/logo.svg" alt="Ghostt Logo" />
           </div>
 
-          <h1>Welcome back</h1>
+          <h1>Music Awaits</h1>
 
           {error && <div style={{ color: '#ff4444', marginBottom: '15px', fontSize: '14px', fontWeight: 'bold' }}>{error}</div>}
           {message && <div style={{ color: '#1db954', marginBottom: '15px', fontSize: '14px', fontWeight: 'bold' }}>{message}</div>}
@@ -604,7 +604,11 @@ function Login({ onShowSignUp, onLoginSuccess }) {
         <GoogleNameModal
           googleUser={pendingGoogleUser}
           onConfirm={handleGoogleModalConfirm}
-          onCancel={() => setPendingGoogleUser(null)}
+          onCancel={() => {
+            setPendingGoogleUser(null);
+            setError('');
+          }}
+          error={error}
         />
       )}
     </div>

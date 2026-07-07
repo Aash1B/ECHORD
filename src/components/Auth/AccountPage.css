@@ -1,9 +1,20 @@
 /* Account Page Styles */
 
 .account-container-new {
+  --blush-of-sin: #E19FC7;
+  --dark-amaranth: #870339;
+  --text-muted: #c88ea3;
+  --body-text-color: #E19FC7;
+  --onyx: #242424;
+
   min-height: 100vh;
-  background: #121212;
-  color: white;
+  background: radial-gradient(
+    circle at top left,
+    rgba(225, 159, 199, 0.12) 0%,
+    rgba(135, 3, 57, 0.22) 25%,
+    #0f0f0f 70%
+  ) no-repeat fixed;
+  color: var(--body-text-color);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   display: flex;
   flex-direction: column;
@@ -12,13 +23,10 @@
 /* Header Navbar */
 .spotify-account-header {
   height: 80px;
-  background: #000000;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: transparent;
+  border-bottom: none;
   display: flex;
   align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 900;
 }
 
 .header-inner {
@@ -34,7 +42,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: white;
+  color: var(--blush-of-sin);
   text-decoration: none;
   transition: opacity 0.2s;
 }
@@ -56,7 +64,7 @@
 }
 
 .header-nav-links a {
-  color: #b3b3b3;
+  color: var(--text-muted);
   font-size: 14px;
   font-weight: 700;
   text-decoration: none;
@@ -64,7 +72,7 @@
 }
 
 .header-nav-links a:hover {
-  color: white;
+  color: var(--blush-of-sin);
 }
 
 .divider {
@@ -76,7 +84,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: white;
+  color: var(--blush-of-sin);
   transition: opacity 0.2s;
 }
 
@@ -124,7 +132,7 @@
 .back-to-overview-btn {
   background: transparent;
   border: none;
-  color: #b3b3b3;
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -136,7 +144,7 @@
 }
 
 .back-to-overview-btn:hover {
-  color: white;
+  color: var(--blush-of-sin);
 }
 
 /* Search Bar Section */
@@ -153,23 +161,24 @@
   position: absolute;
   left: 18px;
   top: 15px;
-  color: #b3b3b3;
+  color: var(--text-muted);
 }
 
 .search-input-wrapper input {
   width: 100%;
   height: 52px;
   border-radius: 8px;
-  background: #242424;
+  background: var(--onyx);
   border: 1px solid transparent;
   outline: none;
-  color: white;
+  color: var(--blush-of-sin);
   padding-left: 54px;
+  padding-right: 48px;
   font-size: 15px;
   font-family: inherit;
   box-sizing: border-box;
   transition: background-color 0.2s, border-color 0.2s;
-  cursor: pointer;
+  cursor: text;
 }
 
 .search-input-wrapper input:hover {
@@ -177,61 +186,66 @@
 }
 
 .search-input-wrapper input:focus {
-  border-color: #535353;
+  border-color: var(--dark-amaranth);
   background: #2e2e2e;
 }
 
 /* Plan Card Styling */
 .plan-section-card {
-  background: #242424;
+  background: var(--onyx);
   border-radius: 8px;
   padding: 32px;
   margin-bottom: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .plan-card-header {
-  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
 }
 
 .plan-badge-green {
-  background: #1db954;
-  color: black;
+  background: #3e3e3e;
+  color: white;
   font-size: 11px;
   font-weight: 700;
-  padding: 4px 8px;
+  padding: 6px 12px;
   border-radius: 4px;
-  text-transform: uppercase;
+  text-transform: capitalize;
 }
 
 .plan-card-body {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 20px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
 }
 
 .plan-icon-logo {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 20px;
-  font-weight: 800;
+  font-size: 16px;
+  font-weight: 700;
 }
 
 .plan-name-spotify {
-  letter-spacing: -0.5px;
+  letter-spacing: -0.2px;
+  color: var(--blush-of-sin);
 }
 
 .plan-family-title {
   font-size: 36px;
   font-weight: 900;
-  margin: 12px 0 8px;
+  margin: 8px 0;
   letter-spacing: -1px;
+  color: var(--blush-of-sin);
 }
 
 .plan-family-desc {
-  color: #b3b3b3;
+  color: var(--text-muted);
   font-size: 14px;
   margin: 0;
   line-height: 1.5;
@@ -240,7 +254,8 @@
 .family-members-stack {
   display: flex;
   align-items: center;
-  padding-left: 8px;
+  padding-left: 12px;
+  margin-top: 12px;
 }
 
 .family-members-stack .member-avatar {
@@ -264,14 +279,14 @@
 }
 
 .setting-category-block h3 {
-  color: #b3b3b3;
+  color: var(--dark-amaranth);
   font-size: 16px;
   font-weight: 700;
   margin: 0 0 16px;
 }
 
 .setting-rows-list {
-  background: #242424;
+  background: var(--onyx);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -290,8 +305,14 @@
   border-bottom: none;
 }
 
-.setting-row-item:hover {
-  background: #2e2e2e;
+.setting-row-item:hover,
+.setting-row-item:active {
+  background: linear-gradient(
+    90deg,
+    rgba(135, 3, 57, 0.5) 0%,
+    rgba(225, 159, 199, 0.15) 40%,
+    transparent 100%
+  );
 }
 
 .row-left {
@@ -301,22 +322,30 @@
 }
 
 .row-icon {
-  color: #b3b3b3;
+  color: rgba(255, 255, 255, 0.6);
+  transition: color 0.2s;
 }
 
 .row-label {
-  color: white;
+  color: var(--blush-of-sin);
   font-size: 15px;
   font-weight: 600;
 }
 
 .row-chevron {
-  color: #b3b3b3;
+  color: rgba(255, 255, 255, 0.6);
+  transition: color 0.2s;
+}
+
+.setting-row-item:hover .row-icon,
+.setting-row-item:hover .row-label,
+.setting-row-item:hover .row-chevron {
+  color: #ffffff;
 }
 
 /* Sub-views Forms (Card Wrap) */
 .sub-view-card {
-  background: #242424;
+  background: var(--onyx);
   border-radius: 8px;
   padding: 40px;
   border: none;
@@ -384,8 +413,8 @@
 }
 
 .save-btn {
-  background: #ffffff;
-  color: #000000;
+  background: var(--dark-amaranth);
+  color: white;
   border: none;
   padding: 14px 32px;
   border-radius: 500px;
@@ -397,7 +426,7 @@
 
 .save-btn:hover {
   transform: scale(1.04);
-  background: #f6f6f6;
+  background: #a10f4c;
 }
 
 .save-btn:disabled {
@@ -409,8 +438,8 @@
 
 .cancel-btn {
   background: transparent;
-  border: 1px solid #727272;
-  color: #ffffff;
+  border: 1px solid var(--blush-of-sin);
+  color: var(--blush-of-sin);
   padding: 14px 32px;
   border-radius: 500px;
   font-weight: 700;
@@ -420,8 +449,10 @@
 }
 
 .cancel-btn:hover {
-  border-color: white;
-  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--blush-of-sin);
+  background: var(--blush-of-sin);
+  color: #0f0f0f;
+  transform: scale(1.04);
 }
 
 /* File Upload styling */
@@ -596,20 +627,24 @@
 }
 
 .revoke-all-btn {
-  background: #ff4444;
-  color: white;
-  border: none;
-  padding: 12px 24px;
+  background: transparent;
+  color: var(--blush-of-sin);
+  border: 1px solid var(--blush-of-sin);
+  padding: 10px 20px;
   border-radius: 500px;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
-  transition: transform 0.1s, background-color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
 }
 
 .revoke-all-btn:hover {
   transform: scale(1.04);
-  background: #ff6666;
+  background: var(--blush-of-sin);
+  color: #0f0f0f;
 }
 
 .timeout-config-card {
@@ -636,8 +671,8 @@
 }
 
 .active-timeout-pill {
-  background: #1db954;
-  color: black;
+  background: var(--dark-amaranth);
+  color: white;
   padding: 4px 12px;
   border-radius: 500px;
   font-size: 12px;
@@ -659,9 +694,9 @@
 }
 
 .timeout-preset-btn {
-  background: #282828;
+  background: transparent;
   color: white;
-  border: 1px solid #727272;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   padding: 8px 16px;
   border-radius: 500px;
   font-size: 14px;
@@ -671,14 +706,14 @@
 }
 
 .timeout-preset-btn:hover {
-  border-color: white;
-  background: #3e3e3e;
+  border-color: var(--blush-of-sin);
+  background: rgba(225, 159, 199, 0.08);
 }
 
 .timeout-preset-btn.active {
-  background: #1db954;
-  color: black;
-  border-color: #1db954;
+  background: var(--blush-of-sin);
+  color: #0f0f0f;
+  border-color: var(--blush-of-sin);
 }
 
 .timeout-preset-btn:disabled {
@@ -704,8 +739,8 @@
   width: 80px;
   height: 40px;
   border-radius: 4px;
-  background: #3e3e3e;
-  border: 1px solid transparent;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
   padding: 0 12px;
   font-size: 14px;
@@ -715,16 +750,15 @@
 }
 
 .timeout-input:focus {
-  background: #4a4a4a;
-  border-color: #727272;
+  border-color: var(--blush-of-sin);
   outline: none;
 }
 
 .timeout-unit-select {
   height: 40px;
   border-radius: 4px;
-  background: #3e3e3e;
-  border: 1px solid transparent;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
   padding: 0 12px;
   font-size: 14px;
@@ -734,27 +768,27 @@
 }
 
 .timeout-unit-select:focus {
-  background: #4a4a4a;
-  border-color: #727272;
+  border-color: var(--blush-of-sin);
   outline: none;
 }
 
 .save-timeout-btn {
-  background: white;
-  color: black;
-  border: none;
+  background: transparent;
+  color: var(--blush-of-sin);
+  border: 1px solid var(--blush-of-sin);
   height: 40px;
   padding: 0 24px;
   border-radius: 500px;
   font-weight: 700;
   font-size: 14px;
   cursor: pointer;
-  transition: transform 0.1s, background-color 0.2s;
+  transition: all 0.2s;
 }
 
 .save-timeout-btn:hover {
   transform: scale(1.04);
-  background: #f6f6f6;
+  background: var(--blush-of-sin);
+  color: #0f0f0f;
 }
 
 .save-timeout-btn:disabled {
@@ -808,7 +842,7 @@
 }
 
 .sessions-table tr.current-row {
-  background: rgba(29, 185, 84, 0.05);
+  background: rgba(135, 3, 57, 0.15);
 }
 
 .device-cell {
@@ -817,44 +851,68 @@
   gap: 12px;
 }
 
+.device-cell .device-icon {
+  color: var(--blush-of-sin);
+  flex-shrink: 0;
+}
+
+/* Status Dots */
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.status-dot.green-dot {
+  background-color: #1db954;
+}
+
+.status-dot.blue-dot {
+  background-color: #4a90e2;
+}
+
+.current-badge, .active-status-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+}
+
 .device-name {
   font-weight: 700;
-  color: white;
+  color: var(--blush-of-sin);
 }
 
 .device-ip {
   font-size: 12px;
-  color: #b3b3b3;
+  color: var(--text-muted);
   margin-top: 4px;
 }
 
 .revoke-btn {
   background: transparent;
-  border: 1px solid #727272;
-  color: white;
-  padding: 8px 16px;
   border-radius: 500px;
   font-weight: 700;
   font-size: 12px;
   cursor: pointer;
+  padding: 8px 20px;
   transition: all 0.2s;
 }
 
-.revoke-btn:hover {
-  border-color: #ff4444;
-  color: #ff4444;
-  background: rgba(255, 68, 68, 0.05);
+.revoke-btn.end-session-btn,
+.revoke-btn.logout-device-btn {
+  border: 1px solid var(--blush-of-sin);
+  color: var(--blush-of-sin);
 }
 
-.revoke-btn.current-device-btn {
-  border-color: #ff4444;
-  background: #ff4444;
-  color: white;
-}
-
-.revoke-btn.current-device-btn:hover {
-  background: #ff6666;
-  border-color: #ff6666;
+.revoke-btn.end-session-btn:hover,
+.revoke-btn.logout-device-btn:hover {
+  background: var(--blush-of-sin);
+  color: #0f0f0f;
+  transform: scale(1.04);
 }
 
 .card-feedback {
@@ -872,9 +930,9 @@
 }
 
 .card-success-msg {
-  background: rgba(29, 185, 84, 0.1);
-  border: 1px solid #1db954;
-  color: #1db954;
+  background: rgba(135, 3, 57, 0.15);
+  border: 1px solid var(--dark-amaranth);
+  color: var(--blush-of-sin);
 }
 
 .feedback-message {
@@ -891,8 +949,292 @@
 }
 
 .success-msg {
-  background: #1db954;
-  color: black;
+  background: var(--dark-amaranth);
+  color: white;
+}
+
+/* Spotify Footer Styles */
+.spotify-account-footer {
+  background-color: #000000;
+  padding: 80px 0 50px 0;
+  margin-top: auto;
+  width: 100%;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.spotify-account-footer .footer-top {
+  width: 1000px;
+  max-width: 90%;
+  margin: 0 auto 40px auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.spotify-account-footer .footer-logo-col {
+  flex: 0 0 160px;
+}
+
+.spotify-account-footer .footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  cursor: pointer;
+}
+
+.spotify-account-footer .footer-links-cols {
+  display: flex;
+  gap: 60px;
+  flex: 1;
+  margin-left: 48px;
+}
+
+.spotify-account-footer .footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.spotify-account-footer .footer-col h4 {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 8px 0;
+}
+
+.spotify-account-footer .footer-col a {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.spotify-account-footer .footer-col a:hover,
+.spotify-account-footer .footer-col a:active {
+  color: var(--dark-amaranth);
+}
+
+.spotify-account-footer .footer-social-col {
+  display: flex;
+  gap: 16px;
+  margin-left: auto;
+}
+
+.spotify-account-footer .social-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #292929;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--blush-of-sin);
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.spotify-account-footer .social-icon-btn:hover {
+  background-color: #404040;
+}
+
+.spotify-account-footer .social-icon-btn svg {
+  fill: #ffffff !important;
+  transition: fill 0.2s ease;
+}
+
+.spotify-account-footer .social-icon-btn:hover svg {
+  fill: var(--dark-amaranth) !important;
+}
+
+.spotify-account-footer .footer-bottom {
+  width: 1000px;
+  max-width: 90%;
+  margin: 0 auto;
+  border-top: 1px solid #292929;
+  padding-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.spotify-account-footer .footer-bottom-left {
+  display: flex;
+  gap: 16px 24px;
+  flex-wrap: wrap;
+}
+
+.spotify-account-footer .footer-bottom-left a {
+  color: #ffffff;
+  font-size: 12px;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.spotify-account-footer .footer-bottom-left a:hover,
+.spotify-account-footer .footer-bottom-left a:active {
+  color: var(--dark-amaranth);
+}
+
+.spotify-account-footer .footer-bottom-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.spotify-account-footer .country-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #ffffff;
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.spotify-account-footer .country-selector:hover {
+  color: var(--dark-amaranth);
+}
+
+.spotify-account-footer .copyright {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 12px;
+  margin: 0;
+}
+
+/* Responsive Footer */
+@media (max-width: 900px) {
+  .spotify-account-footer {
+    padding: 60px 0 40px 0;
+  }
+  
+  .spotify-account-footer .footer-top {
+    flex-direction: column;
+    gap: 48px;
+    margin-bottom: 48px;
+  }
+  
+  .spotify-account-footer .footer-links-cols {
+    margin-left: 0;
+    flex-direction: column;
+    gap: 32px;
+    width: 100%;
+  }
+  
+  .spotify-account-footer .footer-social-col {
+    margin-left: 0;
+  }
+  
+  .spotify-account-footer .footer-bottom {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: 24px;
+    padding-top: 24px;
+  }
+  
+  .spotify-account-footer .footer-bottom-right {
+    align-items: flex-start;
+    width: 100%;
+  }
+}
+
+/* Search results clear button & Help Articles layout definitions */
+.clear-search-btn {
+  position: absolute;
+  right: 18px;
+  top: 15px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.clear-search-btn:hover {
+  color: var(--blush-of-sin);
+}
+
+.search-no-results {
+  text-align: center;
+  padding: 60px 24px;
+  background: var(--onyx);
+  border-radius: 8px;
+  margin-top: 24px;
+}
+
+.search-no-results p {
+  font-size: 16px;
+  margin-bottom: 20px;
+  color: var(--text-muted);
+}
+
+.clear-search-btn-large {
+  background: var(--dark-amaranth);
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 500px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.1s, background-color 0.2s;
+}
+
+.clear-search-btn-large:hover {
+  transform: scale(1.04);
+  background: #a10f4c;
+}
+
+.help-articles-section {
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid #2d2d2d;
+}
+
+.help-articles-section h3 {
+  color: var(--dark-amaranth);
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0 0 20px 0;
+}
+
+.help-articles-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.help-article-item {
+  background: var(--onyx);
+  padding: 24px;
+  border-radius: 8px;
+  border-left: 4px solid var(--dark-amaranth);
+}
+
+.help-article-item h4 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  color: var(--blush-of-sin);
+  font-weight: 700;
+}
+
+.help-article-item p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
 }
 
 
