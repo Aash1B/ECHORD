@@ -24,6 +24,8 @@ import { usePlayer } from './context/PlayerContext.jsx';
 import { ExpandedPlayer } from './components/ExpandedPlayer/ExpandedPlayer.jsx';
 import { usePlaylists } from './context/playlistcontext.jsx';
 import { BrowseView } from './components/BrowseView/BrowseView.jsx';
+import { AlbumsView } from './components/AlbumsView/AlbumsView.jsx';
+import { PlaylistsView } from './components/PlaylistsView/PlaylistsView.jsx';
 
 function ProtectedLayout({
   isAuthenticated,
@@ -394,6 +396,18 @@ function App() {
           path="/browse"
           element={
             <BrowseView />
+          }
+        />
+        <Route
+          path="/albums"
+          element={
+            <AlbumsView />
+          }
+        />
+        <Route
+          path="/playlists"
+          element={
+            <PlaylistsView />
           }
         />
         <Route
