@@ -128,7 +128,7 @@ export function PlaylistView({ playlist }) {
 
                 {playlist.id === "liked-songs" ? (
                     <div className={styles.likedSongsCover}>
-                        <Heart size={80} fill="#870339" color="#870339" />
+                        <Heart size={80} fill="#870339" color="#E19FC7" />
                     </div>
                 ) : playlist.id === "trending" ? (
                     <div className={styles.likedSongsCover} style={{ background: "linear-gradient(135deg,#ff5722,#ff9800)" }}>

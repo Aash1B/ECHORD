@@ -75,20 +75,30 @@
   visibility: visible;
 }
 
-.createButton,
-.filterButtons button,
 .controlButton,
 .recentsButton {
   border: 0;
   color: #E19FC7;
-  background: #242424;
+  background: transparent;
   cursor: pointer;
   font-weight: normal;
   transition:
     color 160ms ease,
     background-color 160ms ease,
-    transform 160ms ease,
-    outline 160ms ease;
+    transform 160ms ease;
+}
+
+.createButton,
+.filterButtons button {
+  border: 1px solid #870339;
+  color: #E19FC7;
+  background: #1a1a1a;
+  cursor: pointer;
+  font-weight: normal;
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    transform 160ms ease;
 }
 
 .createButton {
@@ -103,17 +113,13 @@
 
 .createButton:hover,
 .filterButtons button:hover {
-  background: #2a2a2a;
+  background: #870339;
   transform: scale(1.04);
-  outline: 2px solid #870339;
-  outline-offset: 2px;
 }
 
 .controlButton:hover {
   background: transparent;
   transform: scale(1.05);
-  outline: 2px solid #870339;
-  outline-offset: 2px;
 }
 
 .recentsButton:hover {
@@ -222,13 +228,15 @@
   cursor: pointer;
   gap: 12px;
   text-align: left;
-  transition: background-color 160ms ease, outline 160ms ease;
+  transition: background-color 160ms ease;
 }
 
 .libraryItem:hover {
-  background: #2a2a2a;
-  outline: 2px solid #870339;
-  outline-offset: 2px;
+  background: #870339;
+}
+
+.libraryItem:hover .itemSubtitle {
+  color: white;
 }
 
 .libraryItem img {
@@ -305,11 +313,15 @@
 }
 
 .activePlaylist {
-  background: rgba(255, 255, 255, 0.12);
+  background: #870339;
+}
+
+.activePlaylist .itemSubtitle {
+  color: white;
 }
 
 .activePlaylist:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: #870339;
 }
 
 /* Force collapse styling */

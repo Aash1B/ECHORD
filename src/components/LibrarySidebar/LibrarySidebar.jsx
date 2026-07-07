@@ -166,18 +166,18 @@ export function LibrarySidebar({
                                     height: 48,
                                     borderRadius: 6,
                                     background:
-                                        "linear-gradient(135deg,#E19FC7,#c4efd9)",
+                                        "linear-gradient(135deg, #E19FC7, #E19FC7, #c4efd9)",
                                     display: "flex",
                                     justifyContent: "center",
                                     alignItems: "center",
-                                    color: "#870339",
+                                    color: "#E19FC7",
                                 }}
                             >
 
                                 <Heart
                                     size={20}
                                     fill="#870339"
-                                    color="#870339"
+                                    color="#E19FC7"
                                 />
 
                             </div>

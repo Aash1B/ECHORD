@@ -42,7 +42,7 @@
   width: 220px;
   height: 220px;
   border-radius: 8px;
-  background: linear-gradient(135deg, #E19FC7, #c4efd9);
+  background: linear-gradient(135deg, #E19FC7, #E19FC7, #c4efd9);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -197,7 +197,7 @@
 }
 
 .songIndex {
-  color: white;
+  color: #E19FC7;
   font-variant-numeric: tabular-nums;
   transition: color 0.2s;
 }
@@ -219,7 +219,7 @@
 
 .songTitle {
   font-weight: 500;
-  color: white;
+  color: #E19FC7;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -227,7 +227,7 @@
 }
 
 .songArtist {
-  color: white;
+  color: #E19FC7;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -258,7 +258,7 @@
 }
 
 .songDuration {
-  color: white;
+  color: #E19FC7;
   font-variant-numeric: tabular-nums;
   transition: color 0.2s;
 }
@@ -291,12 +291,18 @@
   gap: 12px;
   max-width: 400px;
   margin-bottom: 24px;
-  border: 1px solid transparent;
-  transition: border-color 0.2s;
+  transition: background-color 160ms ease, outline 160ms ease;
+}
+
+.addSearchBox:hover {
+  background: #2a2a2a;
+  outline: 2px solid #870339;
+  outline-offset: 2px;
 }
 
 .addSearchBox:focus-within {
-  border-color: #535353;
+  outline: 2px solid #870339;
+  outline-offset: 2px;
 }
 
 .addSearchBox input {
@@ -359,6 +365,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: #E19FC7;
 }
 
 .addSongArtist {
@@ -371,23 +378,21 @@
 }
 
 .addButton {
-  background: none;
-  border: 1px solid #878787;
+  background: #1a1a1a;
+  border: 1px solid #870339;
   color: #E19FC7;
   padding: 6px 18px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s, transform 0.2s, outline 0.2s;
+  transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
 }
 
 .addButton:hover {
-  border-color: #E19FC7;
-  background-color: rgba(225, 159, 199, 0.08);
+  background-color: #870339;
+  border-color: #870339;
   transform: scale(1.04);
-  outline: 2px solid #870339;
-  outline-offset: 2px;
 }
 
 .addButton:active {
@@ -446,8 +451,8 @@
 }
 
 .addSongsActionButton {
-  background: none;
-  border: 1px solid rgba(225, 159, 199, 0.4);
+  background: #1a1a1a;
+  border: 1px solid #870339;
   color: #E19FC7;
   padding: 8px 20px;
   border-radius: 20px;
@@ -456,15 +461,13 @@
   cursor: pointer;
   display: flex;
   align-items: center;
-  transition: border-color 0.2s, background-color 0.2s, transform 0.2s, outline 0.2s;
+  transition: border-color 0.2s, background-color 0.2s, transform 0.2s;
 }
 
 .addSongsActionButton:hover {
-  border-color: #E19FC7;
-  background-color: rgba(225, 159, 199, 0.08);
+  background-color: #870339;
+  border-color: #870339;
   transform: scale(1.04);
-  outline: 2px solid #870339;
-  outline-offset: 2px;
 }
 
 .addSongsActionButton:active {
