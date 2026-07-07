@@ -1,12 +1,12 @@
 .heading {
-    margin-bottom:      8px;
+    margin-bottom: 8px;
 }
 
 .heading h3 {
     margin: 0;
     font-size: 28px;
-    font-weight: 700;
-    color: white;
+    font-weight: 500;
+    color: #E19FC7;
 }
 
 .heading p {
@@ -24,21 +24,21 @@
     margin-bottom: 16px;
 }
 
-.carousel{
+.carousel {
 
-    display:flex;
+    display: flex;
 
-    gap:14px;
+    gap: 14px;
 
-    overflow-x:auto;
+    overflow-x: auto;
 
-    overflow-y:hidden;
+    overflow-y: hidden;
 
-    scroll-behavior:smooth;
+    scroll-behavior: smooth;
 
-    scrollbar-width:none;
+    scrollbar-width: none;
 
-    padding:0;
+    padding: 0;
 }
 
 .carousel::-webkit-scrollbar {
@@ -54,8 +54,12 @@
 
     margin-bottom: 8px;
 }
+
 .card {
-    flex: 0 0 145px;
+    flex: 0 0 165px;
+    min-width: 0;
+    width: 165px;
+    max-width: 165px;
 
     background: #181818;
 
@@ -76,12 +80,19 @@
 
 .card h4 {
     margin: 0;
-    color: white;
+    color: #E19FC7;
     font-size: 15px;
-    font-weight: 700;
+    font-weight: 500;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    transition: transform 0.2s ease, color 0.2s ease;
+    display: block;
+}
+
+.card:hover h4 {
+    color: #870339;
+    transform: scale(1.05);
 }
 
 .card p {
@@ -93,51 +104,55 @@
     text-overflow: ellipsis;
 }
 
-.carouselWrapper{
-    position:relative;
+.carouselWrapper {
+    position: relative;
 }
-.carouselArrow{
 
-    position:absolute;
+.carouselArrow {
 
-    top:38%;
+    position: absolute;
 
-    transform:translateY(-50%);
+    top: 38%;
 
-    width:46px;
+    transform: translateY(-50%);
 
-    height:46px;
+    width: 46px;
 
-    border:none;
+    height: 46px;
 
-    border-radius:50%;
+    border: none;
 
-    background:rgba(40,40,40,.95);
+    border-radius: 50%;
 
-    color:white;
+    background: rgba(40, 40, 40, .95);
 
-    font-size:28px;
+    color: #E19FC7;
 
-    cursor:pointer;
+    font-size: 28px;
 
-    z-index:20;
+    cursor: pointer;
 
-    transition:.25s;
+    z-index: 20;
+
+    transition: .25s;
 }
-.carouselArrow:hover{
 
-    background:#3a3a3a;
+.carouselArrow:hover {
 
-    transform:translateY(-50%) scale(1.08);
+    background: #3a3a3a;
 
-}
-.leftArrow{
-
-    left:6px;
+    transform: translateY(-50%) scale(1.08);
 
 }
-.rightArrow{
 
-    right:6px;
+.leftArrow {
+
+    left: 6px;
+
+}
+
+.rightArrow {
+
+    right: 6px;
 
 }
