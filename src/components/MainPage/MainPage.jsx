@@ -322,7 +322,7 @@ export function MainPage({
 
       <div className={styles.sectionHeader}>
         <h2>Trending</h2>
-        <span style={{ cursor: "pointer" }} onClick={() => selectPlaylist({ id: "trending", name: "Trending" })}>Show all</span>
+
       </div>
       <div className={styles.cardsRow}>
         {trendingSongs.slice(0, 3).map(song => (
@@ -333,30 +333,20 @@ export function MainPage({
           />
         ))}
       </div>
-
-      <div className={styles.sectionHeader}>
-        <h2>Latest song</h2>
-        <span style={{ cursor: "pointer" }} onClick={() => selectPlaylist({ id: "latest-song", name: "Latest song" })}>Show all</span>
-      </div>
-      <div className={styles.cardsContainer}>
-        {showLatestLeftArrow && (
-          <button className={styles.spotifyArrowLeft} onClick={() => { scrollLeft(latestRef); setShowLatestLeftArrow(false); }}>
-            <ChevronLeft size={20} />
-          </button>
-        )}
-        <button className={styles.spotifyArrow} onClick={() => { scrollRight(latestRef); setShowLatestLeftArrow(true); }}>
-          <ChevronRight size={20} />
-        </button>
-        <div className={styles.cardsRow} ref={latestRef}>
-          {latestSongs.map(song => (
-            <MusicCard
-              key={song.id}
-              song={song}
-              playlist={latestSongs}
-            />
-          ))}
-        </div>
-      </div>
+<div className={styles.sectionHeader}>
+  <h2>Latest song</h2>
+</div>
+<div className={styles.cardsContainer}>
+  <div className={styles.cardsRow} ref={latestRef}>
+    {latestSongs.map(song => (
+      <MusicCard
+        key={song.id}
+        song={song}
+        playlist={latestSongs}
+      />
+    ))}
+  </div>
+</div>
 
       <div className={styles.sectionHeader}>
         <h2>Recents</h2>
