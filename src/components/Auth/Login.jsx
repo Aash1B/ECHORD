@@ -390,6 +390,11 @@ function Login({ onShowSignUp, onLoginSuccess }) {
           {/* OTP Entry Flow */}
           {loginMethod === 'otp' && (
             <form onSubmit={handleVerifyOtp}>
+              {dummyOtp && (
+                <div style={{ background: 'rgba(29, 185, 84, 0.1)', color: '#1db954', border: '1px solid #1db954', padding: '10px', borderRadius: '4px', marginBottom: '15px', fontSize: '14px', fontWeight: 'bold', textAlign: 'center' }}>
+                  Local Dev OTP: {dummyOtp}
+                </div>
+              )}
               <div style={{ textAlign: 'left' }}>
                 <label>Enter 6-Digit OTP</label>
                 <input
@@ -477,6 +482,11 @@ function Login({ onShowSignUp, onLoginSuccess }) {
           {/* Forgot Password - OTP Verification and Password Reset Flow */}
           {loginMethod === 'forgot_reset' && (
             <form onSubmit={handleResetPasswordSubmit}>
+              {dummyOtp && (
+                <div style={{ background: 'rgba(29, 185, 84, 0.1)', color: '#1db954', border: '1px solid #1db954', padding: '10px', borderRadius: '4px', marginBottom: '15px', fontSize: '14px', fontWeight: 'bold', textAlign: 'center' }}>
+                  Local Dev OTP: {dummyOtp}
+                </div>
+              )}
               <div style={{ textAlign: 'left' }}>
                 <label>Email Address</label>
                 <input
@@ -533,6 +543,11 @@ function Login({ onShowSignUp, onLoginSuccess }) {
               <p style={{ color: '#b3b3b3', fontSize: '14px', marginBottom: '20px', textAlign: 'left' }}>
                 Please enter the 6-digit verification code sent to <strong>{email}</strong> to activate your account.
               </p>
+              {dummyOtp && (
+                <div style={{ background: 'rgba(29, 185, 84, 0.1)', color: '#1db954', border: '1px solid #1db954', padding: '10px', borderRadius: '4px', marginBottom: '15px', fontSize: '14px', fontWeight: 'bold', textAlign: 'center' }}>
+                  Local Dev OTP: {dummyOtp}
+                </div>
+              )}
               
               <div style={{ textAlign: 'left' }}>
                 <label>Enter 6-Digit Code</label>

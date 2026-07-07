@@ -5,8 +5,8 @@
   padding: 16px;
   overflow-y: auto;
   border-radius: 8px;
-  color: #fff;
-  background: #121212;
+  color: #E19FC7;
+  background: #0d0d0d;
   flex-direction: column;
   scrollbar-color: #5f5f5f transparent;
   scrollbar-width: thin;
@@ -21,7 +21,7 @@
 }
 
 .sidebar::-webkit-scrollbar-thumb {
-  border: 3px solid #121212;
+  border: 3px solid #0d0d0d;
   border-radius: 999px;
   background: #5f5f5f;
 }
@@ -42,9 +42,9 @@
 .libraryTitle h2 {
   margin: 0;
   overflow: hidden;
-  color: #fff;
+  color: #E19FC7;
   font-size: 20px;
-  font-weight: 800;
+  font-weight: normal;
   line-height: 1.25;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -57,10 +57,10 @@
   z-index: 2;
   padding: 8px 12px;
   border-radius: 4px;
-  color: #fff;
+  color: #E19FC7;
   background: #282828;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: normal;
   opacity: 0;
   pointer-events: none;
   transform: translateY(-4px);
@@ -80,14 +80,15 @@
 .controlButton,
 .recentsButton {
   border: 0;
-  color: #fff;
+  color: #E19FC7;
   background: #242424;
   cursor: pointer;
-  font-weight: 800;
+  font-weight: normal;
   transition:
     color 160ms ease,
     background-color 160ms ease,
-    transform 160ms ease;
+    transform 160ms ease,
+    box-shadow 160ms ease;
 }
 
 .createButton {
@@ -101,11 +102,21 @@
 }
 
 .createButton:hover,
-.filterButtons button:hover,
-.controlButton:hover,
-.recentsButton:hover {
+.filterButtons button:hover {
   background: #2f2f2f;
   transform: scale(1.04);
+  box-shadow: 0 0 0 1.5px #870339, 0 0 8px #870339;
+}
+
+.controlButton:hover {
+  background: transparent;
+  transform: scale(1.05);
+  box-shadow: 0 0 0 1.5px #870339, 0 0 8px #870339;
+}
+
+.recentsButton:hover {
+  background: transparent;
+  transform: scale(1.05);
 }
 
 .createButton:focus-visible,
@@ -113,7 +124,7 @@
 .controlButton:focus-visible,
 .recentsButton:focus-visible,
 .libraryItem:focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid #E19FC7;
   outline-offset: 2px;
 }
 
@@ -133,7 +144,7 @@
 
 .sidebarControls {
   margin-top: 18px;
-  color: #b3b3b3;
+  color: #E19FC7;
 }
 
 .controlButton {
@@ -142,7 +153,7 @@
   height: 34px;
   padding: 0;
   border-radius: 50%;
-  color: #b3b3b3;
+  color: #E19FC7;
   background: transparent;
   place-items: center;
 }
@@ -155,7 +166,7 @@
 .searchInput {
   background: #1f1f1f;
   border: 1px solid #2b2b2b;
-  color: #fff;
+  color: #E19FC7;
   padding: 6px 10px;
   border-radius: 999px;
   width: 180px;
@@ -172,7 +183,7 @@
   display: inline-flex;
   align-items: center;
   padding: 0;
-  color: #b3b3b3;
+  color: #E19FC7;
   background: transparent;
   font-size: 13px;
   gap: 6px;
@@ -180,7 +191,7 @@
 
 .filterActive {
   background: rgba(255,255,255,0.06);
-  color: #fff;
+  color: #E19FC7;
 }
 
 .unimplementedMessage {
@@ -209,11 +220,12 @@
   cursor: pointer;
   gap: 12px;
   text-align: left;
-  transition: background-color 160ms ease;
+  transition: background-color 160ms ease, box-shadow 160ms ease;
 }
 
 .libraryItem:hover {
   background: #272626;
+  box-shadow: 0 0 0 1.5px #870339, 0 0 8px #870339;
 }
 
 .libraryItem img {
@@ -246,16 +258,16 @@
 }
 
 .itemTitle {
-  color: #fff;
+  color: #E19FC7;
   font-size: 16px;
-  font-weight: 800;
+  font-weight: normal;
   line-height: 1.25;
 }
 
 .itemSubtitle {
   color: #b3b3b3;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: normal;
   line-height: 1.35;
 }
 

@@ -230,7 +230,6 @@ export function PlaylistView({ playlist }) {
                             className={styles.editButton}
                             onClick={handleDeletePlaylist}
                             title="Delete Playlist"
-                            style={{ color: "#b3b3b3" }}
                         >
                             <Trash2 size={24} />
                         </button>
@@ -292,8 +291,8 @@ export function PlaylistView({ playlist }) {
                             >
                                 <Heart
                                     size={16}
-                                    fill={song.is_liked ? "#1db954" : "none"}
-                                    color={song.is_liked ? "#1db954" : "#b3b3b3"}
+                                    fill={song.is_liked ? "#870339" : "none"}
+                                    color={song.is_liked ? "#870339" : "#b3b3b3"}
                                 />
                             </button>
                         </span>
