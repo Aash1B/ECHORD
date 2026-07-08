@@ -66,7 +66,7 @@ export function ProfilePage({ user, onProfileUpdate, onBackToMain }) {
     setIsSaving(true);
     try {
       const token = localStorage.getItem('token');
-      const API_URL = (import.meta.env.VITE_API_URL || 'https://spotifyghostt-backend.loca.lt').replace(/\/$/, '');
+      const API_URL = (import.meta.env.VITE_API_URL || 'https://echord-backend.loca.lt').replace(/\/$/, '');
       const res = await fetch(`${API_URL}/user/profile`, {
         method: 'PUT',
         headers: {
@@ -331,18 +331,6 @@ export function ProfilePage({ user, onProfileUpdate, onBackToMain }) {
           </div>
         </section>
 
-        {/* Section: Followers */}
-        <section className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <h2>Followers</h2>
-          </div>
-          <div className={styles.cardsRow}>
-            <div className={styles.followerCard}>
-              <div className={styles.greyCirclePlaceholder}></div>
-              {/* Image and Name are removed/empty per specifications */}
-            </div>
-          </div>
-        </section>
 
         {/* Section: Following */}
         <section className={styles.section}>
@@ -436,7 +424,7 @@ export function ProfilePage({ user, onProfileUpdate, onBackToMain }) {
             </div>
 
             <p className={styles.modalDisclaimer}>
-              By proceeding, you agree to give Spotify access to the image you choose to upload. Please make sure you have the right to upload the image.
+              By proceeding, you agree to give Echord access to the image you choose to upload. Please make sure you have the right to upload the image.
             </p>
           </div>
         </div>

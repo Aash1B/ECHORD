@@ -1,7 +1,7 @@
 {
-  "name": "spotify-clone",
+  "name": "echord",
   "private": true,
-  "homepage": "https://kritagyaaa.github.io/spotify-ghostt",
+  "homepage": "https://kritagyaaa.github.io/Echord",
   "scripts": {
     "frontend": "vite",
     "backend": "nodemon backend/server.js",

@@ -1,5 +1,5 @@
 // C:\Users\krita\.gemini\antigravity-ide\brain\82adb017-5bf0-4c94-be39-10dd8b2e53f5/scratch/test_api_like.js
-const pool = require('c:/Users/krita/Documents/Codex/2026-06-17/spotify-clone/backend/db');
+const pool = require('../backend/db');
 
 async function testApi() {
   try {

@@ -22,11 +22,13 @@ import {
   Sliders, 
   HelpCircle, 
   Globe,
-  ExternalLink
+  ExternalLink,
+  Diamond
 } from 'lucide-react';
 import './AccountPage.css';
+import logo from '../../assets/logo.svg';
 
-const API_URL = (import.meta.env.VITE_API_URL || 'https://spotifyghostt-backend.loca.lt').replace(/\/$/, '');
+const API_URL = (import.meta.env.VITE_API_URL || 'https://echord-backend.loca.lt').replace(/\/$/, '');
 
 function AccountPage({ user, onProfileUpdate, onLogout, onBackToMain }) {
   const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'edit', 'password', 'notifications', 'sessions'
@@ -374,28 +376,28 @@ function AccountPage({ user, onProfileUpdate, onLogout, onBackToMain }) {
         </div>
       )}
 
-      {/* Ghostt Top Header */}
-      <header className="spotify-account-header">
+      {/* Echord Top Header */}
+      <header className="echord-account-header">
         <div className="header-inner">
-          <div className="spotify-logo-clickable" onClick={onBackToMain} style={{ cursor: 'pointer' }}>
-            <img src="/logo.svg" alt="ECHORD Logo" style={{ width: '36px', height: '36px' }} />
+          <div className="echord-logo-clickable" onClick={onBackToMain} style={{ cursor: 'pointer' }}>
+            <img src={logo} alt="ECHORD Logo" style={{ width: '36px', height: '36px' }} />
             <span className="logo-text">E C H O R D</span>
           </div>
 
           <nav className="header-nav-links">
-            <a href="#" onClick={(e) => { e.preventDefault(); triggerMockToast('Premium plans'); }}>Premium plans</a>
-            <a href="#" onClick={(e) => { e.preventDefault(); triggerMockToast('Support'); }}>Support</a>
             <a href="#" onClick={(e) => { e.preventDefault(); triggerMockToast('Download'); }}>Download</a>
             <span className="divider">|</span>
             <div className="header-profile-dropdown" onClick={onBackToMain} style={{ cursor: 'pointer' }}>
-              <div className="header-avatar-circle">
+              <div className="header-avatar-circle profile-default-avatar">
                 {user?.profile_picture && !user.profile_picture.includes('googleusercontent.com') ? (
                   <img src={user.profile_picture} alt="Avatar" className="header-avatar-img" />
                 ) : (
-                  <User size={16} />
+                  <span className="profile-letter-avatar">
+                    {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                  </span>
                 )}
               </div>
-              <span className="profile-name">Profile ∨</span>
+              <span className="profile-name">{user?.name || 'Username'}</span>
             </div>
           </nav>
         </div>
@@ -447,24 +449,28 @@ function AccountPage({ user, onProfileUpdate, onLogout, onBackToMain }) {
             {(!searchQuery || filteredCategories.length > 0) && (
               <>
                 {/* Plan Section */}
-                <div className="plan-section-card">
-                  <div className="plan-card-header">
-                    <span className="plan-badge-green">Your plan</span>
-                  </div>
-                  <div className="plan-card-body">
-                    <div className="plan-icon-logo">
-                      <img src="/logo.svg" alt="Ghostt Logo" style={{ width: '24px', height: '24px' }} />
-                      <span className="plan-name-spotify">Premium</span>
+                <div className="plan-overview-container">
+                  {/* Free Plan Card */}
+                  <div className="free-plan-card">
+                    <div className="plan-card-header">
+                      <span className="plan-badge-grey">Your plan</span>
                     </div>
-                    <h2 className="plan-family-title">Family</h2>
-                    <p className="plan-family-desc">You're a member of a Family plan.</p>
-                    <div className="family-members-stack">
-                      <div className="member-avatar" style={{ backgroundColor: '#1db954', zIndex: 6 }}>👩</div>
-                      <div className="member-avatar" style={{ backgroundColor: '#4a90e2', zIndex: 5 }}>🧑</div>
-                      <div className="member-avatar" style={{ backgroundColor: '#f5a623', zIndex: 4 }}>👧</div>
-                      <div className="member-avatar" style={{ backgroundColor: '#e28490', zIndex: 3 }}>🧒</div>
-                      <div className="member-avatar" style={{ backgroundColor: '#9b59b6', zIndex: 2 }}>👶</div>
-                      <div className="member-avatar" style={{ backgroundColor: '#1abc9c', zIndex: 1 }}>👵</div>
+                    <div className="free-plan-card-body">
+                      <div className="plan-logo-and-title">
+                        <img src={logo} alt="Echord Logo" style={{ width: '24px', height: '24px' }} />
+                        <h2 className="plan-title-free">Echord Free</h2>
+                      </div>
+                      <button className="explore-plans-btn" onClick={() => triggerMockToast('Explore plans')}>
+                        Explore plans
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Join Premium Card */}
+                  <div className="join-premium-card" onClick={() => triggerMockToast('Join Premium')}>
+                    <div className="join-premium-content">
+                      <Diamond size={28} className="premium-diamond-icon" />
+                      <span className="join-premium-text">Join Premium</span>
                     </div>
                   </div>
                 </div>
@@ -865,8 +871,8 @@ function AccountPage({ user, onProfileUpdate, onLogout, onBackToMain }) {
 
       </div>
 
-      {/* Spotify Footer */}
-      <footer className="spotify-account-footer">
+      {/* Echord Footer */}
+      <footer className="echord-account-footer">
         <div className="footer-top">
           <div className="footer-logo-col">
             <div className="footer-logo" onClick={onBackToMain} style={{ cursor: 'pointer' }}>

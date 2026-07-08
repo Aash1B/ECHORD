@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
+import logo from '../../assets/logo.svg';
 import './auth.css';
-import { FaSpotify } from 'react-icons/fa';
 import { SocialButtons } from './SocialButtons';
 import { useGoogleLogin } from '@react-oauth/google';
 import { GoogleNameModal } from './GoogleNameModal';
 
-const API_URL = (import.meta.env.VITE_API_URL || 'https://spotifyghostt-backend.loca.lt').replace(/\/$/, '');
+const API_URL = (import.meta.env.VITE_API_URL || 'https://echord-backend.loca.lt').replace(/\/$/, '');
 
 function SignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onCreatorSignUpClick }) {
   const [name, setName] = useState('');
@@ -171,9 +171,8 @@ function SignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onCreatorSignUpC
     <div className="auth-container">
       <div className="auth-wrapper">
         <div className="auth-card">
-          {/* Spotify Logo */}
           <div className="logo">
-            <img src="/logo.svg" alt="Echord Logo" />
+            <img src={logo} alt="Echord Logo" />
           </div>
 
           {isVerifying ? (
@@ -284,9 +283,6 @@ function SignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onCreatorSignUpC
 
               <SocialButtons
                 authType="signup"
-                onPhoneLoginClick={() => {
-                  alert('Please sign up by filling out the form. Phone OTP is currently supported for login verification.');
-                }}
                 onGoogleClick={handleGoogleSignUp}
                 onCreatorSignUpClick={onCreatorSignUpClick}
               />

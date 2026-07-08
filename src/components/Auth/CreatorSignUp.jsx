@@ -1,9 +1,9 @@
 import { useState } from 'react';
+import logo from '../../assets/logo.svg';
 import './auth.css';
-import { FaSpotify } from 'react-icons/fa';
 import { SocialButtons } from './SocialButtons';
 
-const API_URL = (import.meta.env.VITE_API_URL || 'https://spotifyghostt-backend.loca.lt').replace(/\/$/, '');
+const API_URL = (import.meta.env.VITE_API_URL || 'https://echord-backend.loca.lt').replace(/\/$/, '');
 
 function CreatorSignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onShowUserSignUp }) {
   const [name, setName] = useState('');
@@ -132,9 +132,8 @@ function CreatorSignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onShowUse
     <div className="auth-container">
       <div className="auth-wrapper">
         <div className="auth-card">
-          {/* Spotify Logo */}
           <div className="logo">
-            <img src="/logo.svg" alt="Echord Logo" />
+            <img src={logo} alt="Echord Logo" />
           </div>
 
           {isVerifying ? (
@@ -245,9 +244,6 @@ function CreatorSignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onShowUse
 
               <SocialButtons
                 authType="signup"
-                onPhoneLoginClick={() => {
-                  alert('Please sign up by filling out the form. Phone OTP is currently supported for login verification.');
-                }}
                 onGoogleClick={handleGoogleSignUp}
               />
 

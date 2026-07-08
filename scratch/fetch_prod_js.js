@@ -1,7 +1,7 @@
 async function main() {
     try {
         console.log("Fetching production index.html...");
-        const res = await fetch('https://kritagyaaa.github.io/spotify-ghostt/');
+        const res = await fetch('https://kritagyaaa.github.io/Echord/');
         const html = await res.text();
         
         // Find the index.js script tag

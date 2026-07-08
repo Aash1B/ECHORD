@@ -68,13 +68,6 @@ function getPublicUrl(key) {
     const encodedKey = key.split('/').map(encodeURIComponent).join('/');
     const bkt = bucket ? bucket.toLowerCase() : '';
 
-    if (ep.includes('supabase.co')) {
-        // Transform S3 endpoint to Supabase public URL structure:
-        // https://<ref>.storage.supabase.co/storage/v1/s3 -> https://<ref>.supabase.co/storage/v1/object/public/<bucket>/<key>
-        const baseUrl = ep.replace('.storage.supabase.co/storage/v1/s3', '.supabase.co/storage/v1/object/public');
-        return `${baseUrl}/${bkt}/${encodedKey}`;
-    }
-
     // Use the bucket as a subdomain for public S3-compatible Backblaze URLs.
     // This avoids path-style issues with public access on some B2 setups.
     const urlPrefix = ep.replace(/^(https?:\/\/)(.*)$/, `$1${bkt}.$2`);
@@ -96,8 +89,8 @@ function formatCoverUrl(coverUrl, req) {
         return getProxyUrl(coverUrl, req);
     }
 
-    // If it's a B2 or Supabase public URL
-    if (coverUrl.includes('backblazeb2.com') || coverUrl.includes('supabase.co')) {
+    // If it's a B2 public URL
+    if (coverUrl.includes('backblazeb2.com')) {
         const match = coverUrl.match(/(covers\/.*)$/);
         if (match) {
             return getProxyUrl(match[1], req);
