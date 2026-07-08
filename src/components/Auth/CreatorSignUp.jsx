@@ -70,8 +70,8 @@ function CreatorSignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onShowUse
       if (!res.ok) {
         throw new Error(data.error || 'Registration failed.');
       }
-      setDummyOtp(data.otp || '');
-      setIsVerifying(true);
+      alert('Creator registration successful! Please log in to verify your email and activate your account.');
+      onSignUpSuccess?.();
     } catch (err) {
       setError(err.message);
     } finally {

@@ -109,8 +109,8 @@ function SignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onCreatorSignUpC
       if (!res.ok) {
         throw new Error(data.error || 'Registration failed.');
       }
-      setDummyOtp(data.otp || '');
-      setIsVerifying(true);
+      alert('Registration successful! Please log in to verify your email and activate your account.');
+      onSignUpSuccess?.();
     } catch (err) {
       setError(err.message);
     } finally {

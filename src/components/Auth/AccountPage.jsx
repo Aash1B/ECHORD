@@ -399,7 +399,7 @@ function AccountPage({ user, onProfileUpdate, onLogout, onBackToMain }) {
                   </span>
                 )}
               </div>
-              <span className="profile-name">Profile ∨</span>
+              <span className="profile-name">{user?.name || 'Profile'}</span>
             </div>
           </nav>
         </div>
