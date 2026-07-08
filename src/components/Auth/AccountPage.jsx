@@ -376,10 +376,10 @@ function AccountPage({ user, onProfileUpdate, onLogout, onBackToMain }) {
         </div>
       )}
 
-      {/* Ghostt Top Header */}
-      <header className="spotify-account-header">
+      {/* Echord Top Header */}
+      <header className="echord-account-header">
         <div className="header-inner">
-          <div className="spotify-logo-clickable" onClick={onBackToMain} style={{ cursor: 'pointer' }}>
+          <div className="echord-logo-clickable" onClick={onBackToMain} style={{ cursor: 'pointer' }}>
             <img src={logo} alt="ECHORD Logo" style={{ width: '36px', height: '36px' }} />
             <span className="logo-text">E C H O R D</span>
           </div>
@@ -871,8 +871,8 @@ function AccountPage({ user, onProfileUpdate, onLogout, onBackToMain }) {
 
       </div>
 
-      {/* Spotify Footer */}
-      <footer className="spotify-account-footer">
+      {/* Echord Footer */}
+      <footer className="echord-account-footer">
         <div className="footer-top">
           <div className="footer-logo-col">
             <div className="footer-logo" onClick={onBackToMain} style={{ cursor: 'pointer' }}>

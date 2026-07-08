@@ -217,7 +217,7 @@ position:relative;
   isolation: isolate;
 }
 
-.spotifyArrow {
+.echordArrow {
   position: absolute;
   right: 10px;
   top: 50%;
@@ -236,14 +236,14 @@ position:relative;
   z-index: 100;
 }
 
-.spotifyArrow:hover {
+.echordArrow:hover {
   transform: translateY(-50%) scale(1.08);
 
   box-shadow:
     0 0 12px rgba(225,159,199,0.45),
     0 0 24px rgba(225,159,199,0.25);
 }
-.spotifyArrowLeft {
+.echordArrowLeft {
   position: absolute;
   left: 10px;
   top: 50%;
@@ -262,7 +262,7 @@ position:relative;
   z-index: 100;
 }
 
-.spotifyArrowLeft:hover {
+.echordArrowLeft:hover {
   transform: translateY(-50%) scale(1.08);
   box-shadow:
     0 0 12px rgba(225,159,199,0.45),

@@ -7,7 +7,7 @@ const mysql = require("mysql2/promise");
 
 async function initDb() {
   console.log("Starting database initialization...");
-  const dbName = process.env.DB_NAME || "spotify_clone";
+  const dbName = process.env.DB_NAME || "echord_db";
   
   // 1. Connect without database name first
   const connection = await mysql.createConnection({

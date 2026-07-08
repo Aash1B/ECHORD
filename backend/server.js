@@ -174,7 +174,7 @@ app.get("/db-viewer", async (req, res) => {
         </head>
         <body>
             <h1>Echord - Database Table Viewer</h1>
-            <p>Showing current records in MySQL database: <strong>spotify_clone</strong></p>
+            <p>Showing current records in MySQL database: <strong>echord_db</strong></p>
         `;
 
         for (const table of tables) {

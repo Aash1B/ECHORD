@@ -359,11 +359,11 @@ export function MainPage({
       </div>
       <div className={styles.cardsContainer}>
         {showRecentLeftArrow && (
-          <button className={styles.spotifyArrowLeft} onClick={() => { scrollLeft(recentRef); setShowRecentLeftArrow(false); }}>
+          <button className={styles.echordArrowLeft} onClick={() => { scrollLeft(recentRef); setShowRecentLeftArrow(false); }}>
             <ChevronLeft size={20} />
           </button>
         )}
-        <button className={styles.spotifyArrow} onClick={() => { scrollRight(recentRef); setShowRecentLeftArrow(true); }}>
+        <button className={styles.echordArrow} onClick={() => { scrollRight(recentRef); setShowRecentLeftArrow(true); }}>
           <ChevronRight size={20} />
         </button>
         <div className={styles.cardsRow} ref={recentRef}>
@@ -383,11 +383,11 @@ export function MainPage({
       </div>
       <div className={styles.cardsContainer}>
         {showMixesLeftArrow && (
-          <button className={`${styles.spotifyArrowLeft} ${styles.mixesArrowLeft}`} onClick={() => { scrollLeft(mixesRef); setShowMixesLeftArrow(false); }}>
+          <button className={`${styles.echordArrowLeft} ${styles.mixesArrowLeft}`} onClick={() => { scrollLeft(mixesRef); setShowMixesLeftArrow(false); }}>
             <ChevronLeft size={20} />
           </button>
         )}
-        <button className={`${styles.spotifyArrow} ${styles.mixesArrow}`} onClick={() => { scrollRight(mixesRef); setShowMixesLeftArrow(true); }}>
+        <button className={`${styles.echordArrow} ${styles.mixesArrow}`} onClick={() => { scrollRight(mixesRef); setShowMixesLeftArrow(true); }}>
           <ChevronRight size={20} />
         </button>
         <div className={styles.cardsRow} ref={mixesRef}>
@@ -406,11 +406,11 @@ export function MainPage({
       </div>
       <div className={styles.cardsContainer}>
         {showFeaturedLeftArrow && (
-          <button className={`${styles.spotifyArrowLeft} ${styles.featuredArrowLeft}`} onClick={() => { scrollLeft(featuredRef); setShowFeaturedLeftArrow(false); }}>
+          <button className={`${styles.echordArrowLeft} ${styles.featuredArrowLeft}`} onClick={() => { scrollLeft(featuredRef); setShowFeaturedLeftArrow(false); }}>
             <ChevronLeft size={20} />
           </button>
         )}
-        <button className={`${styles.spotifyArrow} ${styles.featuredArrow}`} onClick={() => { scrollRight(featuredRef); setShowFeaturedLeftArrow(true); }}>
+        <button className={`${styles.echordArrow} ${styles.featuredArrow}`} onClick={() => { scrollRight(featuredRef); setShowFeaturedLeftArrow(true); }}>
           <ChevronRight size={20} />
         </button>
         <div className={styles.cardsRow} ref={featuredRef}>
