@@ -12,6 +12,7 @@ body,
   min-width: 320px;
   height: 100%;
   margin: 0;
+  background: #0a0a0a;
   overflow-x: hidden;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
