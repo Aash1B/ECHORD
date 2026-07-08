@@ -12,11 +12,7 @@ const cors = require("cors");
 
 const app = express();
 
-// Debug (Temporary - remove after testing)
-console.log("DB_HOST:", process.env.DB_HOST);
-console.log("DB_PORT:", process.env.DB_PORT);
-console.log("DB_USER:", process.env.DB_USER);
-console.log("DB_NAME:", process.env.DB_NAME);
+
 
 // Import Routes
 const songRoutes = require("./routes/songRoutes");
@@ -25,7 +21,22 @@ const playlistRoutes = require("./routes/playlistRoutes");
 const fileRoutes = require("./routes/fileRoutes");
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: function (origin, callback) {
+        const allowedOrigins = [
+            'http://localhost:5173',
+            'https://kritagyaaa.github.io'
+        ];
+        // Allow requests with no origin (mobile apps, curl, etc.)
+        if (!origin) return callback(null, true);
+        // Allow any *.vercel.app preview/production deploy
+        if (origin.endsWith('.vercel.app') || allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+        callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true
+}));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -35,7 +46,7 @@ app.use('/files', fileRoutes);
 app.get("/api/health", (req, res) => {
     res.json({
         success: true,
-        message: "Spotify Backend Running"
+        message: "Echord Backend Running"
     });
 });
 
@@ -173,8 +184,8 @@ app.get("/db-viewer", async (req, res) => {
             </style>
         </head>
         <body>
-            <h1>Spotify Clone - Database Table Viewer</h1>
-            <p>Showing current records in MySQL database: <strong>spotify_clone</strong></p>
+            <h1>Echord - Database Table Viewer</h1>
+            <p>Showing current records in MySQL database: <strong>echord_db</strong></p>
         `;
 
         for (const table of tables) {
@@ -232,6 +243,6 @@ app.use((req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server running on port ${PORT}`);
 });

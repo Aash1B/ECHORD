@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import logo from '../../assets/logo.svg';
 import './auth.css';
-import { FaSpotify } from 'react-icons/fa';
 import { SocialButtons } from './SocialButtons';
 import { useGoogleLogin } from '@react-oauth/google';
 import { GoogleNameModal } from './GoogleNameModal';
 
-const API_URL = (import.meta.env.VITE_API_URL || 'https://spotifyghostt-backend.loca.lt').replace(/\/$/, '');
+const API_URL = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
 
 function Login({ onShowSignUp, onLoginSuccess }) {
   const [loginMethod, setLoginMethod] = useState('email'); // 'email', 'phone', 'otp', 'forgot_email', 'forgot_reset'
@@ -323,7 +322,6 @@ function Login({ onShowSignUp, onLoginSuccess }) {
     <div className="auth-container">
       <div className="auth-wrapper">
         <div className="auth-card">
-          {/* Spotify Logo */}
           <div className="logo">
             <img src={logo} alt="Echord Logo" />
           </div>

@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { FaSpotify } from 'react-icons/fa';
 import logo from '../../assets/logo.svg';
 import './auth.css';
 
-const API_URL = (import.meta.env.VITE_API_URL || 'https://spotifyghostt-backend.loca.lt').replace(/\/$/, '');
+const API_URL = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
 
 function ResetPasswordPage() {
   const [searchParams] = useSearchParams();

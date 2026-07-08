@@ -28,7 +28,7 @@ import {
 import './AccountPage.css';
 import logo from '../../assets/logo.svg';
 
-const API_URL = (import.meta.env.VITE_API_URL || 'https://spotifyghostt-backend.loca.lt').replace(/\/$/, '');
+const API_URL = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
 
 function AccountPage({ user, onProfileUpdate, onLogout, onBackToMain }) {
   const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'edit', 'password', 'notifications', 'sessions'
@@ -36,6 +36,16 @@ function AccountPage({ user, onProfileUpdate, onLogout, onBackToMain }) {
   const [email, setEmail] = useState(user?.email || '');
   const [phone, setPhone] = useState(user?.phone_number || '');
   const [picture, setPicture] = useState(user?.profile_picture && !user.profile_picture.includes('googleusercontent.com') ? user.profile_picture : '');
+  const [profileImgError, setProfileImgError] = useState(false);
+  const [pictureImgError, setPictureImgError] = useState(false);
+
+  useEffect(() => {
+    setProfileImgError(false);
+  }, [user?.profile_picture]);
+
+  useEffect(() => {
+    setPictureImgError(false);
+  }, [picture]);
   
   const [currentPassword, setCurrentPassword] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -376,30 +386,33 @@ function AccountPage({ user, onProfileUpdate, onLogout, onBackToMain }) {
         </div>
       )}
 
-      {/* Ghostt Top Header */}
-      <header className="spotify-account-header">
+      {/* Echord Top Header */}
+      <header className="echord-account-header">
         <div className="header-inner">
-          <div className="spotify-logo-clickable" onClick={onBackToMain} style={{ cursor: 'pointer' }}>
+          <div className="echord-logo-clickable" onClick={onBackToMain} style={{ cursor: 'pointer' }}>
             <img src={logo} alt="ECHORD Logo" style={{ width: '36px', height: '36px' }} />
             <span className="logo-text">E C H O R D</span>
           </div>
 
           <nav className="header-nav-links">
-            <a href="#" onClick={(e) => { e.preventDefault(); triggerMockToast('Premium plans'); }}>Premium plans</a>
-            <a href="#" onClick={(e) => { e.preventDefault(); triggerMockToast('Support'); }}>Support</a>
             <a href="#" onClick={(e) => { e.preventDefault(); triggerMockToast('Download'); }}>Download</a>
             <span className="divider">|</span>
             <div className="header-profile-dropdown" onClick={onBackToMain} style={{ cursor: 'pointer' }}>
               <div className="header-avatar-circle profile-default-avatar">
-                {user?.profile_picture && !user.profile_picture.includes('googleusercontent.com') ? (
-                  <img src={user.profile_picture} alt="Avatar" className="header-avatar-img" />
+                {user?.profile_picture && !user.profile_picture.includes('googleusercontent.com') && !profileImgError ? (
+                  <img 
+                    src={user.profile_picture} 
+                    alt="Avatar" 
+                    className="header-avatar-img" 
+                    onError={() => setProfileImgError(true)}
+                  />
                 ) : (
                   <span className="profile-letter-avatar">
                     {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
                   </span>
                 )}
               </div>
-              <span className="profile-name">{user?.name || 'Profile'}</span>
+              <span className="profile-name">{user?.name || 'Username'}</span>
             </div>
           </nav>
         </div>
@@ -460,7 +473,7 @@ function AccountPage({ user, onProfileUpdate, onLogout, onBackToMain }) {
                     <div className="free-plan-card-body">
                       <div className="plan-logo-and-title">
                         <img src={logo} alt="Echord Logo" style={{ width: '24px', height: '24px' }} />
-                        <h2 className="plan-title-free">Spotify Free</h2>
+                        <h2 className="plan-title-free">Echord Free</h2>
                       </div>
                       <button className="explore-plans-btn" onClick={() => triggerMockToast('Explore plans')}>
                         Explore plans
@@ -570,7 +583,18 @@ function AccountPage({ user, onProfileUpdate, onLogout, onBackToMain }) {
                 <div className="profile-upload-container">
                   {picture && (
                     <div className="profile-upload-preview">
-                      <img src={picture} alt="Upload Preview" />
+                      {!pictureImgError ? (
+                        <img 
+                          src={picture} 
+                          alt="Upload Preview" 
+                          onError={() => setPictureImgError(true)}
+                        />
+                      ) : (
+                        <div className="profile-upload-preview-fallback" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#282828', border: '1px solid #404040' }}>
+                          <User size={32} color="#aaa" />
+                          <span style={{ fontSize: '10px', color: '#aaa', marginTop: '4px', textAlign: 'center' }}>Error</span>
+                        </div>
+                      )}
                       <button 
                         type="button" 
                         className="remove-preview-btn" 
@@ -873,8 +897,8 @@ function AccountPage({ user, onProfileUpdate, onLogout, onBackToMain }) {
 
       </div>
 
-      {/* Spotify Footer */}
-      <footer className="spotify-account-footer">
+      {/* Echord Footer */}
+      <footer className="echord-account-footer">
         <div className="footer-top">
           <div className="footer-logo-col">
             <div className="footer-logo" onClick={onBackToMain} style={{ cursor: 'pointer' }}>

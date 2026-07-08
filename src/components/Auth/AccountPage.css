@@ -23,7 +23,7 @@
 }
 
 /* Header Navbar */
-.spotify-account-header {
+.echord-account-header {
   height: 80px;
   background: transparent;
   border-bottom: none;
@@ -40,7 +40,7 @@
   align-items: center;
 }
 
-.spotify-logo-clickable {
+.echord-logo-clickable {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -49,7 +49,7 @@
   transition: opacity 0.2s;
 }
 
-.spotify-logo-clickable:hover {
+.echord-logo-clickable:hover {
   opacity: 0.9;
 }
 
@@ -1025,8 +1025,8 @@
   color: white;
 }
 
-/* Spotify Footer Styles */
-.spotify-account-footer {
+/* Echord Footer Styles */
+.echord-account-footer {
   background-color: #000000;
   padding: 80px 0 50px 0;
   margin-top: auto;
@@ -1034,7 +1034,7 @@
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.spotify-account-footer .footer-top {
+.echord-account-footer .footer-top {
   width: 1000px;
   max-width: 90%;
   margin: 0 auto 40px auto;
@@ -1043,11 +1043,11 @@
   align-items: flex-start;
 }
 
-.spotify-account-footer .footer-logo-col {
+.echord-account-footer .footer-logo-col {
   flex: 0 0 160px;
 }
 
-.spotify-account-footer .footer-logo {
+.echord-account-footer .footer-logo {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1058,20 +1058,20 @@
   cursor: pointer;
 }
 
-.spotify-account-footer .footer-links-cols {
+.echord-account-footer .footer-links-cols {
   display: flex;
   gap: 60px;
   flex: 1;
   margin-left: 48px;
 }
 
-.spotify-account-footer .footer-col {
+.echord-account-footer .footer-col {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.spotify-account-footer .footer-col h4 {
+.echord-account-footer .footer-col h4 {
   color: rgba(255, 255, 255, 0.5);
   font-size: 12px;
   font-weight: 900;
@@ -1080,7 +1080,7 @@
   margin: 0 0 8px 0;
 }
 
-.spotify-account-footer .footer-col a {
+.echord-account-footer .footer-col a {
   color: #ffffff;
   font-size: 16px;
   font-weight: 500;
@@ -1088,18 +1088,18 @@
   transition: color 0.2s ease;
 }
 
-.spotify-account-footer .footer-col a:hover,
-.spotify-account-footer .footer-col a:active {
+.echord-account-footer .footer-col a:hover,
+.echord-account-footer .footer-col a:active {
   color: var(--dark-amaranth);
 }
 
-.spotify-account-footer .footer-social-col {
+.echord-account-footer .footer-social-col {
   display: flex;
   gap: 16px;
   margin-left: auto;
 }
 
-.spotify-account-footer .social-icon-btn {
+.echord-account-footer .social-icon-btn {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -1112,20 +1112,20 @@
   transition: background-color 0.2s ease;
 }
 
-.spotify-account-footer .social-icon-btn:hover {
+.echord-account-footer .social-icon-btn:hover {
   background-color: #404040;
 }
 
-.spotify-account-footer .social-icon-btn svg {
+.echord-account-footer .social-icon-btn svg {
   fill: #ffffff !important;
   transition: fill 0.2s ease;
 }
 
-.spotify-account-footer .social-icon-btn:hover svg {
+.echord-account-footer .social-icon-btn:hover svg {
   fill: var(--dark-amaranth) !important;
 }
 
-.spotify-account-footer .footer-bottom {
+.echord-account-footer .footer-bottom {
   width: 1000px;
   max-width: 90%;
   margin: 0 auto;
@@ -1136,32 +1136,32 @@
   align-items: flex-end;
 }
 
-.spotify-account-footer .footer-bottom-left {
+.echord-account-footer .footer-bottom-left {
   display: flex;
   gap: 16px 24px;
   flex-wrap: wrap;
 }
 
-.spotify-account-footer .footer-bottom-left a {
+.echord-account-footer .footer-bottom-left a {
   color: #ffffff;
   font-size: 12px;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
-.spotify-account-footer .footer-bottom-left a:hover,
-.spotify-account-footer .footer-bottom-left a:active {
+.echord-account-footer .footer-bottom-left a:hover,
+.echord-account-footer .footer-bottom-left a:active {
   color: var(--dark-amaranth);
 }
 
-.spotify-account-footer .footer-bottom-right {
+.echord-account-footer .footer-bottom-right {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 12px;
 }
 
-.spotify-account-footer .country-selector {
+.echord-account-footer .country-selector {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1171,11 +1171,11 @@
   transition: color 0.2s ease;
 }
 
-.spotify-account-footer .country-selector:hover {
+.echord-account-footer .country-selector:hover {
   color: var(--dark-amaranth);
 }
 
-.spotify-account-footer .copyright {
+.echord-account-footer .copyright {
   color: rgba(255, 255, 255, 0.4);
   font-size: 12px;
   margin: 0;
@@ -1183,35 +1183,35 @@
 
 /* Responsive Footer */
 @media (max-width: 900px) {
-  .spotify-account-footer {
+  .echord-account-footer {
     padding: 60px 0 40px 0;
   }
 
-  .spotify-account-footer .footer-top {
+  .echord-account-footer .footer-top {
     flex-direction: column;
     gap: 48px;
     margin-bottom: 48px;
   }
 
-  .spotify-account-footer .footer-links-cols {
+  .echord-account-footer .footer-links-cols {
     margin-left: 0;
     flex-direction: column;
     gap: 32px;
     width: 100%;
   }
 
-  .spotify-account-footer .footer-social-col {
+  .echord-account-footer .footer-social-col {
     margin-left: 0;
   }
 
-  .spotify-account-footer .footer-bottom {
+  .echord-account-footer .footer-bottom {
     flex-direction: column-reverse;
     align-items: flex-start;
     gap: 24px;
     padding-top: 24px;
   }
 
-  .spotify-account-footer .footer-bottom-right {
+  .echord-account-footer .footer-bottom-right {
     align-items: flex-start;
     width: 100%;
   }
