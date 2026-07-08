@@ -11,6 +11,7 @@ import {
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Header.module.css';
+import logo from '../../assets/logo.svg';
 import { searchSongs } from "../../services/api";
 export function Header({
   onHomeClick,
@@ -76,7 +77,7 @@ export function Header({
     <header className={styles.navbar} aria-label="Main navigation">
       <div className={styles.left}>
         <div className={styles.siteHeader} onClick={onHomeClick} title="Go to Home" role="link" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter') onHomeClick(); }}>
-          <img src="/logo.svg" alt="Echord Logo" className={styles.titleLogo} />
+          <img src={logo} alt="Echord Logo" className={styles.titleLogo} />
           <span className={styles.siteTitle}>E C H O R D</span>
         </div>
       </div>

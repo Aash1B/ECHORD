@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import logo from '../../assets/logo.svg';
 import './auth.css';
 import { FaSpotify } from 'react-icons/fa';
 import { SocialButtons } from './SocialButtons';
@@ -300,7 +301,7 @@ function Login({ onShowSignUp, onLoginSuccess }) {
         <div className="auth-card">
           {/* Spotify Logo */}
           <div className="logo">
-            <img src="/logo.svg" alt="Echord Logo" />
+            <img src={logo} alt="Echord Logo" />
           </div>
 
           <h1>Music Awaits</h1>

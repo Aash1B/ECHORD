@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import logo from '../../assets/logo.svg';
 import './auth.css';
 import { FaSpotify } from 'react-icons/fa';
 import { SocialButtons } from './SocialButtons';
@@ -134,7 +135,7 @@ function CreatorSignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onShowUse
         <div className="auth-card">
           {/* Spotify Logo */}
           <div className="logo">
-            <img src="/logo.svg" alt="Echord Logo" />
+            <img src={logo} alt="Echord Logo" />
           </div>
 
           {isVerifying ? (
