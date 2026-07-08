@@ -4,7 +4,7 @@ import { Music, Heart, Plus, Edit, Trash2, LogOut, ArrowRight, X, Upload, Check 
 import placeholder from '../../assets/music-placeholder.jpg';
 import './CreatorDashboard.css';
 
-const API_URL = (import.meta.env.VITE_API_URL || 'https://spotifyghostt-backend.loca.lt').replace(/\/$/, '');
+const API_URL = (import.meta.env.VITE_API_URL || 'https://echord-backend.loca.lt').replace(/\/$/, '');
 
 function CreatorDashboard({ user, onLogout }) {
   const navigate = useNavigate();
@@ -536,19 +536,6 @@ function CreatorDashboard({ user, onLogout }) {
         </div>
       )}
     </div>
-  );
-}
-
-// Simple local representation of Spotify Logo
-function FaSpotifyLogo() {
-  return (
-    <svg 
-      viewBox="0 0 24 24" 
-      xmlns="http://www.w3.org/2000/svg" 
-      style={{ fill: '#870339', width: '36px', height: '36px' }}
-    >
-      <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424c-.18.295-.565.387-.86.207-2.377-1.454-5.37-1.783-8.894-.982-.336.076-.67-.135-.746-.472-.076-.336.135-.67.472-.746 3.847-.878 7.14-.505 9.822 1.135.295.18.387.565.207.86zm1.226-2.723c-.227.367-.707.487-1.074.26-2.72-1.672-6.87-2.157-10.076-1.183-.412.125-.845-.107-.97-.52-.125-.413.107-.847.52-.972 3.666-1.112 8.232-.57 11.34 1.342.367.227.487.707.26 1.074zm.106-2.833C14.382 8.87 8.528 8.676 5.136 9.705c-.52.158-1.074-.138-1.232-.658-.158-.52.138-1.074.658-1.232 3.896-1.182 10.372-.958 14.445 1.46.468.278.62.883.342 1.352-.277.47-.883.62-1.35.342z"/>
-    </svg>
   );
 }
 
