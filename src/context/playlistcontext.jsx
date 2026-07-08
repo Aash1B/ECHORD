@@ -100,7 +100,7 @@ export function PlaylistProvider({ children }) {
                 setSelectedPlaylist({
                     id: "featured",
                     name: "Featured now",
-                    description: "Featured songs on Spotify Clone",
+                    description: "Featured songs on Echord",
                     cover_url: null,
                     songs: featuredSongs,
                     song_count: featuredSongs.length,
