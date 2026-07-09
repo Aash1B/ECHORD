@@ -5,7 +5,7 @@ import { SocialButtons } from './SocialButtons';
 import { useGoogleLogin } from '@react-oauth/google';
 import { GoogleNameModal } from './GoogleNameModal';
 
-const API_URL = (import.meta.env.VITE_API_URL || 'https://echord-backend.loca.lt').replace(/\/$/, '');
+const API_URL = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
 
 function Login({ onShowSignUp, onLoginSuccess }) {
   const [loginMethod, setLoginMethod] = useState('email'); // 'email', 'phone', 'otp', 'forgot_email', 'forgot_reset'
@@ -262,6 +262,30 @@ function Login({ onShowSignUp, onLoginSuccess }) {
     }
   };
 
+  const handleResendSignupOtp = async (e) => {
+    e.preventDefault();
+    setError('');
+    setMessage('');
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/auth/send-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, purpose: 'verify' }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to resend code.');
+      }
+      setDummyOtp(data.otp || '');
+      alert('Verification code resent successfully!');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleResetPasswordSubmit = async (e) => {
     e.preventDefault();
     if (!email || !otp || !password) {
@@ -455,7 +479,7 @@ function Login({ onShowSignUp, onLoginSuccess }) {
                   className="auth-btn"
                   onClick={handleSendResetOtp}
                   disabled={loading}
-                  style={{ background: 'transparent', border: '1px solid #1db954', color: '#1db954', marginBottom: 0 }}
+                  style={{ marginBottom: 0 }}
                 >
                   {loadingAction === 'reset_otp' ? 'Requesting OTP...' : 'Send Reset OTP'}
                 </button>
@@ -564,10 +588,17 @@ function Login({ onShowSignUp, onLoginSuccess }) {
                 {loading ? 'Verifying...' : 'Verify Code'}
               </button>
 
-              <p style={{ marginTop: '10px', fontSize: '13px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>
                 <a
                   href="#"
-                  style={{ color: '#b3b3b3', textDecoration: 'none', fontWeight: 'bold' }}
+                  style={{ color: '#1db954', fontSize: '14px', textDecoration: 'none', fontWeight: 'bold' }}
+                  onClick={handleResendSignupOtp}
+                >
+                  Resend Verification Code
+                </a>
+                <a
+                  href="#"
+                  style={{ color: '#b3b3b3', fontSize: '13px', textDecoration: 'none' }}
                   onClick={(e) => {
                     e.preventDefault();
                     setLoginMethod('email');
@@ -577,7 +608,7 @@ function Login({ onShowSignUp, onLoginSuccess }) {
                 >
                   Back to Login
                 </a>
-              </p>
+              </div>
             </form>
           )}
 

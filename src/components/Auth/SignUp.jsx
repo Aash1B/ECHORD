@@ -5,7 +5,7 @@ import { SocialButtons } from './SocialButtons';
 import { useGoogleLogin } from '@react-oauth/google';
 import { GoogleNameModal } from './GoogleNameModal';
 
-const API_URL = (import.meta.env.VITE_API_URL || 'https://echord-backend.loca.lt').replace(/\/$/, '');
+const API_URL = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
 
 function SignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onCreatorSignUpClick }) {
   const [name, setName] = useState('');
@@ -108,8 +108,8 @@ function SignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onCreatorSignUpC
       if (!res.ok) {
         throw new Error(data.error || 'Registration failed.');
       }
-      setDummyOtp(data.otp || '');
-      setIsVerifying(true);
+      alert('Registration successful! Please log in to verify your email and activate your account.');
+      onSignUpSuccess?.();
     } catch (err) {
       setError(err.message);
     } finally {

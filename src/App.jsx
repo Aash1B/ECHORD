@@ -46,7 +46,7 @@ function ProtectedLayout({
   const isProfilePage = location.pathname === '/profile';
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/signup" replace />;
   }
 
   return (
@@ -318,7 +318,7 @@ function App() {
       />
 
       {/* Legacy auth route compatibility */}
-      <Route path="/auth" element={<Navigate to="/login" replace />} />
+      <Route path="/auth" element={<Navigate to="/signup" replace />} />
       <Route path="/auth/signup" element={<Navigate to="/signup" replace />} />
 
       {/* Protected Routes inside the App Layout */}
