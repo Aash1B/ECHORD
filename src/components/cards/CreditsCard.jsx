@@ -11,6 +11,7 @@ export function CreditsCard({ credits }) {
         <button className={styles.showAllButton} type="button">
           Show all
         </button>
+  
       </div>
       <ul className={styles.creditList}>
         {credits.map((credit) => (
