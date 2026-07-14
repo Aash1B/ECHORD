@@ -16,7 +16,7 @@
    ===================================================== */
 .appShell {
   display: grid;
-  grid-template-columns: 340px minmax(0, 1fr) 340px;
+  grid-template-columns: 340px minmax(0, 1fr) 380px;
   grid-template-rows: minmax(0, 1fr);
   gap: 8px !important;
   min-height: 0;
@@ -86,11 +86,11 @@
 /* ── Large tablet (≤1100px): collapse library to icons, shrink right sidebar ── */
 @media (max-width: 1100px) {
   .appShell {
-    grid-template-columns: 88px minmax(0, 1fr) 320px;
+    grid-template-columns: 88px minmax(0, 1fr) 380px;
   }
 
   .sidebarCollapsed {
-    grid-template-columns: 88px minmax(0, 1fr) 320px !important;
+    grid-template-columns: 88px minmax(0, 1fr) 380px !important;
   }
 }
 

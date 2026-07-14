@@ -29,6 +29,9 @@ function Login({ onShowSignUp, onLoginSuccess }) {
           headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
         });
         const profile = await res.json();
+        if (!res.ok || !profile.email || !profile.sub) {
+          throw new Error(profile.error_description || 'Google did not return a valid profile.');
+        }
         setPendingGoogleUser({
           email: profile.email,
           name: profile.name || 'Google User',

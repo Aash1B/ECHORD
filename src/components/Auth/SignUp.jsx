@@ -34,6 +34,9 @@ function SignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onCreatorSignUpC
           headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
         });
         const profile = await res.json();
+        if (!res.ok || !profile.email || !profile.sub) {
+          throw new Error(profile.error_description || 'Google did not return a valid profile.');
+        }
         setPendingGoogleUser({
           email: profile.email,
           name: profile.name || 'Google User',
@@ -69,6 +72,7 @@ function SignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onCreatorSignUpC
           google_id: pendingGoogleUser.google_id,
           profile_picture: pendingGoogleUser.profile_picture,
           share_name: shareName,
+          role: 'user',
         }),
       });
       const data = await res.json();

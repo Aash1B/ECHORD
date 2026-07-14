@@ -45,7 +45,7 @@ rgba(13, 13, 13, 0.4);
 
 .quickPicks {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   margin-bottom: 40px;
 }
@@ -78,7 +78,7 @@ rgba(13, 13, 13, 0.4);
 }
 
 .likedSongsHeroCard {
-  grid-column: span 2;
+  grid-column: span 1;
   background: linear-gradient(135deg, rgba(135, 3, 57, 0.2) 0%, rgba(26, 26, 26, 0.75) 100%) !important;
   border: 1px solid rgba(225, 159, 199, 0.15);
   position: relative;
@@ -378,15 +378,28 @@ position:relative;
 @media (max-width: 600px) {
   .mainContent {
     padding: 12px;
+    background:
+      radial-gradient(circle at top left, rgba(135, 3, 57, 0.3) 0%, rgba(82, 37, 61, 0.22) 48%, transparent 78%),
+      #35232d;
   }
 
   .quickPicks {
     grid-template-columns: 1fr;
+    gap: 10px;
   }
 
   .pickCard {
-    flex-direction: column;
-    text-align: center;
+    flex-direction: row;
+    min-height: 72px;
+    padding: 10px 14px;
+    text-align: left;
+  }
+
+  .playlistCollage,
+  .pickCard img {
+    width: 52px !important;
+    height: 52px !important;
+    flex: 0 0 52px;
   }
 
   .likedSongsHeroCard {

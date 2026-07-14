@@ -304,7 +304,7 @@ export function MainPage({
           </div>
         </div>
 
-        {playlists.slice(0, 5).map(playlist => (
+        {playlists.slice(0, 1).map(playlist => (
           <div
             key={playlist.id}
             className={styles.pickCard}
