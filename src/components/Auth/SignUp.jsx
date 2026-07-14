@@ -4,6 +4,7 @@ import './auth.css';
 import { SocialButtons } from './SocialButtons';
 import { useGoogleLogin } from '@react-oauth/google';
 import { GoogleNameModal } from './GoogleNameModal';
+import { authenticateWithNativeGoogle, isNativeGoogleAuth } from '../../services/nativeGoogleAuth';
 
 const API_URL = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
 
@@ -42,6 +43,7 @@ function SignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onCreatorSignUpC
           name: profile.name || 'Google User',
           google_id: profile.sub,
           profile_picture: profile.picture,
+          access_token: tokenResponse.access_token,
         });
       } catch (err) {
         setError('Failed to fetch Google user profile.');
@@ -54,9 +56,22 @@ function SignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onCreatorSignUpC
     },
   });
 
-  const handleGoogleSignUp = () => {
+  const handleGoogleSignUp = async () => {
     setError('');
-    triggerGoogleAuth();
+    if (!isNativeGoogleAuth()) {
+      triggerGoogleAuth();
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const data = await authenticateWithNativeGoogle('user');
+      onLoginSuccess?.(data.token, data.user);
+    } catch (err) {
+      setError(err.message || 'Google Sign-Up failed.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoogleModalConfirm = async ({ displayName, shareName }) => {
@@ -72,6 +87,7 @@ function SignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onCreatorSignUpC
           google_id: pendingGoogleUser.google_id,
           profile_picture: pendingGoogleUser.profile_picture,
           share_name: shareName,
+          access_token: pendingGoogleUser.access_token,
           role: 'user',
         }),
       });
