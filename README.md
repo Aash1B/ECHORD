@@ -1,10 +1,11 @@
+# ECHORD
 <div align="center">
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=870339&height=180&section=header&text=ECHORD&fontSize=60&fontColor=E19FC7&animation=fadeIn&fontAlignY=40" width="100%"/>
 
 ### Echo Beyond the Beat.
 
-ECHORD is a full-stack music streaming platform built for listeners and creators alike — stream your favorite tracks, build playlists that match your mood, and discover new sounds with personalized listening through intelligent music recommandations, real-time trending charts. Designed with a focus on seamless user experience, ECHORD brings together secure authentication, real-time music playback, and an intuitive interface that makes discovering and organizing music effortless. Whether you're curating the perfect playlist for a late-night drive or exploring what's trending today, ECHORD adapts to how you listen — and for creators, it offers a dedicated space to share their work with a growing community of listeners.
+ECHORD is a full-stack music streaming platform built for listeners and creators alike — stream your favourite tracks, build playlists that match your mood, and discover new sounds with personalised listening through intelligent music recommendations and real-time trending charts. Designed with a focus on a seamless user experience, ECHORD brings together secure authentication, real-time music playback, and an intuitive interface that makes discovering and organising music effortless. Whether you're curating the perfect playlist for a late-night drive or exploring what's trending today, ECHORD adapts to how you listen — and for creators, it offers a dedicated space to share their work with a growing community of listeners.
 
 ![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white)
@@ -285,15 +286,12 @@ ECHORD/
 
 ---
 
-## 🤝 Contributing
+## 📄 License
 
-Contributions are welcome!
+This project is developed for educational and portfolio purposes.
 
-1. Fork the repo
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+---
+⭐ If you found this project useful, consider giving it a star!
 
 ---
 
@@ -309,11 +307,7 @@ This project was developed by:
 
 For any queries, feel free to open an issue in this repository or contact any of the team members.
 
-
 ---
 
 <div align="center">
-
-Made with 🎧 and a lot of ☕
-
 </div>
