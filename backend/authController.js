@@ -7,6 +7,46 @@ const emailService = require('./services/emailService');
 const fs = require('fs');
 const path = require('path');
 const storageService = require('./services/storageService');
+const { OAuth2Client } = require('google-auth-library');
+
+const GOOGLE_WEB_CLIENT_ID = process.env.GOOGLE_WEB_CLIENT_ID ||
+  '804239846700-6o1h8fo0d98l3bk3a1duoabslp9efj82.apps.googleusercontent.com';
+const googleOAuthClient = new OAuth2Client(GOOGLE_WEB_CLIENT_ID);
+
+async function verifyGoogleCredential({ idToken, accessToken, nonce }) {
+  if (idToken) {
+    const ticket = await googleOAuthClient.verifyIdToken({
+      idToken,
+      audience: GOOGLE_WEB_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    if (!nonce || payload?.nonce !== nonce) {
+      throw Object.assign(new Error('Google sign-in nonce is invalid.'), { statusCode: 401 });
+    }
+    if (!payload?.sub || !payload.email || !payload.email_verified) {
+      throw Object.assign(new Error('Google account email is not verified.'), { statusCode: 401 });
+    }
+    return payload;
+  }
+
+  if (accessToken) {
+    const tokenInfo = await googleOAuthClient.getTokenInfo(accessToken);
+    const audiences = Array.isArray(tokenInfo.aud) ? tokenInfo.aud : [tokenInfo.aud];
+    if (!audiences.includes(GOOGLE_WEB_CLIENT_ID)) {
+      throw Object.assign(new Error('Google access token was issued for another application.'), { statusCode: 401 });
+    }
+    const profileResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    const profile = await profileResponse.json();
+    if (!profileResponse.ok || !profile.sub || !profile.email || profile.email_verified === false) {
+      throw Object.assign(new Error('Unable to verify the Google account.'), { statusCode: 401 });
+    }
+    return profile;
+  }
+
+  throw Object.assign(new Error('A Google ID token or access token is required.'), { statusCode: 400 });
+}
 
 async function saveBase64Image(base64String, req) {
   if (!base64String) return null;
@@ -98,10 +138,29 @@ async function handleRegister(request, response) {
     }
 
     // Check if email already registered
-    const [existingUsers] = await database.query('SELECT id FROM users WHERE email = ?', [email]);
+    const [existingUsers] = await database.query('SELECT id, role, is_verified FROM users WHERE email = ?', [email]);
     const existing = existingUsers[0];
     if (existing) {
-      return sendJson(response, 409, { error: 'Email already registered.' });
+      if (userRole === 'creator' && existing.role === 'user') {
+        // Upgrade the existing user to creator
+        const passwordHash = bcrypt.hashSync(password, 10);
+        await database.query('UPDATE users SET role = ?, password = ? WHERE id = ?', ['creator', passwordHash, existing.id]);
+        
+        // If already verified, insert into creators table
+        if (existing.is_verified) {
+          await database.query(
+            'INSERT INTO creators (name, email) VALUES (?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name)',
+            [name, email]
+          );
+        }
+        
+        return sendJson(response, 200, {
+          message: 'Account upgraded to Creator successfully. Please log in.',
+          user: { id: existing.id, name, email, phone_number: phone_number || null }
+        });
+      } else {
+        return sendJson(response, 409, { error: 'Email already registered.' });
+      }
     }
 
     // Hash the password
@@ -147,7 +206,7 @@ async function handleLogin(request, response) {
 
   try {
     const body = await readBody(request);
-    const { email, password } = body;
+    const { email, password, role: requestedRole } = body;
 
     if (!email || !password) {
       return sendJson(response, 400, { error: 'Email and password are required.' });
@@ -177,6 +236,11 @@ async function handleLogin(request, response) {
       return sendJson(response, 401, { error: 'Invalid email or password.' });
     }
 
+    // Check if user has the creator role
+    if (requestedRole === 'creator' && user.role !== 'creator' && user.role !== 'admin') {
+      return sendJson(response, 403, { error: 'You are not registered as a creator. Please sign up as a creator first.' });
+    }
+
     // Check if account is verified
     if (user.is_verified === 0) {
       // Generate new OTP
@@ -204,7 +268,11 @@ async function handleLogin(request, response) {
     }
 
     // Success - Create JWT & Session (7 days expiry)
-    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+    let finalRole = user.role;
+    if (user.role === 'creator' && requestedRole === 'user') {
+      finalRole = 'user';
+    }
+    const token = jwt.sign({ id: user.id, email: user.email, role: finalRole }, JWT_SECRET, { expiresIn: '7d' });
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
     // Store session in DB
@@ -230,7 +298,7 @@ async function handleLogin(request, response) {
         name: user.name,
         email: user.email,
         phone_number: user.phone_number,
-        role: user.role,
+        role: finalRole,
         profile_picture: user.profile_picture
       }
     });
@@ -330,7 +398,7 @@ async function handleSendOtp(request, response) {
 async function handleVerifyOtp(request, response) {
   try {
     const body = await readBody(request);
-    const { email, phone_number, otp_code, purpose } = body;
+    const { email, phone_number, otp_code, purpose, role: requestedRole } = body;
     const otpPurpose = purpose || 'verify';
 
     if (!otp_code || (!email && !phone_number)) {
@@ -385,9 +453,19 @@ async function handleVerifyOtp(request, response) {
     if (otpPurpose === 'login') {
       const [users] = await database.query('SELECT * FROM users WHERE id = ?', [user.id]);
       const fullUser = users[0];
+      
+      // Check if user has the creator role
+      if (requestedRole === 'creator' && fullUser.role !== 'creator' && fullUser.role !== 'admin') {
+        return sendJson(response, 403, { error: 'You are not registered as a creator. Please sign up as a creator first.' });
+      }
+      
       const { ip, device } = getClientMeta(request);
       
-      const token = jwt.sign({ id: fullUser.id, email: fullUser.email, role: fullUser.role }, JWT_SECRET, { expiresIn: '7d' });
+      let finalRole = fullUser.role;
+      if (fullUser.role === 'creator' && requestedRole === 'user') {
+        finalRole = 'user';
+      }
+      const token = jwt.sign({ id: fullUser.id, email: fullUser.email, role: finalRole }, JWT_SECRET, { expiresIn: '7d' });
       const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
       await database.query(
@@ -410,7 +488,7 @@ async function handleVerifyOtp(request, response) {
           name: fullUser.name,
           email: fullUser.email,
           phone_number: fullUser.phone_number,
-          role: fullUser.role,
+          role: finalRole,
           profile_picture: fullUser.profile_picture
         }
       });
@@ -822,25 +900,40 @@ async function handleSocialLogin(request, response) {
 
   try {
     const body = await readBody(request);
-    const { email, name, google_id, profile_picture } = body;
-
-    if (!email || !google_id) {
-      return sendJson(response, 400, { error: 'Email and google_id are required.' });
-    }
+    const { id_token: idToken, access_token: accessToken, nonce, name: requestedName, role: requestedRole } = body;
+    const googleProfile = await verifyGoogleCredential({ idToken, accessToken, nonce });
+    const email = googleProfile.email;
+    const google_id = googleProfile.sub;
+    const profile_picture = googleProfile.picture || null;
+    const name = requestedName || googleProfile.name || 'Google User';
 
     // Check if user already exists
     let [users] = await database.query('SELECT * FROM users WHERE google_id = ? OR email = ?', [google_id, email]);
     let user = users[0];
 
+    if (user) {
+      if (requestedRole === 'creator' && user.role !== 'creator' && user.role !== 'admin') {
+        return sendJson(response, 403, { error: 'You are not registered as a creator. Please sign up as a creator first.' });
+      }
+    }
+
     if (!user) {
+      const dbRole = requestedRole === 'creator' ? 'creator' : 'user';
       // Create user
       const [result] = await database.query(
-        'INSERT INTO users (name, email, is_google_user, google_id, profile_picture, is_verified) VALUES (?, ?, 1, ?, ?, 1)',
-        [name || 'Google User', email, google_id, profile_picture || null]
+        'INSERT INTO users (name, email, is_google_user, google_id, profile_picture, is_verified, role) VALUES (?, ?, 1, ?, ?, 1, ?)',
+        [name || 'Google User', email, google_id, profile_picture || null, dbRole]
       );
       const userId = result.insertId;
       const [newUsers] = await database.query('SELECT * FROM users WHERE id = ?', [userId]);
       user = newUsers[0];
+      
+      if (dbRole === 'creator') {
+        await database.query(
+          'INSERT INTO creators (name, email) VALUES (?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name)',
+          [user.name, user.email]
+        );
+      }
     } else {
       // User exists - update google_id, profile_picture, and name
       await database.query(
@@ -853,8 +946,11 @@ async function handleSocialLogin(request, response) {
 
     userIdForLog = user.id;
 
-    // Success - Create JWT & Session (7 days expiry)
-    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+    let finalRole = user.role;
+    if (user.role === 'creator' && requestedRole === 'user') {
+      finalRole = 'user';
+    }
+    const token = jwt.sign({ id: user.id, email: user.email, role: finalRole }, JWT_SECRET, { expiresIn: '7d' });
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
     // Store session in DB
@@ -880,7 +976,7 @@ async function handleSocialLogin(request, response) {
         name: user.name,
         email: user.email,
         phone_number: user.phone_number,
-        role: user.role,
+        role: finalRole,
         profile_picture: user.profile_picture
       }
     });

@@ -4,6 +4,7 @@ import './auth.css';
 import { SocialButtons } from './SocialButtons';
 import { useGoogleLogin } from '@react-oauth/google';
 import { GoogleNameModal } from './GoogleNameModal';
+import { authenticateWithNativeGoogle, isNativeGoogleAuth } from '../../services/nativeGoogleAuth';
 
 const API_URL = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
 
@@ -19,6 +20,7 @@ function Login({ onShowSignUp, onLoginSuccess }) {
   const [loading, setLoading] = useState(false);
   const [loadingAction, setLoadingAction] = useState('');
   const [pendingGoogleUser, setPendingGoogleUser] = useState(null);
+  const [loginRole, setLoginRole] = useState('user'); // 'user' or 'creator'
 
   const triggerGoogleAuth = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
@@ -28,11 +30,15 @@ function Login({ onShowSignUp, onLoginSuccess }) {
           headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
         });
         const profile = await res.json();
+        if (!res.ok || !profile.email || !profile.sub) {
+          throw new Error(profile.error_description || 'Google did not return a valid profile.');
+        }
         setPendingGoogleUser({
           email: profile.email,
           name: profile.name || 'Google User',
           google_id: profile.sub,
           profile_picture: profile.picture,
+          access_token: tokenResponse.access_token,
         });
       } catch (err) {
         setError('Failed to fetch Google user profile.');
@@ -45,9 +51,22 @@ function Login({ onShowSignUp, onLoginSuccess }) {
     },
   });
 
-  const handleGoogleLogin = () => {
+  const handleGoogleLogin = async () => {
     setError('');
-    triggerGoogleAuth();
+    if (!isNativeGoogleAuth()) {
+      triggerGoogleAuth();
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const data = await authenticateWithNativeGoogle(loginRole);
+      onLoginSuccess?.(data.token, data.user);
+    } catch (err) {
+      setError(err.message || 'Google Sign-In failed.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoogleModalConfirm = async ({ displayName, shareName }) => {
@@ -63,6 +82,8 @@ function Login({ onShowSignUp, onLoginSuccess }) {
           google_id: pendingGoogleUser.google_id,
           profile_picture: pendingGoogleUser.profile_picture,
           share_name: shareName,
+          access_token: pendingGoogleUser.access_token,
+          role: loginRole,
         }),
       });
       const data = await res.json();
@@ -92,7 +113,7 @@ function Login({ onShowSignUp, onLoginSuccess }) {
       const res = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, role: loginRole }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -154,7 +175,7 @@ function Login({ onShowSignUp, onLoginSuccess }) {
       const res = await fetch(`${API_URL}/auth/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone_number: phone, otp_code: otp, purpose: 'login' }),
+        body: JSON.stringify({ phone_number: phone, otp_code: otp, purpose: 'login', role: loginRole }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -329,7 +350,52 @@ function Login({ onShowSignUp, onLoginSuccess }) {
           <h1>Music Awaits</h1>
 
           {error && <div style={{ color: '#ff4444', marginBottom: '15px', fontSize: '14px', fontWeight: 'bold' }}>{error}</div>}
-          {message && <div style={{ color: '#1db954', marginBottom: '15px', fontSize: '14px', fontWeight: 'bold' }}>{message}</div>}
+          {message && <div style={{ color: '#E19FC7', marginBottom: '15px', fontSize: '14px', fontWeight: 'bold' }}>{message}</div>}
+
+          {(loginMethod === 'email' || loginMethod === 'phone' || loginMethod === 'otp') && (
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '30px', marginBottom: '25px' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setLoginRole('user');
+                  setError('');
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: loginRole === 'user' ? '#E19FC7' : '#b3b3b3',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  borderBottom: loginRole === 'user' ? '2px solid #E19FC7' : 'none',
+                  paddingBottom: '5px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease-in-out'
+                }}
+              >
+                User Login
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setLoginRole('creator');
+                  setError('');
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: loginRole === 'creator' ? '#E19FC7' : '#b3b3b3',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  borderBottom: loginRole === 'creator' ? '2px solid #E19FC7' : 'none',
+                  paddingBottom: '5px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease-in-out'
+                }}
+              >
+                Creator Login
+              </button>
+            </div>
+          )}
 
           {/* Email Login Flow */}
           {loginMethod === 'email' && (
@@ -413,11 +479,7 @@ function Login({ onShowSignUp, onLoginSuccess }) {
           {/* OTP Entry Flow */}
           {loginMethod === 'otp' && (
             <form onSubmit={handleVerifyOtp}>
-              {dummyOtp && (
-                <div style={{ background: 'rgba(29, 185, 84, 0.1)', color: '#1db954', border: '1px solid #1db954', padding: '10px', borderRadius: '4px', marginBottom: '15px', fontSize: '14px', fontWeight: 'bold', textAlign: 'center' }}>
-                  Local Dev OTP: {dummyOtp}
-                </div>
-              )}
+
               <div style={{ textAlign: 'left' }}>
                 <label>Enter 6-Digit OTP</label>
                 <input
@@ -505,11 +567,7 @@ function Login({ onShowSignUp, onLoginSuccess }) {
           {/* Forgot Password - OTP Verification and Password Reset Flow */}
           {loginMethod === 'forgot_reset' && (
             <form onSubmit={handleResetPasswordSubmit}>
-              {dummyOtp && (
-                <div style={{ background: 'rgba(29, 185, 84, 0.1)', color: '#1db954', border: '1px solid #1db954', padding: '10px', borderRadius: '4px', marginBottom: '15px', fontSize: '14px', fontWeight: 'bold', textAlign: 'center' }}>
-                  Local Dev OTP: {dummyOtp}
-                </div>
-              )}
+
               <div style={{ textAlign: 'left' }}>
                 <label>Email Address</label>
                 <input
@@ -566,11 +624,7 @@ function Login({ onShowSignUp, onLoginSuccess }) {
               <p style={{ color: '#b3b3b3', fontSize: '14px', marginBottom: '20px', textAlign: 'left' }}>
                 Please enter the 6-digit verification code sent to <strong>{email}</strong> to activate your account.
               </p>
-              {dummyOtp && (
-                <div style={{ background: 'rgba(29, 185, 84, 0.1)', color: '#1db954', border: '1px solid #1db954', padding: '10px', borderRadius: '4px', marginBottom: '15px', fontSize: '14px', fontWeight: 'bold', textAlign: 'center' }}>
-                  Local Dev OTP: {dummyOtp}
-                </div>
-              )}
+
               
               <div style={{ textAlign: 'left' }}>
                 <label>Enter 6-Digit Code</label>
@@ -591,7 +645,7 @@ function Login({ onShowSignUp, onLoginSuccess }) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>
                 <a
                   href="#"
-                  style={{ color: '#1db954', fontSize: '14px', textDecoration: 'none', fontWeight: 'bold' }}
+                  style={{ color: '#E19FC7', fontSize: '14px', textDecoration: 'none', fontWeight: 'bold' }}
                   onClick={handleResendSignupOtp}
                 >
                   Resend Verification Code

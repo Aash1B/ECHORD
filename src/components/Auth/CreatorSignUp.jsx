@@ -2,6 +2,9 @@ import { useState } from 'react';
 import logo from '../../assets/logo.svg';
 import './auth.css';
 import { SocialButtons } from './SocialButtons';
+import { useGoogleLogin } from '@react-oauth/google';
+import { GoogleNameModal } from './GoogleNameModal';
+import { authenticateWithNativeGoogle, isNativeGoogleAuth } from '../../services/nativeGoogleAuth';
 
 const API_URL = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
 
@@ -17,26 +20,75 @@ function CreatorSignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onShowUse
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationOtp, setVerificationOtp] = useState('');
   const [dummyOtp, setDummyOtp] = useState('');
+  const [pendingGoogleUser, setPendingGoogleUser] = useState(null);
+
+  const triggerGoogleAuth = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        setLoading(true);
+        const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        });
+        const profile = await res.json();
+        if (!res.ok || !profile.email || !profile.sub) {
+          throw new Error(profile.error_description || 'Google did not return a valid profile.');
+        }
+        setPendingGoogleUser({
+          email: profile.email,
+          name: profile.name || 'Google User',
+          google_id: profile.sub,
+          profile_picture: profile.picture,
+          access_token: tokenResponse.access_token,
+        });
+      } catch (err) {
+        setError(err.message || 'Failed to fetch Google user profile.');
+      } finally {
+        setLoading(false);
+      }
+    },
+    onError: () => setError('Google Sign-Up was cancelled or failed.'),
+  });
 
   const handleGoogleSignUp = async () => {
     setError('');
+    if (!isNativeGoogleAuth()) {
+      triggerGoogleAuth();
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const data = await authenticateWithNativeGoogle('creator');
+      onLoginSuccess?.(data.token, data.user);
+    } catch (err) {
+      setError(err.message || 'Google Sign-Up failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleModalConfirm = async ({ displayName, shareName }) => {
+    if (!pendingGoogleUser) return;
     setLoading(true);
     try {
       const res = await fetch(`${API_URL}/auth/social-login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: 'dummygoogle@example.com',
-          name: 'Dummy Google User',
-          google_id: 'g-123456',
-          profile_picture: 'https://i.pinimg.com/736x/6c/41/cb/6c41cb3ae4d97eeb68ee2279fe0e0c6f.jpg',
-          role: 'creator'
+          email: pendingGoogleUser.email,
+          name: displayName,
+          google_id: pendingGoogleUser.google_id,
+          profile_picture: pendingGoogleUser.profile_picture,
+          share_name: shareName,
+          access_token: pendingGoogleUser.access_token,
+          role: 'creator',
         }),
       });
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error || 'Google Sign Up failed.');
       }
+      setPendingGoogleUser(null);
       onLoginSuccess?.(data.token, data.user);
     } catch (err) {
       setError(err.message);
@@ -44,7 +96,6 @@ function CreatorSignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onShowUse
       setLoading(false);
     }
   };
-
   const handleSignUp = async (e) => {
     e.preventDefault();
     if (!name || !email || !password) {
@@ -142,11 +193,7 @@ function CreatorSignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onShowUse
               <p style={{ color: '#b3b3b3', fontSize: '14px', marginBottom: '20px', textAlign: 'center' }}>
                 We sent a 6-digit verification code to <strong>{email}</strong>. Please enter it below to activate your creator account.
               </p>
-              {dummyOtp && (
-                <div style={{ background: 'rgba(29, 185, 84, 0.1)', color: '#1db954', border: '1px solid #1db954', padding: '10px', borderRadius: '4px', marginBottom: '15px', fontSize: '14px', fontWeight: 'bold', textAlign: 'center' }}>
-                  Local Dev OTP: {dummyOtp}
-                </div>
-              )}
+
               {error && <div style={{ color: '#ff4444', marginBottom: '15px', fontSize: '14px', fontWeight: 'bold' }}>{error}</div>}
 
               <form onSubmit={handleVerifyOtp}>
@@ -170,7 +217,7 @@ function CreatorSignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onShowUse
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>
                 <a
                   href="#"
-                  style={{ color: '#1db954', fontSize: '14px', textDecoration: 'none', fontWeight: 'bold' }}
+                  style={{ color: '#E19FC7', fontSize: '14px', textDecoration: 'none', fontWeight: 'bold' }}
                   onClick={handleResendOtp}
                 >
                   Resend Verification Code
@@ -276,6 +323,18 @@ function CreatorSignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onShowUse
           )}
         </div>
       </div>
+
+      {pendingGoogleUser && (
+        <GoogleNameModal
+          googleUser={pendingGoogleUser}
+          onConfirm={handleGoogleModalConfirm}
+          onCancel={() => {
+            setPendingGoogleUser(null);
+            setError('');
+          }}
+          error={error}
+        />
+      )}
     </div>
   );
 }

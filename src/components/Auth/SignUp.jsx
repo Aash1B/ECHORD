@@ -4,6 +4,7 @@ import './auth.css';
 import { SocialButtons } from './SocialButtons';
 import { useGoogleLogin } from '@react-oauth/google';
 import { GoogleNameModal } from './GoogleNameModal';
+import { authenticateWithNativeGoogle, isNativeGoogleAuth } from '../../services/nativeGoogleAuth';
 
 const API_URL = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
 
@@ -34,11 +35,15 @@ function SignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onCreatorSignUpC
           headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
         });
         const profile = await res.json();
+        if (!res.ok || !profile.email || !profile.sub) {
+          throw new Error(profile.error_description || 'Google did not return a valid profile.');
+        }
         setPendingGoogleUser({
           email: profile.email,
           name: profile.name || 'Google User',
           google_id: profile.sub,
           profile_picture: profile.picture,
+          access_token: tokenResponse.access_token,
         });
       } catch (err) {
         setError('Failed to fetch Google user profile.');
@@ -51,9 +56,22 @@ function SignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onCreatorSignUpC
     },
   });
 
-  const handleGoogleSignUp = () => {
+  const handleGoogleSignUp = async () => {
     setError('');
-    triggerGoogleAuth();
+    if (!isNativeGoogleAuth()) {
+      triggerGoogleAuth();
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const data = await authenticateWithNativeGoogle('user');
+      onLoginSuccess?.(data.token, data.user);
+    } catch (err) {
+      setError(err.message || 'Google Sign-Up failed.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoogleModalConfirm = async ({ displayName, shareName }) => {
@@ -69,6 +87,8 @@ function SignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onCreatorSignUpC
           google_id: pendingGoogleUser.google_id,
           profile_picture: pendingGoogleUser.profile_picture,
           share_name: shareName,
+          access_token: pendingGoogleUser.access_token,
+          role: 'user',
         }),
       });
       const data = await res.json();
@@ -181,11 +201,7 @@ function SignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onCreatorSignUpC
               <p style={{ color: '#b3b3b3', fontSize: '14px', marginBottom: '20px', textAlign: 'center' }}>
                 We sent a 6-digit verification code to <strong>{email}</strong>. Please enter it below to activate your account.
               </p>
-              {dummyOtp && (
-                <div style={{ background: 'rgba(29, 185, 84, 0.1)', color: '#1db954', border: '1px solid #1db954', padding: '10px', borderRadius: '4px', marginBottom: '15px', fontSize: '14px', fontWeight: 'bold', textAlign: 'center' }}>
-                  Local Dev OTP: {dummyOtp}
-                </div>
-              )}
+
               {error && <div style={{ color: '#ff4444', marginBottom: '15px', fontSize: '14px', fontWeight: 'bold' }}>{error}</div>}
 
               <form onSubmit={handleVerifyOtp}>
@@ -209,7 +225,7 @@ function SignUp({ onShowLogin, onSignUpSuccess, onLoginSuccess, onCreatorSignUpC
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>
                 <a
                   href="#"
-                  style={{ color: '#1db954', fontSize: '14px', textDecoration: 'none', fontWeight: 'bold' }}
+                  style={{ color: '#E19FC7', fontSize: '14px', textDecoration: 'none', fontWeight: 'bold' }}
                   onClick={handleResendOtp}
                 >
                   Resend Verification Code

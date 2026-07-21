@@ -25,6 +25,9 @@ app.use(cors({
     origin: function (origin, callback) {
         const allowedOrigins = [
             'http://localhost:5173',
+            'http://localhost',
+            'https://localhost',
+            'capacitor://localhost',
             'https://kritagyaaa.github.io'
         ];
         // Allow requests with no origin (mobile apps, curl, etc.)
